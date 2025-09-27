@@ -7,36 +7,58 @@
 -->
 <html lang="en">
 <head>
+  <!-- Light mode favicon -->
+<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)">
+
+<!-- Dark mode favicon -->
+<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)">
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
-  <title>Girly</title>
+  <title>SDL Visuals</title>
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-md  fixed-top maine-menu">
-    <div class="container">
-      <button class="navbar-toggler ml-auto" data-target="#my-nav" onclick="myFunction(this)" data-toggle="collapse"> <span class="bar1"></span> <span class="bar2"></span> <span class="bar3"></span> </button>
-      <div id="my-nav" class="collapse navbar-collapse">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item active"> <a class="nav-link" href="#">Home</a> </li>
-          <li class="nav-item"> <a class="nav-link" href="#about" tabindex="-1" aria-disabled="true">About</a></li>
-          <li class="nav-item"> <a class="nav-link" href="#activity" tabindex="-1" aria-disabled="true">Activity</a></li>
-          <li class="nav-item"> <a class="nav-link" href="#portfolio" tabindex="-1" aria-disabled="true">Portfolio</a></li>
-          <li class="nav-item"> <a class="nav-link" href="#testimonial" tabindex="-1" aria-disabled="true">Testimonial</a></li>
-          <li class="nav-item"> <a class="nav-link" href="blog.html" tabindex="-1" aria-disabled="true">Blog</a></li>
-          <li class="nav-item"> <a class="nav-link" href="#contact" tabindex="-1" aria-disabled="true">Contact</a></li>
-        </ul>
-      </div>
+  <nav class="navbar navbar-expand-md fixed-top maine-menu">
+  <div class="container">
+
+    <!-- 🔹 Logo linksboven -->
+   <a class="navbar-brand" href="#">
+  <!-- Zwart logo (voor light mode) -->
+  <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" class="logo-lightmode">
+  <!-- Wit logo (voor dark mode) -->
+  <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" class="logo-darkmode">
+</a>
+    <!-- 🔹 /Logo -->
+
+    <!-- Menu toggle knop voor mobiel -->
+    <button class="navbar-toggler ml-auto" data-target="#my-nav" onclick="myFunction(this)" data-toggle="collapse"> 
+      <span class="bar1"></span> 
+      <span class="bar2"></span> 
+      <span class="bar3"></span> 
+    </button>
+
+    <!-- Menu items -->
+    <div id="my-nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item active"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">Over</a></li>
+        <li class="nav-item"><a class="nav-link" href="#activity">Activity</a></li>
+        <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#testimonial">Testimonial</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
     </div>
-  </nav>
+
+  </div>
+</nav>
   <div class="container-fluid fh5co-home-banner">
     <div class="card"> <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
       <div class="card-img-overlay">
         <div class="center-text">
-          <h2 class="card-title">ik breng jouw visie †ot leven met oog voor detail en passsie voor beeld.</h2>
+          <h2 class="card-title">ik breng jouw visie tot leven met oog voor detail en passsie voor beeld.</h2>
           <a href="#" class="btn">
             <svg width="201" height="51" viewBox="0 0 201 51">
               <defs>
@@ -54,7 +76,7 @@
             </defs>
             <rect id="Rounded_Rectangle_1" data-name="Rounded Rectangle 1" class="cls-1" x="0.5" y="0.5" width="200" height="50" rx="25" ry="25"/>
           </svg>
-        Explore</a> </div>
+        Ondek</a> </div>
       </div>
     </div>
   </div>
