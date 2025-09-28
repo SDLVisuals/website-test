@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evenementen Fotografie - SDL Visuals</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+
+<!-- Favicon -->
+<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)">
+
+<style>
+body { margin:0; padding-top:80px; background-color:#f5f5f5; transition: background-color 0.3s; }
+@media (prefers-color-scheme: dark){ body { background-color:#121212; color:#fff; } }
+
+/* Navbar */
+.navbar { position:fixed; top:0; width:100%; z-index:1050; background-color:transparent; }
+.navbar-brand img { height:50px; display:inline-block; vertical-align:middle; }
+.navbar-brand img.logo-lightmode { display:inline !important; }
+.navbar-brand img.logo-darkmode { display:none !important; }
+@media (prefers-color-scheme: dark){
+  .navbar-brand img.logo-lightmode { display:none !important; }
+  .navbar-brand img.logo-darkmode { display:inline !important; }
+}
+
+/* Hamburger Button */
+.navbar-toggler { border:none; background:transparent; position:relative; z-index:1051; }
+.navbar-toggler span, .navbar-toggler span::before, .navbar-toggler span::after {
+  display:block; position:absolute; width:25px; height:3px; background:#000; border-radius:2px; transition:0.4s; content:''; }
+.navbar-toggler span { top:50%; transform: translateY(-50%); }
+.navbar-toggler span::before { top:-8px; }
+.navbar-toggler span::after { top:8px; }
+.navbar-toggler.active span{ background-color: transparent; }
+.navbar-toggler.active span::before{ top:0; transform:rotate(45deg); }
+.navbar-toggler.active span::after{ top:0; transform:rotate(-45deg); }
+
+/* Mobile menu overlay */
+.menu-overlay{ position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); display:none; z-index:1040; }
+.menu-overlay.active{ display:block; }
+
+/* Mobile menu panel */
+#my-nav { position:fixed; top:0; right:-250px; width:250px; height:100vh; background:#fff; padding-top:80px; transition:right 0.3s; z-index:1050; overflow-y:auto; }
+#my-nav.open { right:0; }
+#my-nav .nav-link { display:block; padding:15px; font-size:18px; font-weight:bold; color:#000; text-decoration:none; }
+@media (prefers-color-scheme: dark){
+  #my-nav{ background:#121212; }
+  #my-nav .nav-link{ color:#fff; }
+}
+@media (min-width:768px){ .navbar-toggler{ display:none;} #my-nav{ position:static;width:auto;height:auto;background:transparent;padding-top:0; overflow:visible; } .menu-overlay{ display:none !important; } }
+
+/* Gallery Grid */
+.gallery-container { column-count:1; column-gap:15px; }
+@media (min-width:576px){ .gallery-container{ column-count:2; } }
+@media (min-width:768px){ .gallery-container{ column-count:3; } }
+@media (min-width:1200px){ .gallery-container{ column-count:4; } }
+.gallery-container a{ display:inline-block; width:100%; margin-bottom:15px; }
+.gallery-container img{ width:100%; border-radius:12px; object-fit:cover; display:block; transition: transform 0.2s; }
+.gallery-container img:hover{ transform: scale(1.05);}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="assets/img/SDL Visuals Black .png" class="logo-lightmode" alt="SDL Visuals">
+      <img src="assets/img/SDL Visuals White .png" class="logo-darkmode" alt="SDL Visuals">
+    </a>
+    <button class="navbar-toggler" type="button"><span></span></button>
+    <div id="my-nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="menu-overlay"></div>
+
+<!-- Gallery -->
+<div class="container mt-4">
+  <h2 class="text-center mb-4" id="portfolio">Evenementen Fotografie</h2>
+  <div class="gallery-container" id="gallery"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+<script>
+// Stel hier het aantal foto's in
+const totalImages = 50; 
+const gallery = document.getElementById('gallery');
+for(let i=1;i<=totalImages;i++){
+  const src = `assets/img/evenementen/foto${i}.jpg`;
+  const a = document.createElement('a');
+  a.href = src;
+  a.setAttribute('data-fancybox','evenementen');
+  a.setAttribute('data-caption',`foto${i}.jpg`);
+  const img = document.createElement('img');
+  img.src = src; img.alt=`foto${i}.jpg`;
+  a.appendChild(img);
+  gallery.appendChild(a);
+}
+
+// Hamburger toggle
+const toggler = document.querySelector('.navbar-toggler');
+const navMenu = document.getElementById('my-nav');
+const overlay = document.querySelector('.menu-overlay');
+
+toggler.addEventListener('click',()=>{
+  toggler.classList.toggle('active');
+  navMenu.classList.toggle('open');
+  overlay.classList.toggle('active');
+  document.body.style.overflow = navMenu.classList.contains('open')?'hidden':'';
+});
+
+overlay.addEventListener('click',()=>{
+  toggler.classList.remove('active'); navMenu.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow='';
+});
+
+navMenu.querySelectorAll('.nav-link').forEach(link=>{
+  link.addEventListener('click',()=>{
+    if(window.innerWidth<768){
+      toggler.classList.remove('active'); navMenu.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow='';
+    }
+  });
+});
+</script>
+</body>
+</html>
+
