@@ -64,8 +64,8 @@ body.menu-open { overflow: hidden; }
 <nav class="navbar navbar-expand-lg sdl-navbar">
   <div class="container-fluid">
     <a class="navbar-brand" href="index.html">
-      <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" height="40">
-      <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" height="40">
+      <img src="assets/img/sdl-visuals-black.png" alt="SDL Visuals Black" height="40">
+      <img src="assets/img/sdl-visuals-white.png" alt="SDL Visuals White" height="40">
     </a>
     <button class="navbar-toggler hamburger hamburger--squeeze" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sdlNavOverlay">
       <span class="hamburger-box"><span class="hamburger-inner"></span></span>
@@ -120,13 +120,14 @@ document.addEventListener('DOMContentLoaded', function () {
 const totalImages = 3;
 const gallery = document.getElementById('gallery');
 for(let i=1;i<=totalImages;i++){
-  const src = `assets/img/evenementen/foto${i}.jpg`;
+  const src = `assets/img/evenementen/foto${i}.jpg`.toLowerCase();
   const a = document.createElement('a');
   a.href = src;
   a.setAttribute('data-fancybox','evenementen');
-  a.setAttribute('data-caption',`foto${i}.jpg`);
+  a.setAttribute('data-caption', `foto${i}.jpg`);
   const img = document.createElement('img');
-  img.src = src; img.alt=`foto${i}.jpg`;
+  img.src = src;
+  img.alt = `foto${i}`;
   a.appendChild(img);
   gallery.appendChild(a);
 }
