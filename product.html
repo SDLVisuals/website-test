@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Product Fotografie - SDL Visuals</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+<link rel="stylesheet" href="assets/css/style.css" />
+
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+
+<!-- Favicon -->
+<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)" />
+<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)" />
+
+<style>
+/* Body & Navbar CSS */
+/* --- KEEP THIS CSS AS IS FOR DARK/LIGHT MODE AND RESPONSIVE HAMBURGER --- */
+body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background-color 0.3s, color 0.3s; }
+@media (prefers-color-scheme: dark){ body { background-color:#121212; color:#fff; } }
+
+/* Navbar & Hamburger */
+.sdl-navbar { background:#fff; padding:0.4rem 0; box-shadow:0 1px 10px rgba(0,0,0,0.03); position:sticky; top:0; z-index:1020; display:flex; align-items:center; justify-content:space-between; }
+.sdl-navbar .container-fluid { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; }
+.sdl-navbar .navbar-brand img.light, .sdl-navbar .navbar-brand img.dark { height:50px; }
+.sdl-navbar .navbar-brand img.dark { display:none; }
+@media (prefers-color-scheme: dark){ .sdl-navbar { background:#121212; } .sdl-navbar .navbar-brand img.light { display:none; } .sdl-navbar .navbar-brand img.dark { display:block; } }
+.sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; cursor:pointer; position:relative; }
+@media (prefers-color-scheme: dark){ .sdl-navbar .navbar-nav .nav-link { color:#fff; } }
+.sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
+
+/* Dropdown arrow desktop */
+.sdl-navbar .navbar-nav li.dropdown > a::after { content:"▼"; font-size:0.6rem; margin-left:0.3rem; position:relative; top:1px; transition:transform 0.3s ease; display:inline-block; transform-origin:center; }
+@media (min-width:992px){
+  .sdl-navbar .navbar-nav li.dropdown:hover > a::after,
+  .sdl-navbar .navbar-nav li.dropdown.show > a::after { transform:rotate(-180deg); }
+  .sdl-navbar .navbar-nav li.dropdown:hover > .dropdown-menu { display:block; }
+  .sdl-navbar .dropdown-menu { display:none; position:absolute; top:100%; left:0; z-index:1050; background:#fff; border-radius:4px; box-shadow:0 4px 8px rgba(0,0,0,0.1); min-width:180px; }
+  .sdl-navbar .dropdown-menu a.dropdown-item { color:#111; font-weight:500; padding:0.5rem 1rem; display:block; transition: color 0.2s; }
+  .sdl-navbar .dropdown-menu a.dropdown-item:hover { color:#e90e65; background-color:transparent; }
+}
+@media (prefers-color-scheme: dark) and (min-width:992px){
+  .sdl-navbar .dropdown-menu { background:#121212; }
+  .sdl-navbar .dropdown-menu a.dropdown-item { color:#fff; }
+  .sdl-navbar .dropdown-menu a.dropdown-item:hover { color:#e90e65; }
+}
+
+/* Hamburger */
+.hamburger, .hamburger-box { padding:0; }
+.hamburger-box { width:30px; height:24px; display:flex; align-items:center; justify-content:center; position:relative; }
+.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { width:30px; height:4px; background-color:#111; border-radius:2px; position:absolute; transition: transform 0.15s ease, background-color 0.15s ease; }
+.hamburger-inner::before { top:-10px; content:""; display:block; }
+.hamburger-inner::after { bottom:-10px; content:""; display:block; }
+.hamburger.is-active .hamburger-inner { transform:rotate(45deg); background-color:#e90e65; }
+.hamburger.is-active .hamburger-inner::before { top:0; opacity:0; }
+.hamburger.is-active .hamburger-inner::after { bottom:0; transform:rotate(-90deg); background-color:#e90e65; }
+@media (prefers-color-scheme: dark){ .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { background-color:#fff; } .hamburger.is-active .hamburger-inner, .hamburger.is-active .hamburger-inner::after { background-color:#e90e65; } }
+
+/* Overlay menu */
+.sdl-nav-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.92); z-index:2000; display:flex; align-items:center; justify-content:flex-end; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.77,0,0.18,1); pointer-events:none; }
+.sdl-nav-overlay.open { transform:translateX(0); pointer-events:auto; }
+.sdl-nav-menu { background:#fff; width:80vw; max-width:320px; height:100%; box-shadow:-4px 0 32px rgba(0,0,0,.14); display:flex; flex-direction:column; align-items:flex-start; padding:2.5rem 2rem 2rem 2rem; position:relative; overflow-y:auto; }
+.sdl-nav-menu ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:2rem; width:100%; }
+.sdl-nav-menu li { width:100%; position:relative; }
+.sdl-nav-menu a { font-size:1.3rem; font-weight:600; color:#111; text-decoration:none; display:block; padding:0.2em 0; cursor:pointer; transition: color 0.15s; }
+.sdl-nav-menu a:hover, .sdl-nav-menu li.dropdown:hover > a { color:#e90e65; }
+.sdl-nav-menu li.dropdown > a::after { content:"▼"; float:right; font-size:0.7rem; margin-left:0.5rem; transition:transform 0.3s ease; }
+.sdl-nav-menu li.dropdown.open > a::after { transform:rotate(-180deg); }
+.sdl-nav-menu ul.submenu { max-height:0; overflow:hidden; flex-direction:column; padding-left:1rem; margin-top:0.5rem; gap:1rem; transition:max-height 0.4s ease; display:flex; }
+.sdl-nav-menu li.dropdown.open > ul.submenu { max-height:500px; }
+.sdl-nav-menu ul.submenu a { font-size:1.1rem; font-weight:500; color:#555; }
+.sdl-nav-menu ul.submenu a:hover { color:#e90e65; }
+.sdl-nav-close { position:absolute; top:1.1rem; right:1.1rem; font-size:2.3rem; color:#e90e65; background:transparent; border:none; cursor:pointer; z-index:10; }
+@media (prefers-color-scheme: dark){
+  .sdl-nav-menu { background:#121212; }
+  .sdl-nav-menu a { color:#fff; }
+  .sdl-nav-menu a:hover, .sdl-nav-menu li.dropdown:hover > a { color:#e90e65; }
+  .sdl-nav-menu ul.submenu a { color:#ddd; }
+  .sdl-nav-menu ul.submenu a:hover { color:#e90e65; }
+}
+body.menu-open { overflow:hidden; }
+
+/* Gallery Grid */
+.gallery-container { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
+.gallery-container a { flex:1 0 100%; max-width:100%; margin-bottom:15px; display:block; opacity:0; transform:scale(0.95); transition: transform 0.4s ease, opacity 0.4s ease; }
+@media (min-width:576px){ .gallery-container a { flex:1 0 48%; max-width:48%; } }
+@media (min-width:768px){ .gallery-container a { flex:1 0 31%; max-width:31%; } }
+@media (min-width:1200px){ .gallery-container a { flex:1 0 23%; max-width:23%; } }
+.gallery-container a img { width:100%; border-radius:12px; object-fit:cover; display:block; transition: transform 0.4s ease, box-shadow 0.4s ease; }
+.gallery-container a img:hover { transform:scale(1.08) translateY(-4px); box-shadow:0 15px 25px rgba(0,0,0,0.3); }
+.gallery-container a.loaded { opacity:1; transform:scale(1); }
+.fancybox__container .fancybox__content img { border-radius:12px; }
+@media (prefers-color-scheme: dark){ .fancybox__container { background: rgba(18,18,18,0.95) !important; } }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg sdl-navbar">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <a class="navbar-brand" href="index.html">
+      <img src="assets/img/SDL Visuals Black .png" class="light" alt="SDL Visuals">
+      <img src="assets/img/SDL Visuals White .png" class="dark" alt="SDL Visuals">
+    </a>
+    <button class="navbar-toggler hamburger hamburger--squeeze" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sdlNavOverlay">
+      <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+    </button>
+    <div class="collapse navbar-collapse d-none d-lg-flex justify-content-end">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="index.html#about">Over</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link" href="#" id="portfolioDropdown" role="button">Portfolio</a>
+          <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
+            <!-- MARK: Update links for new portfolio categories here -->
+            <a class="dropdown-item" href="evenementen.html#portfolio-evenementen">Evenementen</a>
+            <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
+            <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
+            <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
+          </div>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="index.html#activity">Activity</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="sdlNavOverlay" class="sdl-nav-overlay" aria-hidden="true">
+    <div class="sdl-nav-menu" role="menu">
+      <button class="sdl-nav-close" aria-label="Close menu">&times;</button>
+      <ul>
+        <li><a href="index.html#about" role="menuitem">Over</a></li>
+        <li class="dropdown">
+          <a href="#" role="button">Portfolio</a>
+          <ul class="submenu" role="menu">
+            <!-- MARK: Update links for new portfolio categories here -->
+            <li><a href="evenementen.html#portfolio-evenementen" role="menuitem">Evenementen</a></li>
+            <li><a href="auto.html#portfolio-auto" role="menuitem">Auto</a></li>
+            <li><a href="portret.html#portfolio-portret" role="menuitem">Portret</a></li>
+            <li><a href="product.html#portfolio-product" role="menuitem">Product</a></li>
+          </ul>
+        </li>
+        <li><a href="index.html#activity" role="menuitem">Activity</a></li>
+        <li><a href="index.html#contact" role="menuitem">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Gallery -->
+<div class="container mt-4">
+  <h2 class="text-center mb-4" id="portfolio-product">Product Fotografie</h2>
+  <div class="gallery-container" id="gallery"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+<script>
+// Hamburger + mobile dropdown submenu
+document.addEventListener("DOMContentLoaded", function(){
+  const hamburger = document.querySelector(".navbar-toggler.hamburger");
+  const overlay = document.getElementById("sdlNavOverlay");
+  const closeBtn = document.querySelector(".sdl-nav-close");
+  const menuLinks = overlay.querySelectorAll("a");
+  const dropdownToggle = overlay.querySelector("li.dropdown > a");
+  const dropdownLi = dropdownToggle.parentElement;
+
+  function openMenu(){ hamburger.classList.add("is-active"); overlay.classList.add("open"); overlay.setAttribute("aria-hidden","false"); document.body.classList.add("menu-open"); dropdownToggle.setAttribute("aria-expanded", "false"); }
+  function closeMenu(){ hamburger.classList.remove("is-active"); overlay.classList.remove("open"); overlay.setAttribute("aria-hidden","true"); document.body.classList.remove("menu-open"); dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded", "false"); }
+
+  hamburger.addEventListener("click", ()=> overlay.classList.contains("open") ? closeMenu() : openMenu() );
+  closeBtn.addEventListener("click", closeMenu);
+  dropdownToggle.addEventListener("click", e=>{ if(window.innerWidth < 992){ e.preventDefault(); const isOpen = dropdownLi.classList.toggle("open"); dropdownToggle.setAttribute("aria-expanded", isOpen ? "true" : "false"); } });
+  menuLinks.forEach(link=>{ if(link!==dropdownToggle) link.addEventListener("click", closeMenu); });
+
+  // Desktop hover submenu
+  function handleResize(){
+    if(window.innerWidth >= 768){
+      dropdownLi.addEventListener("mouseenter", ()=>{ dropdownLi.classList.add("open"); dropdownToggle.setAttribute("aria-expanded","true"); });
+      dropdownLi.addEventListener("mouseleave", ()=>{ dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded","false"); });
+      dropdownToggle.style.cursor="default";
+    } else {
+      dropdownLi.removeEventListener("mouseenter", ()=>{}); 
+      dropdownLi.removeEventListener("mouseleave", ()=>{}); 
+      dropdownToggle.style.cursor="pointer"; dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded","false");
+    }
+  }
+  handleResize(); window.addEventListener("resize", handleResize);
+});
+
+// Gallery auto generate with lazy load + bounce
+const totalImages = 5; // MARK: Change number of images for this portfolio
+const gallery = document.getElementById("gallery");
+for(let i=1;i<=totalImages;i++){
+  const src=`assets/img/product/foto${i}.jpg`; // MARK: Change folder & file names for new portfolio
+  const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
+  const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
+  img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
+  a.appendChild(img); gallery.appendChild(a);
+}
+</script>
+
+</body>
+</html>
