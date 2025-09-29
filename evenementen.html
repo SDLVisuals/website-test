@@ -1,16 +1,136 @@
-// Gallery automatisch genereren met exacte bestandsnamen
-const imageFiles = ["Foto1.JPG", "Foto2.JPG", "Foto3.JPG"]; 
-const gallery = document.getElementById('gallery');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evenementen Fotografie - SDL Visuals</title>
 
-imageFiles.forEach(file => {
-  const src = `assets/img/evenementen/${file}`;
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+
+<!-- Favicon -->
+<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)">
+
+<style>
+body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background-color 0.3s, color 0.3s; }
+@media (prefers-color-scheme: dark){ body { background-color:#121212; color:#fff; } }
+
+/* Navbar & Hamburger exact zoals index.html */
+.sdl-navbar { background: #fff; padding-top: .4rem; padding-bottom: .4rem; box-shadow: 0 1px 10px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1020; }
+.sdl-navbar .navbar-brand img { height: 70px; }
+.sdl-navbar .navbar-nav .nav-link { font-weight: 600; font-size: 1rem; color: #111; margin: 0 1rem; transition: color 0.2s; }
+.sdl-navbar .navbar-nav .nav-link:hover { color: #e90e65; }
+
+.hamburger { padding: 15px; display: inline-block; cursor: pointer; background: transparent; border: 0; }
+.hamburger-box { width: 30px; height: 11px; display: inline-block; position: relative; }
+.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { width: 30px; height: 4px; background-color: #111; border-radius: 2px; position: absolute; transition: transform 0.15s ease; }
+.hamburger-inner::before { top: -10px; content: ''; display: block; }
+.hamburger-inner::after { bottom: -10px; content: ''; display: block; }
+.hamburger.is-active .hamburger-inner { transform: rotate(45deg); background-color: #e90e65; }
+.hamburger.is-active .hamburger-inner::before { top: 0; opacity: 0; }
+.hamburger.is-active .hamburger-inner::after { bottom: 0; transform: rotate(-90deg); background-color: #e90e65; }
+
+.sdl-nav-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.92); z-index:2000; display:flex; align-items:center; justify-content:flex-end; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.77,0,0.18,1); pointer-events: none; }
+.sdl-nav-overlay.open { transform: translateX(0); pointer-events:auto; }
+.sdl-nav-menu { background: #fff; width: 80vw; max-width: 320px; height: 100%; box-shadow: -4px 0 32px rgba(0,0,0,.14); display: flex; flex-direction: column; align-items: flex-start; padding: 2.5rem 2rem 2rem 2rem; position: relative; }
+.sdl-nav-menu ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem; width: 100%; }
+.sdl-nav-menu li { width: 100%; }
+.sdl-nav-menu a { font-size: 1.3rem; color: #111; font-weight: 600; text-decoration: none; display: block; transition: color 0.15s; padding: 0.2em 0; }
+.sdl-nav-menu a:hover { color: #e90e65; }
+.sdl-nav-close { position: absolute; right: 1.1rem; top: 1.1rem; background: transparent; border: none; font-size: 2.3rem; color: #e90e65; cursor: pointer; z-index: 10; }
+@media (min-width: 992px) { .sdl-nav-overlay { display: none !important; } .navbar-toggler { display: none !important; } }
+body.menu-open { overflow: hidden; }
+
+/* Gallery Grid */
+.gallery-container { column-count:1; column-gap:15px; }
+@media (min-width:576px){ .gallery-container{ column-count:2; } }
+@media (min-width:768px){ .gallery-container{ column-count:3; } }
+@media (min-width:1200px){ .gallery-container{ column-count:4; } }
+.gallery-container a{ display:inline-block; width:100%; margin-bottom:15px; }
+.gallery-container img{ width:100%; border-radius:12px; object-fit:cover; display:block; transition: transform 0.2s; }
+.gallery-container img:hover{ transform: scale(1.05);}
+.fancybox__container .fancybox__content img { border-radius:12px; }
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg sdl-navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" height="40">
+      <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" height="40">
+    </a>
+    <button class="navbar-toggler hamburger hamburger--squeeze" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sdlNavOverlay">
+      <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+    </button>
+    <div class="collapse navbar-collapse d-none d-lg-flex justify-content-end">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="#about">Over</a></li>
+        <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#activity">Activity</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="sdlNavOverlay" class="sdl-nav-overlay">
+    <div class="sdl-nav-menu">
+      <button class="sdl-nav-close">&times;</button>
+      <ul>
+        <li><a href="#about">Over</a></li>
+        <li><a href="#portfolio">Portfolio</a></li>
+        <li><a href="#activity">Activity</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Gallery -->
+<div class="container mt-4">
+  <h2 class="text-center mb-4" id="portfolio">Evenementen Fotografie</h2>
+  <div class="gallery-container" id="gallery"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+<script>
+// Hamburger menu
+document.addEventListener('DOMContentLoaded', function () {
+  var hamburger = document.querySelector('.navbar-toggler.hamburger');
+  var overlay = document.getElementById('sdlNavOverlay');
+  var closeBtn = document.querySelector('.sdl-nav-close');
+  var menuLinks = overlay.querySelectorAll('a');
+  function openMenu() { hamburger.classList.add('is-active'); overlay.classList.add('open'); document.body.classList.add('menu-open'); }
+  function closeMenu() { hamburger.classList.remove('is-active'); overlay.classList.remove('open'); document.body.classList.remove('menu-open'); }
+  hamburger.addEventListener('click', function () { overlay.classList.contains('open') ? closeMenu() : openMenu(); });
+  closeBtn.addEventListener('click', closeMenu);
+  menuLinks.forEach(function(link){ link.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) { if (e.key==='Escape' && overlay.classList.contains('open')) closeMenu(); });
+});
+
+// Gallery automatisch genereren
+const totalImages = 1;
+const gallery = document.getElementById('gallery');
+for(let i=1;i<=totalImages;i++){
+  const src = `assets/img/evenementen/foto${i}.jpg`;
   const a = document.createElement('a');
   a.href = src;
   a.setAttribute('data-fancybox','evenementen');
-  a.setAttribute('data-caption', file);
+  a.setAttribute('data-caption',`foto${i}.jpg`);
   const img = document.createElement('img');
-  img.src = src;
-  img.alt = file;
+  img.src = src; img.alt=`foto${i}.jpg`;
   a.appendChild(img);
   gallery.appendChild(a);
-});
+}
+</script>
+
+</body>
+</html>
