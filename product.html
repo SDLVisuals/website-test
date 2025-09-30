@@ -17,8 +17,7 @@
 <link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)" />
 
 <style>
-/* Body & Navbar CSS */
-/* --- KEEP THIS CSS AS IS FOR DARK/LIGHT MODE AND RESPONSIVE HAMBURGER --- */
+/* Body */
 body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background-color 0.3s, color 0.3s; }
 @media (prefers-color-scheme: dark){ body { background-color:#121212; color:#fff; } }
 
@@ -27,7 +26,11 @@ body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background
 .sdl-navbar .container-fluid { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; }
 .sdl-navbar .navbar-brand img.light, .sdl-navbar .navbar-brand img.dark { height:50px; }
 .sdl-navbar .navbar-brand img.dark { display:none; }
-@media (prefers-color-scheme: dark){ .sdl-navbar { background:#121212; } .sdl-navbar .navbar-brand img.light { display:none; } .sdl-navbar .navbar-brand img.dark { display:block; } }
+@media (prefers-color-scheme: dark){
+  .sdl-navbar { background:#121212; }
+  .sdl-navbar .navbar-brand img.light { display:none; }
+  .sdl-navbar .navbar-brand img.dark { display:block; }
+}
 .sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; cursor:pointer; position:relative; }
 @media (prefers-color-scheme: dark){ .sdl-navbar .navbar-nav .nav-link { color:#fff; } }
 .sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
@@ -57,7 +60,10 @@ body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background
 .hamburger.is-active .hamburger-inner { transform:rotate(45deg); background-color:#e90e65; }
 .hamburger.is-active .hamburger-inner::before { top:0; opacity:0; }
 .hamburger.is-active .hamburger-inner::after { bottom:0; transform:rotate(-90deg); background-color:#e90e65; }
-@media (prefers-color-scheme: dark){ .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { background-color:#fff; } .hamburger.is-active .hamburger-inner, .hamburger.is-active .hamburger-inner::after { background-color:#e90e65; } }
+@media (prefers-color-scheme: dark){
+  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { background-color:#fff; }
+  .hamburger.is-active .hamburger-inner, .hamburger.is-active .hamburger-inner::after { background-color:#e90e65; }
+}
 
 /* Overlay menu */
 .sdl-nav-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.92); z-index:2000; display:flex; align-items:center; justify-content:flex-end; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.77,0,0.18,1); pointer-events:none; }
@@ -96,6 +102,7 @@ body.menu-open { overflow:hidden; }
 @media (prefers-color-scheme: dark){ .fancybox__container { background: rgba(18,18,18,0.95) !important; } }
 </style>
 </head>
+
 <body>
 
 <!-- Navbar -->
@@ -114,7 +121,6 @@ body.menu-open { overflow:hidden; }
         <li class="nav-item dropdown">
           <a class="nav-link" href="#" id="portfolioDropdown" role="button">Portfolio</a>
           <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
-            <!-- MARK: Update links for new portfolio categories here -->
             <a class="dropdown-item" href="evenementen.html#portfolio-evenementen">Evenementen</a>
             <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
             <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
@@ -134,7 +140,6 @@ body.menu-open { overflow:hidden; }
         <li class="dropdown">
           <a href="#" role="button">Portfolio</a>
           <ul class="submenu" role="menu">
-            <!-- MARK: Update links for new portfolio categories here -->
             <li><a href="evenementen.html#portfolio-evenementen" role="menuitem">Evenementen</a></li>
             <li><a href="auto.html#portfolio-auto" role="menuitem">Auto</a></li>
             <li><a href="portret.html#portfolio-portret" role="menuitem">Portret</a></li>
@@ -150,6 +155,7 @@ body.menu-open { overflow:hidden; }
 
 <!-- Gallery -->
 <div class="container mt-4">
+  <!-- MARK: wijzig hier de header en ID voor andere portfolio categorie -->
   <h2 class="text-center mb-4" id="portfolio-product">Product Fotografie</h2>
   <div class="gallery-container" id="gallery"></div>
 </div>
@@ -158,6 +164,9 @@ body.menu-open { overflow:hidden; }
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
 
 <script>
+// Scroll naar boven bij pagina load
+window.addEventListener('load', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
 // Hamburger + mobile dropdown submenu
 document.addEventListener("DOMContentLoaded", function(){
   const hamburger = document.querySelector(".navbar-toggler.hamburger");
@@ -166,6 +175,7 @@ document.addEventListener("DOMContentLoaded", function(){
   const menuLinks = overlay.querySelectorAll("a");
   const dropdownToggle = overlay.querySelector("li.dropdown > a");
   const dropdownLi = dropdownToggle.parentElement;
+  const submenu = dropdownLi.querySelector("ul.submenu");
 
   function openMenu(){ hamburger.classList.add("is-active"); overlay.classList.add("open"); overlay.setAttribute("aria-hidden","false"); document.body.classList.add("menu-open"); dropdownToggle.setAttribute("aria-expanded", "false"); }
   function closeMenu(){ hamburger.classList.remove("is-active"); overlay.classList.remove("open"); overlay.setAttribute("aria-hidden","true"); document.body.classList.remove("menu-open"); dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded", "false"); }
@@ -175,7 +185,6 @@ document.addEventListener("DOMContentLoaded", function(){
   dropdownToggle.addEventListener("click", e=>{ if(window.innerWidth < 992){ e.preventDefault(); const isOpen = dropdownLi.classList.toggle("open"); dropdownToggle.setAttribute("aria-expanded", isOpen ? "true" : "false"); } });
   menuLinks.forEach(link=>{ if(link!==dropdownToggle) link.addEventListener("click", closeMenu); });
 
-  // Desktop hover submenu
   function handleResize(){
     if(window.innerWidth >= 768){
       dropdownLi.addEventListener("mouseenter", ()=>{ dropdownLi.classList.add("open"); dropdownToggle.setAttribute("aria-expanded","true"); });
@@ -191,10 +200,10 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 // Gallery auto generate with lazy load + bounce
-const totalImages = 5; // MARK: Change number of images for this portfolio
+const totalImages = 5; // MARK: wijzig hier het aantal foto's voor deze categorie
 const gallery = document.getElementById("gallery");
 for(let i=1;i<=totalImages;i++){
-  const src=`assets/img/product/foto${i}.jpg`; // MARK: Change folder & file names for new portfolio
+  const src=`assets/img/product/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
   const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
   const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
