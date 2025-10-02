@@ -12,11 +12,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
-  <style>
-    .scroll-offset {
-      scroll-margin-top: 90px; /* hoogte van de sticky navbar */
-    }
-  </style>
+  <!--
+    Adjust scroll offset for sticky navbar:
+    The .scroll-offset class adds a scroll margin so that anchor links don't hide content behind the sticky navbar.
+    Change the scroll-margin-top value below to match the height of your sticky navbar if you update it.
+  -->
 </title>
 </head>
 
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 </script>
 <!-- END CLEAN NAVBAR -->
-  <div class="container-fluid fh5co-home-banner">
+  <div class="container-fluid fh5co-home-banner" style="min-height: 600px;">
     <div class="card"> <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
       <div class="card-img-overlay">
         <div class="center-text">
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function(){
       </div>
     </div>
   </div>
-  <div class="container-fluid fh5co-two-img">
+  <div class="container-fluid fh5co-two-img" style="min-height: 400px;">
     <div class="row">
       <div class="col-sm-6 pr-0 pl-0">
         <div class="card"> <img class="card-img" src="assets/img/Portret_-30.JPG" alt="">
@@ -226,7 +226,11 @@ document.addEventListener("DOMContentLoaded", function(){
     <!--  Home Page. ---------------------------------------------------->
     <!--  Over . ---------------------------------------------------->
 
-  <div class="container-fluid fh5co-recent-work scroll-offset" id="about">
+  <!-- ===========================
+       ABOUT SECTION
+       Pas hier de min-height en scroll-margin-top aan indien gewenst.
+  ============================ -->
+  <div class="container-fluid recent fh5co-about" id="about" style="min-height: 500px; scroll-margin-top: 200px;">
     <div class="container contact-pop">
       <div class="row">
         <div class="col-md-6  pr-0">
@@ -234,168 +238,65 @@ document.addEventListener("DOMContentLoaded", function(){
             <div class="card-img-overlay"> </div>
           </div>
         </div>
-        <div class="col-md-6 pl-0" id="about">
+        <div class="col-md-6 pl-0">
           <div class="content">
             <h3>ik ben seppe de luycker</h3>
             <h4>Fotograaf en videograaf gespecialiseerd in product-, auto- en evenementenfotografie. Gebaseerd in België.</h4>
             <hr />
             <p>Fotografie en videografie zijn voor mij veel meer dan een beroep — het is een passie. Met SDL_Visuals specialiseer ik mij in productfotografie, automotive shoots en evenementenreportages. Ik streef ernaar elk beeld te laten spreken door sfeer, detail en emotie vast te leggen. Binnenkort breid ik mijn portfolio uit met trouw- en communiefotografie, zodat ik ook de mooiste momenten uit het leven voor altijd kan vereeuwigen. Mijn missie? Creatieve, hoogwaardige beelden leveren die écht impact maken.
 </p>
-            <a href="#" class="btn">CONTACT</a> </div>
-          </div>
-        </div>
-      </div>
-       <!--  Over . ---------------------------------------------------->
-      <!--  Recent work ---------------------------------------------------->
-      <div class="container recent scroll-offset" id="activity">
-        <div class="row">
-          <h2>Recent works</h2>
-          <div class="owl-carousel owl-carousel2 owl-theme">
-            <div>
-              <div class="card"> <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
-                <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                  <div class="bottom-text">
-                    <h5 class="card-title">Model photography</h5>
-                    <p class="card-text">Digital, Photography</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card"> <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
-                <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                  <div class="bottom-text">
-                    <h5 class="card-title">Product fotografie</h5>
-                    <p class="card-text">Digital, Photography</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card"> <img class="card-img" src="assets/img/" alt="">
-                <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                  <div class="bottom-text">
-                    <h5 class="card-title">portret fotografie</h5>
-                    <p class="card-text"> fotografie</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card"> <img class="card-img" src="assets/img/recent-img4.jpg" alt="">
-                <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                  <div class="bottom-text">
-                    <h5 class="card-title">Classical photography</h5>
-                    <p class="card-text">Digital, Photography</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <a href="#" class="btn">CONTACT</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-<!--  Recent work ---------------------------------------------------->
-<!--  Portofolio ----------------------------------------------------->
 
-  <div class="container-fluid recent fh5co-portfolio scroll-offset" id="portfolio">
-  <div class="container">
-    <h2>Portfolios</h2>
-    <div class="row">
-
-      <div class="bx bx-1">
-        <div class="card">
-          <a href="evenementen.html"> <!-- link naar evenementenpagina -->
-            <img class="card-img" src="assets/img/Aluvision TeamBuilding 2025-73.JPG" alt="">
-            <div class="card-img-overlay">
-              <img src="assets/img/heart.png" class="heart" alt="heart icon">
-              <div class="bottom-text">
-                <h5 class="card-title">Evenement Fotografie</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div class="bx bx-2">
-        <div class="card">
-          <a href="auto.html"> <!-- link naar automotive galerij -->
-            <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-11.JPG" alt="">
-            <div class="card-img-overlay">
-              <img src="assets/img/heart.png" class="heart" alt="heart icon">
-              <div class="bottom-text">
-                <h5 class="card-title">Auto Motive fotografie</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div class="bx bx-3">
-        <div class="card">
-          <a href="portret.html"> <!-- link naar portret galerij -->
-            <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
-            <div class="card-img-overlay">
-              <img src="assets/img/heart.png" class="heart" alt="heart icon">
-              <div class="bottom-text">
-                <h5 class="card-title">Portret fotografie</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div class="bx bx-4">
-        <div class="card">
-          <a href="product.html"> <!-- link naar product galerij -->
-            <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
-            <div class="card-img-overlay">
-              <img src="assets/img/heart.png" class="heart" alt="heart icon">
-              <div class="bottom-text">
-                <h5 class="card-title">Product fotografie</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-  <!--  Portofolio ----------------------------------------------------->
-  <!--  activity ------------------------------------------------------->
-  <div class="container-fluid fh5co-recent-work activity">
-    <div class="container recent">
+  <!-- ===========================
+       RECENT WORK / ACTIVITY SECTION
+       Pas hier de min-height en scroll-margin-top aan indien gewenst.
+  ============================ -->
+  <div class="container-fluid recent fh5co-activity" id="activity" style="min-height: 800px; scroll-margin-top: 120px;">
+    <div class="container">
       <div class="row">
-        <h2>Activity of the month</h2>
-        <div class="owl-carousel owl-carousel3 owl-theme">
+        <h2>Recent works</h2>
+        <div class="owl-carousel owl-carousel2 owl-theme">
           <div>
-            <div class="card"> <img class="card-img" src="assets/img/activity-img1.png" alt="">
-              <div class="card-img-overlay">
+            <div class="card"> <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
+              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
                 <div class="bottom-text">
-                  <h5 class="card-title">Sed ut perspiciatis unde &nbsp; iste natus error sit volup</h5>
-                  <a href="#">Read more <img src="assets/img/double-right.svg" alt=""></a> 
+                  <h5 class="card-title">Model photography</h5>
+                  <p class="card-text">Digital, Photography</p>
                 </div>
               </div>
             </div>
           </div>
           <div>
-            <div class="card"> <img class="card-img" src="assets/img/activity-img2.png"  alt="">
-              <div class="card-img-overlay">
+            <div class="card"> <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
+              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
                 <div class="bottom-text">
-                  <h5 class="card-title">Sed ut perspiciatis unde &nbsp; iste natus error sit volup</h5>
-                  <a href="#">Read more <img src="assets/img/double-right.svg" alt=""></a> 
+                  <h5 class="card-title">Product fotografie</h5>
+                  <p class="card-text">Digital, Photography</p>
                 </div>
               </div>
             </div>
           </div>
           <div>
-            <div class="card"> <img class="card-img" src="assets/img/activity-img3.png" alt="">
-              <div class="card-img-overlay">
+            <div class="card"> <img class="card-img" src="assets/img/" alt="">
+              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
                 <div class="bottom-text">
-                  <h5 class="card-title">Sed ut perspiciatis unde &nbsp; iste natus error sit volup</h5>
-                  <a href="#">Read more <img src="assets/img/double-right.svg" alt=""></a> 
+                  <h5 class="card-title">portret fotografie</h5>
+                  <p class="card-text"> fotografie</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card"> <img class="card-img" src="assets/img/recent-img4.jpg" alt="">
+              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
+                <div class="bottom-text">
+                  <h5 class="card-title">Classical photography</h5>
+                  <p class="card-text">Digital, Photography</p>
                 </div>
               </div>
             </div>
@@ -404,9 +305,80 @@ document.addEventListener("DOMContentLoaded", function(){
       </div>
     </div>
   </div>
-  
-  <div class="container-fluid fh5co-insta-feed activity scroll-offset" id="contact">
-    <div class="container recent">
+  <!-- ===========================
+       PORTFOLIO SECTION
+       Pas hier de min-height en scroll-margin-top aan indien gewenst.
+  ============================ -->
+  <div class="container-fluid recent fh5co-portfolio" id="portfolio" style="min-height: 400px; scroll-margin-top: 120px;">
+    <div class="container">
+      <h2>Portfolios</h2>
+      <div class="row">
+        <div class="bx bx-1">
+          <div class="card">
+            <a href="evenementen.html">
+              <img class="card-img" src="assets/img/Aluvision TeamBuilding 2025-73.JPG" alt="">
+              <div class="card-img-overlay">
+                <img src="assets/img/heart.png" class="heart" alt="heart icon">
+                <div class="bottom-text">
+                  <h5 class="card-title">Evenement Fotografie</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="bx bx-2">
+          <div class="card">
+            <a href="auto.html">
+              <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-11.JPG" alt="">
+              <div class="card-img-overlay">
+                <img src="assets/img/heart.png" class="heart" alt="heart icon">
+                <div class="bottom-text">
+                  <h5 class="card-title">Auto Motive fotografie</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="bx bx-3">
+          <div class="card">
+            <a href="portret.html">
+              <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
+              <div class="card-img-overlay">
+                <img src="assets/img/heart.png" class="heart" alt="heart icon">
+                <div class="bottom-text">
+                  <h5 class="card-title">Portret fotografie</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="bx bx-4">
+          <div class="card">
+            <a href="product.html">
+              <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
+              <div class="card-img-overlay">
+                <img src="assets/img/heart.png" class="heart" alt="heart icon">
+                <div class="bottom-text">
+                  <h5 class="card-title">Product fotografie</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================
+       CONTACT SECTION (Refactored)
+       De iframe en contact-form staan nu in aparte container-fluid secties.
+       Pas min-height en scroll-margin-top hieronder aan voor desktop/mobiel.
+  ============================ -->
+  <!--
+    Contact-kaart, socials, feed: behouden in 1 container (optioneel)
+  -->
+  <div class="container-fluid recent fh5co-contact" id="contact" style="min-height: 400px; scroll-margin-top: -950px;">
+    <div class="container">
       <div class="row mb-5 pb-5">
         <div class="col-lg-6">
           <div class="twit-box">
@@ -447,6 +419,45 @@ document.addEventListener("DOMContentLoaded", function(){
       </div>
     </div>
   </div>
+
+  <!-- ===========================
+       CONTACT MAP SECTION
+       Pas hier de min-height en scroll-margin-top aan voor de map.
+       Gebruik bijv. min-height: 350px; scroll-margin-top: 120px; voor desktop.
+       Voor mobiel kun je eenvoudig de hoogte aanpassen in de inline style hieronder.
+  ============================ -->
+  <!--
+    Mobiele aanpassing: pas min-height en scroll-margin-top aan indien gewenst.
+    Bijvoorbeeld: style="min-height: 220px; scroll-margin-top: 80px;"
+  -->
+  <div class="container-fluid" id="contact-map-section"
+       style="min-height: 350px; scroll-margin-top: 120px;">
+    <!--
+      Voor mobiele aanpassing: wijzig min-height/scroll-margin-top hierboven.
+    -->
+    
+  </div>
+
+  <!-- ===========================
+       CONTACT FORM SECTION
+       Pas hier de min-height en scroll-margin-top aan voor het formulier.
+       Gebruik bijv. min-height: 400px; scroll-margin-top: 120px; voor desktop.
+       Voor mobiel kun je eenvoudig de hoogte aanpassen in de inline style hieronder.
+  ============================ -->
+  <!--
+    Mobiele aanpassing: pas min-height en scroll-margin-top aan indien gewenst.
+    Bijvoorbeeld: style="min-height: 300px; scroll-margin-top: 80px;"
+  -->
+  <div class="container-fluid" id="container-fluid p-0 pr-0"
+       style="min-height: 400px; scroll-margin-top: 8000px;">
+    <!--
+      Voor mobiele aanpassing: wijzig min-height/scroll-margin-top hierboven.
+    -->
+  
+
+  <!-- ===========================
+       FOOTER
+  ============================ -->
   <footer class="container-fluid p-0 pr-0">
     <div class="row mr-0 ml-0">
       <div class="col-md-6 pr-0 pl-0 map">

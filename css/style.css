@@ -1,10 +1,18 @@
 
+
+/* ========================
+   RESET & BASIC STYLES
+   ======================== */
+
 * {
   margin: 0;
   padding: 0; }
 
-/* Colors */
-/* fonts variable */
+
+/* ========================
+   FONTS
+   ======================== */
+
 @font-face {
   font-family: "Oswald-Bold";
   src: url(../fonts/Oswald-Bold.ttf); }
@@ -35,68 +43,10 @@ h2 {
     h2 {
       font-size: 18px; } }
 
-.maine-menu {
-  position: absolute;
-  top: 20px; }
-  .maine-menu .navbar-nav li .nav-link {
-    font-family: "PT-Sans-Bold";
-    font-size: 16px;
-    text-transform: uppercase;
-    padding: 15px 25px;
-    color: #fff; }
-  .maine-menu .navbar-nav li.active a, .maine-menu .navbar-nav li:hover a, .maine-menu .navbar-nav li:visited a {
-    color: #ff0000; }
-  .maine-menu .bar1, .maine-menu .bar2, .maine-menu .bar3 {
-    width: 25px;
-    height: 2px;
-    background-color: #fff;
-    margin: 5px 0;
-    transition: 0.4s;
-    display: block;
-    position: relative; }
-  .maine-menu .change .bar1 {
-    -webkit-transform: rotate(-42deg) translate(-2px, 6px);
-    transform: rotate(-42deg) translate(-2px, 6px); }
-  .maine-menu .change .bar2 {
-    opacity: 0; }
-  .maine-menu .change .bar3 {
-    -webkit-transform: rotate(46deg) translate(-4px, -8px);
-    transform: rotate(46deg) translate(-4px, -8px); }
- @media (max-width: 991px) {
-  /* Mobile menu container */
-  .maine-menu .navbar-nav {
-    float: none;
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 100%; /* direct onder navbar */
-    right: 0;
-    width: 250px; /* breedte van het menu */
-    max-height: 500px; /* standaard open, geen delay */
-    overflow: hidden;
-    background-color: #000; /* menu achtergrond */
-    border-radius: 12px; /* lichte afgeronde hoeken */
-    z-index: 1050;
-    transition: max-height 0.1s ease-in-out; /* sneller reageren */
-  }
 
-  /* Menu links */
-  .maine-menu .navbar-nav li .nav-link {
-    font-family: "PT-Sans-Bold";
-    font-size: 16px;
-    text-transform: uppercase;
-    padding: 10px 15px;
-    color: #fff;
-    text-decoration: none;
-  }
-
-  /* Verwijder de oude grijze overlay van collapse.show */
-  .maine-menu .collapse.show {
-    background: transparent !important;
-    border-radius: 12px;
-    transition: none; /* directe weergave, geen delay */
-  }
-}
+/* ========================
+   CARDS
+   ======================== */
 
 .card {
   border: none;
@@ -104,6 +54,11 @@ h2 {
   border-radius: 0; }
   .card img {
     border-radius: 0; }
+
+
+/* ========================
+   HOME BANNER
+   ======================== */
 
 .fh5co-home-banner {
   padding: 0; }
@@ -160,11 +115,21 @@ h2 {
     .fh5co-home-banner .center-text {
       top: 30%; } }
 
+
+/* ========================
+   TWO IMAGES SECTION
+   ======================== */
+
 .fh5co-two-img .card-img-overlay {
   background: -webkit-linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), black);
   background: -moz-linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), black);
   background: -o-linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), black);
   background: -linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), black); }
+
+
+/* ========================
+   ABOUT / CONTACT SECTION
+   ======================== */
 
 .contact-pop {
   margin-top: -300px; }
@@ -236,6 +201,11 @@ h2 {
         border-radius: 15px 15px 0 0; }
       .contact-pop .content {
         border-radius: 0 0 15px 15px; } }
+
+
+/* ========================
+   OWL CAROUSEL (GENERIC)
+   ======================== */
 
 .owl-carousel, .owl-carousel .owl-item {
   -webkit-tap-highlight-color: transparent;
@@ -404,6 +374,11 @@ h2 {
   height: 100%;
   width: 100%; }
 
+
+/* ========================
+   RECENT WORK SECTION
+   ======================== */
+
 .fh5co-recent-work {
   background: #dbdbdb;
   padding: 100px 0; }
@@ -485,6 +460,11 @@ h2 {
     .recent {
       margin-top: 100px; } }
 
+
+/* ========================
+   PORTFOLIO SECTION
+   ======================== */
+
 .fh5co-portfolio {
   background-color: #f0f0f0;
   background-image: url(../img/camera-bg.jpg);
@@ -537,6 +517,11 @@ h2 {
       .fh5co-portfolio .bx-middle .heart {
         float: left !important; } }
 
+
+/* ========================
+   ACTIVITY SECTION
+   ======================== */
+
 .activity {
   background: #f3e7e8;
   padding-bottom: 50px; }
@@ -584,6 +569,11 @@ h2 {
         width: 20px;
         display: inline-block;
         color: #fff; }
+
+
+/* ========================
+   ABOUT ME SECTION
+   ======================== */
 
 .fh5co-about-me {
   padding: 0; }
@@ -670,6 +660,11 @@ h2 {
           height: 100px;
           width: 100px; } }
 
+
+/* ========================
+   INSTAGRAM FEED
+   ======================== */
+
 .fh5co-insta-feed {
   padding: 100px 0;
   background: #f7f0f1; }
@@ -734,6 +729,11 @@ h2 {
     .social-links ul li:hover a, .social-links ul li:visited a {
       background: #fff; }
 
+
+/* ========================
+   FOOTER
+   ======================== */
+
 footer {
   background: #e8e7e7; }
   footer iframe {
@@ -796,6 +796,11 @@ footer {
     footer .map {
       min-height: 300px; } }
 
+
+/* ========================
+   RESPONSIVE CONTAINERS
+   ======================== */
+
 @media (max-width: 767px) {
   .row {
     margin-left: 0;
@@ -803,210 +808,3 @@ footer {
   .container-fluid {
     padding-left: 0;
     padding-right: 0; } }
-
-/* Blog page style */
-.fh5co-blog-content {
-  background-image: url(../img/girl2.jpg);
-  background-position: right bottom;
-  background-repeat: no-repeat;
-  background-size: cover; }
-
-.blog-content-bckg {
-  margin: 0 auto;
-  padding: 70px 0;
-  width: 80%;
-  color: #fff; }
-  @media (max-width: 992px) {
-    .blog-content-bckg {
-      padding: 40px 0; } }
-
-.blog-content-inner {
-  background-color: #f2d5d7;
-  background-color: #e90e65;
-  padding: 70px;
-  border-radius: 15px; }
-  .blog-content-inner .card-title {
-    margin-bottom: 70px;
-    font-size: 45px;
-    text-align: center; }
-    @media (max-width: 992px) {
-      .blog-content-inner .card-title {
-        margin-bottom: 40px;
-        font-size: 30px; } }
-    @media (max-width: 600px) {
-      .blog-content-inner .card-title {
-        font-size: 18px; } }
-  @media (max-width: 767px) {
-    .blog-content-inner {
-      padding: 40px; } }
-  @media (max-width: 600px) {
-    .blog-content-inner {
-      padding: 20px 0; } }
-
-.single-blog {
-  display: flex;
-  align-items: center;
-  margin-bottom: 50px; }
-  .single-blog:last-child {
-    margin-bottom: 0; }
-  @media (max-width: 1199px) {
-    .single-blog .single-blog__img {
-      margin-bottom: 30px; } }
-  @media (max-width: 600px) {
-    .single-blog .single-blog__text {
-      font-size: 14px;
-      text-align: justify; } }
-  @media (max-width: 1199px) {
-    .single-blog {
-      padding-bottom: 20px;
-      border-bottom: 1px solid #fff; }
-      .single-blog:last-child {
-        padding-bottom: 0;
-        border-bottom: none; } }
-/* --- Logo styling --- */
-.navbar-brand img {
-  max-height: 80px;   /* Logo blijft netjes */
-  width: auto;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Standaard alleen donkere (zwarte) logo tonen */
-.navbar-brand img.logo-lightmode { display: inline !important; }
-.navbar-brand img.logo-darkmode { display: none !important; }
-
-@media (prefers-color-scheme: dark) {
-  .navbar-brand img.logo-lightmode { display: none !important; }
-  .navbar-brand img.logo-darkmode { display: inline !important; }
-}
-
-/* Hamburger-menu fix: voorkom klikken/scrollen achter menu */
-@media (max-width: 991px) {
-  body.menu-open {
-    overflow: hidden;
-  }
-}
-/* ===============================
-   Mobiel Hamburger-menu Styling
-   ===============================
-*/
-@media (max-width: 991px) {
-  /* Hamburger icon styling */
-  .maine-menu .navbar-toggler {
-    display: block;
-    background: none;
-    border: none;
-    outline: none;
-    position: relative;
-    z-index: 1202;
-    height: 40px;
-    width: 40px;
-    cursor: pointer;
-    margin-right: 10px;
-  }
-  .maine-menu .navbar-toggler:focus {
-    outline: none;
-    box-shadow: none;
-  }
-  .maine-menu .navbar-toggler .bar1,
-  .maine-menu .navbar-toggler .bar2,
-  .maine-menu .navbar-toggler .bar3 {
-    width: 30px;
-    height: 3px;
-    background-color: #fff;
-    margin: 6px 0;
-    transition: 0.4s;
-    border-radius: 2px;
-    display: block;
-    position: relative;
-  }
-  .maine-menu .navbar-toggler.change .bar1 {
-    transform: rotate(-42deg) translate(-2px, 8px);
-  }
-  .maine-menu .navbar-toggler.change .bar2 {
-    opacity: 0;
-  }
-  .maine-menu .navbar-toggler.change .bar3 {
-    transform: rotate(46deg) translate(-4px, -8px);
-  }
-
-  /* Overlay menu */
-  .mobile-menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(24, 24, 24, 0.97);
-    z-index: 1200;
-    transition: opacity 0.3s;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .mobile-menu-overlay.active {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Mobiel menu-items */
-  .mobile-menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1201;
-    background: transparent;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-  }
-  .mobile-menu.active {
-    opacity: 1;
-    visibility: visible;
-    background: transparent;
-  }
-  .mobile-menu ul,
-  .mobile-menu .navbar-nav {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    text-align: center;
-  }
-  .mobile-menu ul li,
-  .mobile-menu .navbar-nav li {
-    margin: 20px 0;
-  }
-  .mobile-menu ul li .nav-link,
-  .mobile-menu .navbar-nav li .nav-link {
-    font-family: "PT-Sans-Bold";
-    font-size: 22px;
-    color: #fff;
-    text-transform: uppercase;
-    padding: 15px 0;
-    display: inline-block;
-    width: 100%;
-    letter-spacing: 1px;
-    transition: color 0.2s;
-  }
-  .mobile-menu ul li.active .nav-link,
-  .mobile-menu ul li:hover .nav-link,
-  .mobile-menu .navbar-nav li.active .nav-link,
-  .mobile-menu .navbar-nav li:hover .nav-link {
-    color: #ff0000;
-  }
-  /* Zorg dat klikken achter menu niet mogelijk is */
-  body.menu-open {
-    overflow: hidden !important;
-    height: 100vh;
-    position: fixed;
-    width: 100vw;
-  }
-}
