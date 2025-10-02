@@ -21,7 +21,7 @@
 body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background-color 0.3s, color 0.3s; }
 @media (prefers-color-scheme: dark){ body { background-color:#121212; color:#fff; } }
 
-/* Navbar & Hamburger & Overlay menu & Gallery CSS exact zoals auto.html */
+/* Navbar & Hamburger */
 .sdl-navbar { background:#fff; padding:0.4rem 0; box-shadow:0 1px 10px rgba(0,0,0,0.03); position:sticky; top:0; z-index:1020; display:flex; align-items:center; justify-content:space-between; }
 .sdl-navbar .container-fluid { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; }
 .sdl-navbar .navbar-brand img.light, .sdl-navbar .navbar-brand img.dark { height:50px; }
@@ -34,8 +34,24 @@ body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background
 .sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; cursor:pointer; position:relative; }
 @media (prefers-color-scheme: dark){ .sdl-navbar .navbar-nav .nav-link { color:#fff; } }
 .sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
-.sdl-navbar .navbar-nav li.dropdown > a::after { content:"▼"; font-size:0.6rem; margin-left:0.3rem; position:relative; top:1px; transition:transform 0.3s ease; display:inline-block; transform-origin:center; }
 
+/* Dropdown arrow desktop */
+.sdl-navbar .navbar-nav li.dropdown > a::after { content:"▼"; font-size:0.6rem; margin-left:0.3rem; position:relative; top:1px; transition:transform 0.3s ease; display:inline-block; transform-origin:center; }
+@media (min-width:992px){
+  .sdl-navbar .navbar-nav li.dropdown:hover > a::after,
+  .sdl-navbar .navbar-nav li.dropdown.show > a::after { transform:rotate(-180deg); }
+  .sdl-navbar .navbar-nav li.dropdown:hover > .dropdown-menu { display:block; }
+  .sdl-navbar .dropdown-menu { display:none; position:absolute; top:100%; left:0; z-index:1050; background:#fff; border-radius:4px; box-shadow:0 4px 8px rgba(0,0,0,0.1); min-width:180px; }
+  .sdl-navbar .dropdown-menu a.dropdown-item { color:#111; font-weight:500; padding:0.5rem 1rem; display:block; transition: color 0.2s; }
+  .sdl-navbar .dropdown-menu a.dropdown-item:hover { color:#e90e65; background-color:transparent; }
+}
+@media (prefers-color-scheme: dark) and (min-width:992px){
+  .sdl-navbar .dropdown-menu { background:#121212; }
+  .sdl-navbar .dropdown-menu a.dropdown-item { color:#fff; }
+  .sdl-navbar .dropdown-menu a.dropdown-item:hover { color:#e90e65; }
+}
+
+/* Hamburger */
 .hamburger, .hamburger-box { padding:0; }
 .hamburger-box { width:30px; height:24px; display:flex; align-items:center; justify-content:center; position:relative; }
 .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { width:30px; height:4px; background-color:#111; border-radius:2px; position:absolute; transition: transform 0.15s ease, background-color 0.15s ease; }
@@ -49,6 +65,7 @@ body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background
   .hamburger.is-active .hamburger-inner, .hamburger.is-active .hamburger-inner::after { background-color:#e90e65; }
 }
 
+/* Overlay menu */
 .sdl-nav-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.92); z-index:2000; display:flex; align-items:center; justify-content:flex-end; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.77,0,0.18,1); pointer-events:none; }
 .sdl-nav-overlay.open { transform:translateX(0); pointer-events:auto; }
 .sdl-nav-menu { background:#fff; width:80vw; max-width:320px; height:100%; box-shadow:-4px 0 32px rgba(0,0,0,.14); display:flex; flex-direction:column; align-items:flex-start; padding:2.5rem 2rem 2rem 2rem; position:relative; overflow-y:auto; }
@@ -72,6 +89,7 @@ body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background
 }
 body.menu-open { overflow:hidden; }
 
+/* Gallery Grid */
 .gallery-container { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
 .gallery-container a { flex:1 0 100%; max-width:100%; margin-bottom:15px; display:block; opacity:0; transform:scale(0.95); transition: transform 0.4s ease, opacity 0.4s ease; }
 @media (min-width:576px){ .gallery-container a { flex:1 0 48%; max-width:48%; } }
@@ -186,11 +204,12 @@ const totalImages = 5; // MARK: wijzig hier het aantal foto's voor deze categori
 const gallery = document.getElementById("gallery");
 for(let i=1;i<=totalImages;i++){
   const src=`assets/img/portret/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
-  const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","portret"); // MARK: data-fancybox attribuut aanpassen voor categorie
+  const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
   const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
   a.appendChild(img); gallery.appendChild(a);
 }
 </script>
+
 </body>
 </html>
