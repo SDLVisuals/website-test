@@ -1,241 +1,233 @@
 <!DOCTYPE html>
-
+<!-- Combined: original Girly structure + clean SDL navbar (Bootstrap collapse on mobile).
+     Replace images/text with your own as needed.
+-->
 <html lang="en">
 <head>
-  <!-- Light mode favicon -->
-<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>SDL Visuals</title>
 
-<!-- Dark mode favicon -->
-<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)">
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <!--
-    Adjust scroll offset for sticky navbar:
-    The .scroll-offset class adds a scroll margin so that anchor links don't hide content behind the sticky navbar.
-    Change the scroll-margin-top value below to match the height of your sticky navbar if you update it.
-  -->
-</title>
-</head>
+  <!-- Favicons -->
+  <link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)">
 
-<body>
-<!-- BEGIN CLEAN NAVBAR -->
-<style>
-/* Body */
-body { margin:0; padding-top:0; background-color:#f5f5f5; transition: background-color 0.3s, color 0.3s; }
-@media (prefers-color-scheme: dark){ body { background-color:#121212; color:#fff; } }
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
 
-/* Navbar & Hamburger */
-.sdl-navbar { background:#fff; padding:0.4rem 0; box-shadow:0 1px 10px rgba(0,0,0,0.03); position:sticky; top:0; z-index:1020; display:flex; align-items:center; justify-content:space-between; }
-.sdl-navbar .container-fluid { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; }
-.sdl-navbar .navbar-brand img.light, .sdl-navbar .navbar-brand img.dark { height:50px; }
-.sdl-navbar .navbar-brand img.dark { display:none; }
-@media (prefers-color-scheme: dark){
-  .sdl-navbar { background:#121212; }
-  .sdl-navbar .navbar-brand img.light { display:none; }
-  .sdl-navbar .navbar-brand img.dark { display:block; }
-}
-.sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; cursor:pointer; position:relative; }
-@media (prefers-color-scheme: dark){ .sdl-navbar .navbar-nav .nav-link { color:#fff; } }
-.sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
+  <style>
+    /* ------------------------------
+       NAVBAR + HAMBURGER STYLES
+       (kept separate so you can see / tweak)
+       ------------------------------ */
+    .sdl-navbar { background:#fff; padding:0.4rem 0; box-shadow:0 1px 10px rgba(0,0,0,0.03); position:sticky; top:0; z-index:1020; }
+    .sdl-navbar .navbar-brand img { height:50px; }
+    .sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; }
+    .sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
 
-/* Dropdown arrow desktop */
-.sdl-navbar .navbar-nav li.dropdown > a::after { content:"▼"; font-size:0.6rem; margin-left:0.3rem; position:relative; top:1px; transition:transform 0.3s ease; display:inline-block; transform-origin:center; }
-@media (min-width:992px){
-  .sdl-navbar .navbar-nav li.dropdown:hover > a::after,
-  .sdl-navbar .navbar-nav li.dropdown.show > a::after { transform:rotate(-180deg); }
-  .sdl-navbar .navbar-nav li.dropdown:hover > .dropdown-menu { display:block; }
-  .sdl-navbar .dropdown-menu { display:none; position:absolute; top:100%; left:0; z-index:1050; background:#fff; border-radius:4px; box-shadow:0 4px 8px rgba(0,0,0,0.1); min-width:180px; }
-  .sdl-navbar .dropdown-menu a.dropdown-item { color:#111; font-weight:500; padding:0.5rem 1rem; display:block; transition: color 0.2s; }
-  .sdl-navbar .dropdown-menu a.dropdown-item:hover { color:#e90e65; background-color:transparent; }
-}
-@media (prefers-color-scheme: dark) and (min-width:992px){
-  .sdl-navbar .dropdown-menu { background:#121212; }
-  .sdl-navbar .dropdown-menu a.dropdown-item { color:#fff; }
-  .sdl-navbar .dropdown-menu a.dropdown-item:hover { color:#e90e65; }
-}
-
-/* Hamburger */
-.hamburger, .hamburger-box { padding:0; }
-.hamburger-box { width:30px; height:24px; display:flex; align-items:center; justify-content:center; position:relative; }
-.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { width:30px; height:4px; background-color:#111; border-radius:2px; position:absolute; transition: transform 0.15s ease, background-color 0.15s ease; }
-.hamburger-inner::before { top:-10px; content:""; display:block; }
-.hamburger-inner::after { bottom:-10px; content:""; display:block; }
-.hamburger.is-active .hamburger-inner { transform:rotate(45deg); background-color:#e90e65; }
-.hamburger.is-active .hamburger-inner::before { top:0; opacity:0; }
-.hamburger.is-active .hamburger-inner::after { bottom:0; transform:rotate(-90deg); background-color:#e90e65; }
-@media (prefers-color-scheme: dark){
-  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { background-color:#fff; }
-  .hamburger.is-active .hamburger-inner, .hamburger.is-active .hamburger-inner::after { background-color:#e90e65; }
-}
-
-/* Overlay menu */
-.sdl-nav-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.92); z-index:2000; display:flex; align-items:center; justify-content:flex-end; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.77,0,0.18,1); pointer-events:none; }
-.sdl-nav-overlay.open { transform:translateX(0); pointer-events:auto; }
-.sdl-nav-menu { background:#fff; width:80vw; max-width:320px; height:100%; box-shadow:-4px 0 32px rgba(0,0,0,.14); display:flex; flex-direction:column; align-items:flex-start; padding:2.5rem 2rem 2rem 2rem; position:relative; overflow-y:auto; }
-.sdl-nav-menu ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:2rem; width:100%; }
-.sdl-nav-menu li { width:100%; position:relative; }
-.sdl-nav-menu a { font-size:1.3rem; font-weight:600; color:#111; text-decoration:none; display:block; padding:0.2em 0; cursor:pointer; transition: color 0.15s; }
-.sdl-nav-menu a:hover, .sdl-nav-menu li.dropdown:hover > a { color:#e90e65; }
-.sdl-nav-menu li.dropdown > a::after { content:"▼"; float:right; font-size:0.7rem; margin-left:0.5rem; transition:transform 0.3s ease; }
-.sdl-nav-menu li.dropdown.open > a::after { transform:rotate(-180deg); }
-.sdl-nav-menu ul.submenu { max-height:0; overflow:hidden; flex-direction:column; padding-left:1rem; margin-top:0.5rem; gap:1rem; transition:max-height 0.4s ease; display:flex; }
-.sdl-nav-menu li.dropdown.open > ul.submenu { max-height:500px; }
-.sdl-nav-menu ul.submenu a { font-size:1.1rem; font-weight:500; color:#555; }
-.sdl-nav-menu ul.submenu a:hover { color:#e90e65; }
-.sdl-nav-close { position:absolute; top:1.1rem; right:1.1rem; font-size:2.3rem; color:#e90e65; background:transparent; border:none; cursor:pointer; z-index:10; }
-@media (prefers-color-scheme: dark){
-  .sdl-nav-menu { background:#121212; }
-  .sdl-nav-menu a { color:#fff; }
-  .sdl-nav-menu a:hover, .sdl-nav-menu li.dropdown:hover > a { color:#e90e65; }
-  .sdl-nav-menu ul.submenu a { color:#ddd; }
-  .sdl-nav-menu ul.submenu a:hover { color:#e90e65; }
-}
-body.menu-open { overflow:hidden; }
-
-</style>
-</head>
-
-<body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg sdl-navbar">
-  <div class="container-fluid d-flex align-items-center justify-content-between">
-    <a class="navbar-brand" href="index.html">
-      <img src="assets/img/SDL Visuals Black .png" class="light" alt="SDL Visuals">
-      <img src="assets/img/SDL Visuals White .png" class="dark" alt="SDL Visuals">
-    </a>
-    <button class="navbar-toggler hamburger hamburger--squeeze" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sdlNavOverlay">
-      <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-    </button>
-    <div class="collapse navbar-collapse d-none d-lg-flex justify-content-end">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" href="index.html#about">Over</a></li>
-        <li class="nav-item dropdown">
-          <a class="nav-link" href="#" id="portfolioDropdown" role="button">Portfolio</a>
-          <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
-            <a class="dropdown-item" href="evenementen.html#portfolio-evenementen">Evenementen</a>
-            <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
-            <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
-            <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
-          </div>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="index.html#activity">Activity</a></li>
-        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
-      </ul>
-    </div>
-  </div>
-  <div id="sdlNavOverlay" class="sdl-nav-overlay" aria-hidden="true">
-    <div class="sdl-nav-menu" role="menu">
-      <button class="sdl-nav-close" aria-label="Close menu">&times;</button>
-      <ul>
-        <li><a href="index.html#about" role="menuitem">Over</a></li>
-        <li class="dropdown">
-          <a href="#" role="button">Portfolio</a>
-          <ul class="submenu" role="menu">
-            <li><a href="evenementen.html#portfolio-evenementen" role="menuitem">Evenementen</a></li>
-            <li><a href="auto.html#portfolio-auto" role="menuitem">Auto</a></li>
-            <li><a href="portret.html#portfolio-portret" role="menuitem">Portret</a></li>
-            <li><a href="product.html#portfolio-product" role="menuitem">Product</a></li>
-          </ul>
-        </li>
-        <li><a href="index.html#activity" role="menuitem">Activity</a></li>
-        <li><a href="index.html#contact" role="menuitem">Contact</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<script>
-// Hamburger + mobile dropdown submenu
-document.addEventListener("DOMContentLoaded", function(){
-  const hamburger = document.querySelector(".navbar-toggler.hamburger");
-  const overlay = document.getElementById("sdlNavOverlay");
-  const closeBtn = document.querySelector(".sdl-nav-close");
-  const menuLinks = overlay.querySelectorAll("a");
-  const dropdownToggle = overlay.querySelector("li.dropdown > a");
-  const dropdownLi = dropdownToggle.parentElement;
-  const submenu = dropdownLi.querySelector("ul.submenu");
-
-  function openMenu(){ hamburger.classList.add("is-active"); overlay.classList.add("open"); overlay.setAttribute("aria-hidden","false"); document.body.classList.add("menu-open"); dropdownToggle.setAttribute("aria-expanded", "false"); }
-  function closeMenu(){ hamburger.classList.remove("is-active"); overlay.classList.remove("open"); overlay.setAttribute("aria-hidden","true"); document.body.classList.remove("menu-open"); dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded", "false"); }
-
-  hamburger.addEventListener("click", ()=> overlay.classList.contains("open") ? closeMenu() : openMenu() );
-  closeBtn.addEventListener("click", closeMenu);
-  dropdownToggle.addEventListener("click", e=>{ if(window.innerWidth < 992){ e.preventDefault(); const isOpen = dropdownLi.classList.toggle("open"); dropdownToggle.setAttribute("aria-expanded", isOpen ? "true" : "false"); } });
-  menuLinks.forEach(link=>{ if(link!==dropdownToggle) link.addEventListener("click", closeMenu); });
-
-  function handleResize(){
-    if(window.innerWidth >= 768){
-      dropdownLi.addEventListener("mouseenter", ()=>{ dropdownLi.classList.add("open"); dropdownToggle.setAttribute("aria-expanded","true"); });
-      dropdownLi.addEventListener("mouseleave", ()=>{ dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded","false"); });
-      dropdownToggle.style.cursor="default";
-    } else {
-      dropdownLi.removeEventListener("mouseenter", ()=>{}); 
-      dropdownLi.removeEventListener("mouseleave", ()=>{}); 
-      dropdownToggle.style.cursor="pointer"; dropdownLi.classList.remove("open"); dropdownToggle.setAttribute("aria-expanded","false");
+    .sdl-navbar .dropdown-toggle::after {
+      content: "▼";
+      font-size: 0.6rem;
+      margin-left: 0.3rem;
+      transition: transform 0.3s ease;
+      display: inline-block;
+      border: none !important; /* remove Bootstrap default caret */
     }
-  }
-  handleResize(); window.addEventListener("resize", handleResize);
-});
+    .sdl-navbar .dropdown.show > .dropdown-toggle::after {
+      transform: rotate(-180deg);
+    }
 
-</script>
-<!-- END CLEAN NAVBAR -->
-  <div class="container-fluid fh5co-home-banner" style="min-height: 600px;">
-    <div class="card"> <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
+    /* Dark mode support for navbar */
+    @media (prefers-color-scheme: dark) {
+      .sdl-navbar {
+        background: #181a1b !important;
+        box-shadow: 0 1px 10px rgba(0,0,0,0.50);
+      }
+      .sdl-navbar .navbar-nav .nav-link {
+        color: #fff !important;
+      }
+      .sdl-navbar .navbar-nav .nav-link:hover {
+        color: #e90e65 !important;
+      }
+      /* Hamburger bars in dark mode */
+      .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+        background-color: #fff !important;
+      }
+      .hamburger.is-active .hamburger-inner,
+      .hamburger.is-active .hamburger-inner::after {
+        background-color: #e90e65 !important;
+      }
+      /* Dropdown menu in dark mode */
+      .sdl-navbar .dropdown-menu {
+        background: #232526 !important;
+        color: #fff;
+        border-color: #222;
+      }
+      .sdl-navbar .dropdown-menu .dropdown-item {
+        color: #fff !important;
+      }
+      .sdl-navbar .dropdown-menu .dropdown-item:hover {
+        color: #e90e65 !important;
+        background: #31202a !important;
+      }
+    }
+
+    /* Hamburger (visual) */
+    .hamburger { padding: 10px; border:0; background:transparent; }
+    .hamburger-box { width:30px; height:24px; display:inline-block; position:relative; }
+    .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+      width: 30px; height:4px; background-color:#111; border-radius:2px; position:absolute; left:0; transition: transform .22s cubic-bezier(.55,.055,.675,.19), opacity .18s, background-color .18s;
+    }
+    .hamburger-inner { top:50%; transform:translateY(-50%); }
+    .hamburger-inner::before { content:""; top:-10px; }
+    .hamburger-inner::after { content:""; bottom:-10px; }
+
+    /* active state */
+    .hamburger.is-active .hamburger-inner { transform: rotate(45deg); background-color:#e90e65; }
+    .hamburger.is-active .hamburger-inner::before { top:0; opacity:0; }
+    .hamburger.is-active .hamburger-inner::after { bottom:0; transform: rotate(-90deg); background-color:#e90e65; }
+
+    /* Desktop dropdown behaviour - keep visually like original */
+    .sdl-navbar .dropdown-menu { min-width:185px; border-radius:.5rem; box-shadow:0 6px 32px rgba(0,0,0,0.13); }
+    .sdl-navbar .dropdown-menu .dropdown-item:hover { color:#e90e65; background:#f3e8f0; }
+
+    /* Mobile submenu show (overrides Bootstrap collapse hiding) */
+    @media (max-width: 991.98px) {
+      .sdl-navbar .dropdown-menu {
+        display: none;
+      }
+      .sdl-navbar .dropdown.show .dropdown-menu,
+      .sdl-navbar .dropdown .dropdown-menu.show {
+        display: block;
+      }
+    }
+
+    /* Small helper: smooth scrolling */
+    html { scroll-behavior: smooth; }
+
+    /* Responsive tweak: ensure collapse button visible on small screens */
+    @media (min-width: 992px) {
+      .navbar-toggler { display: none; } /* hide toggler on desktop */
+    }
+
+    /* If you want, you can control the height of the navbar here */
+    :root { --navbar-height: 72px; } /* change if navbar height changes */
+  </style>
+
+  <!-- NOTE:
+       Per-section min-heights & scroll-margin-top values are set inline per section below.
+       Change them inline where marked if you want different heights/offsets for mobile/desktop.
+  -->
+</head>
+
+<body>
+
+  <!-- ===========================
+       NAVBAR (clean + Bootstrap collapse on mobile)
+       - Desktop: dropdown opens on hover & click
+       - Mobile: standard bootstrap collapse (click to open)
+     ============================ -->
+  <nav class="navbar navbar-expand-lg sdl-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" class="sdl-logo-light">
+        <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" class="sdl-logo-dark" style="display:none;">
+      </a>
+
+      <!-- Mobile toggler: keeps the hamburger animation by toggling .is-active -->
+      <button class="navbar-toggler hamburger hamburger--squeeze" type="button" data-toggle="collapse" data-target="#my-nav" aria-controls="my-nav" aria-expanded="false" aria-label="Toggle navigation" onclick="this.classList.toggle('is-active')">
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </button>
+
+      <!-- Collapsible nav (Bootstrap) -->
+      <div id="my-nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item active"> <a class="nav-link" href="#">Home</a> </li>
+          <li class="nav-item"> <a class="nav-link" href="#about">Over</a></li>
+
+          <!-- Portfolio dropdown (works on desktop hover & mobile click) -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="portfolioDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Portfolio
+            </a>
+            <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
+              <a class="dropdown-item" href="evenementen.html#portfolio-evenementen">Evenementen</a>
+              <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
+              <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
+              <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
+            </div>
+          </li>
+
+          <li class="nav-item"> <a class="nav-link" href="#activity">Activity</a></li>
+          <li class="nav-item"> <a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===========================
+       BANNER (home)
+       Change min-height below to control banner height.
+       Example: style="min-height: 600px;"
+     ============================ -->
+  <div class="container-fluid fh5co-home-banner" style="min-height: 600px; margin-bottom:0;">
+    <div class="card">
+      <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
       <div class="card-img-overlay">
         <div class="center-text">
           <h2 class="card-title">ik breng jouw visie tot leven met oog voor detail en passsie voor beeld.</h2>
-          <a href="#" class="btn">
+          <a href="#portfolio" class="btn">
+            <!-- fancy SVG button -->
             <svg width="201" height="51" viewBox="0 0 201 51">
               <defs>
-                <style>
-                .cls-1 {
-                  fill: none;
-                  stroke-width: 1px;
-                  stroke: url(#linear-gradient);
-                }
-              </style>
-              <linearGradient id="linear-gradient" x1="140.508" y1="50.5" x2="60.492" y2="0.5" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stop-color="#e90e65"/>
-                <stop offset="1" stop-color="#fff"/>
-              </linearGradient>
-            </defs>
-            <rect id="Rounded_Rectangle_1" data-name="Rounded Rectangle 1" class="cls-1" x="0.5" y="0.5" width="200" height="50" rx="25" ry="25"/>
-          </svg>
-        Ondek</a> </div>
+                <style>.cls-1 { fill: none; stroke-width: 1px; stroke: url(#linear-gradient); }</style>
+                <linearGradient id="linear-gradient" x1="140.508" y1="50.5" x2="60.492" y2="0.5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#e90e65"/><stop offset="1" stop-color="#fff"/>
+                </linearGradient>
+              </defs>
+              <rect class="cls-1" x="0.5" y="0.5" width="200" height="50" rx="25" ry="25"/>
+            </svg>
+            Ontdek
+          </a>
+        </div>
       </div>
     </div>
   </div>
-  <div class="container-fluid fh5co-two-img" style="min-height: 400px;">
+
+  <!-- two images -->
+  <div class="container-fluid fh5co-two-img" style="min-height: 400px; margin-top:0;">
     <div class="row">
       <div class="col-sm-6 pr-0 pl-0">
-        <div class="card"> <img class="card-img" src="assets/img/Portret_-30.JPG" alt="">
-          <div class="card-img-overlay"> </div>
+        <div class="card">
+          <img class="card-img" src="assets/img/Portret_-30.JPG" alt="">
+          <div class="card-img-overlay"></div>
         </div>
       </div>
       <div class="col-sm-6 pr-0 pl-0">
-        <div class="card"> <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-16.JPG" alt="">
-          <div class="card-img-overlay"> </div>
+        <div class="card">
+          <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-16.JPG" alt="">
+          <div class="card-img-overlay"></div>
         </div>
       </div>
     </div>
   </div>
-    <!--  Home Page. ---------------------------------------------------->
-    <!--  Over . ---------------------------------------------------->
 
   <!-- ===========================
        ABOUT SECTION
-       Pas hier de min-height en scroll-margin-top aan indien gewenst.
-  ============================ -->
-  <div class="container-fluid recent fh5co-about" id="about" style="min-height: 500px; scroll-margin-top: 200px;">
+       Inline style: min-height controls section height.
+       scroll-margin-top helps anchors not end up UNDER the sticky nav.
+       Change values here per section if you want different offsets.
+     ============================ -->
+  <div class="container-fluid recent fh5co-about scroll-offset" id="about" style="min-height: 500px; scroll-margin-top: 100px;">
     <div class="container contact-pop">
       <div class="row">
-        <div class="col-md-6  pr-0">
-          <div class="card"> <img class="card-img w-100" src="assets/img/Aluvision Team Building 2024-38.jpg" alt="">
-            <div class="card-img-overlay"> </div>
+        <div class="col-md-6 pr-0">
+          <div class="card">
+            <img class="card-img w-100" src="assets/img/Aluvision Team Building 2024-38.jpg" alt="">
+            <div class="card-img-overlay"></div>
           </div>
         </div>
         <div class="col-md-6 pl-0">
@@ -243,9 +235,8 @@ document.addEventListener("DOMContentLoaded", function(){
             <h3>ik ben seppe de luycker</h3>
             <h4>Fotograaf en videograaf gespecialiseerd in product-, auto- en evenementenfotografie. Gebaseerd in België.</h4>
             <hr />
-            <p>Fotografie en videografie zijn voor mij veel meer dan een beroep — het is een passie. Met SDL_Visuals specialiseer ik mij in productfotografie, automotive shoots en evenementenreportages. Ik streef ernaar elk beeld te laten spreken door sfeer, detail en emotie vast te leggen. Binnenkort breid ik mijn portfolio uit met trouw- en communiefotografie, zodat ik ook de mooiste momenten uit het leven voor altijd kan vereeuwigen. Mijn missie? Creatieve, hoogwaardige beelden leveren die écht impact maken.
-</p>
-            <a href="#" class="btn">CONTACT</a>
+            <p>Fotografie en videografie zijn voor mij veel meer dan een beroep — het is een passie. Met SDL_Visuals specialiseer ik mij in productfotografie, automotive shoots en evenementenreportages. Ik streef ernaar elk beeld te laten spreken door sfeer, detail en emotie vast te leggen. Binnenkort breid ik mijn portfolio uit met trouw- en communiefotografie, zodat ik ook de mooiste momenten uit het leven voor altijd kan vereeuwigen. Mijn missie? Creatieve, hoogwaardige beelden leveren die écht impact maken.</p>
+            <a href="#contact" class="btn">CONTACT</a>
           </div>
         </div>
       </div>
@@ -253,17 +244,26 @@ document.addEventListener("DOMContentLoaded", function(){
   </div>
 
   <!-- ===========================
-       RECENT WORK / ACTIVITY SECTION
-       Pas hier de min-height en scroll-margin-top aan indien gewenst.
-  ============================ -->
-  <div class="container-fluid recent fh5co-activity" id="activity" style="min-height: 800px; scroll-margin-top: 120px;">
+       RECENT WORK / ACTIVITY
+     ============================ -->
+  <style>
+    /* Desktop: original offset */
+    #activity { scroll-margin-top: 120px; }
+    /* Mobile: adjust so scroll is correct */
+    @media (max-width: 991.98px) {
+      #activity { scroll-margin-top: 70px !important; }
+    }
+  </style>
+  <div class="container-fluid recent fh5co-activity" id="activity" style="min-height: 500px;">
     <div class="container">
       <div class="row">
         <h2>Recent works</h2>
         <div class="owl-carousel owl-carousel2 owl-theme">
           <div>
-            <div class="card"> <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
-              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
+            <div class="card">
+              <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
+              <div class="card-img-overlay">
+                <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
                 <div class="bottom-text">
                   <h5 class="card-title">Model photography</h5>
                   <p class="card-text">Digital, Photography</p>
@@ -272,8 +272,10 @@ document.addEventListener("DOMContentLoaded", function(){
             </div>
           </div>
           <div>
-            <div class="card"> <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
-              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
+            <div class="card">
+              <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
+              <div class="card-img-overlay">
+                <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
                 <div class="bottom-text">
                   <h5 class="card-title">Product fotografie</h5>
                   <p class="card-text">Digital, Photography</p>
@@ -281,86 +283,64 @@ document.addEventListener("DOMContentLoaded", function(){
               </div>
             </div>
           </div>
-          <div>
-            <div class="card"> <img class="card-img" src="assets/img/" alt="">
-              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                <div class="bottom-text">
-                  <h5 class="card-title">portret fotografie</h5>
-                  <p class="card-text"> fotografie</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="card"> <img class="card-img" src="assets/img/recent-img4.jpg" alt="">
-              <div class="card-img-overlay"> <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                <div class="bottom-text">
-                  <h5 class="card-title">Classical photography</h5>
-                  <p class="card-text">Digital, Photography</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- You can add/remove items here -->
         </div>
       </div>
     </div>
   </div>
+
+
   <!-- ===========================
-       PORTFOLIO SECTION
-       Pas hier de min-height en scroll-margin-top aan indien gewenst.
-  ============================ -->
+       PORTFOLIO
+       Inline style on container available if you want to change height/offset
+     ============================ -->
   <div class="container-fluid recent fh5co-portfolio" id="portfolio" style="min-height: 400px; scroll-margin-top: 120px;">
     <div class="container">
       <h2>Portfolios</h2>
       <div class="row">
-        <div class="bx bx-1">
+        <div class="col-md-3 col-sm-6 mb-4">
           <div class="card">
             <a href="evenementen.html">
               <img class="card-img" src="assets/img/Aluvision TeamBuilding 2025-73.JPG" alt="">
               <div class="card-img-overlay">
                 <img src="assets/img/heart.png" class="heart" alt="heart icon">
-                <div class="bottom-text">
-                  <h5 class="card-title">Evenement Fotografie</h5>
-                </div>
+                <div class="bottom-text"><h5 class="card-title">Evenement Fotografie</h5></div>
               </div>
             </a>
           </div>
         </div>
-        <div class="bx bx-2">
+
+        <div class="col-md-3 col-sm-6 mb-4">
           <div class="card">
             <a href="auto.html">
               <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-11.JPG" alt="">
               <div class="card-img-overlay">
                 <img src="assets/img/heart.png" class="heart" alt="heart icon">
-                <div class="bottom-text">
-                  <h5 class="card-title">Auto Motive fotografie</h5>
-                </div>
+                <div class="bottom-text"><h5 class="card-title">Auto Motive fotografie</h5></div>
               </div>
             </a>
           </div>
         </div>
-        <div class="bx bx-3">
+
+        <div class="col-md-3 col-sm-6 mb-4">
           <div class="card">
             <a href="portret.html">
               <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
               <div class="card-img-overlay">
                 <img src="assets/img/heart.png" class="heart" alt="heart icon">
-                <div class="bottom-text">
-                  <h5 class="card-title">Portret fotografie</h5>
-                </div>
+                <div class="bottom-text"><h5 class="card-title">Portret fotografie</h5></div>
               </div>
             </a>
           </div>
         </div>
-        <div class="bx bx-4">
+
+        <div class="col-md-3 col-sm-6 mb-4">
           <div class="card">
             <a href="product.html">
               <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
               <div class="card-img-overlay">
                 <img src="assets/img/heart.png" class="heart" alt="heart icon">
-                <div class="bottom-text">
-                  <h5 class="card-title">Product fotografie</h5>
-                </div>
+                <div class="bottom-text"><h5 class="card-title">Product fotografie</h5></div>
               </div>
             </a>
           </div>
@@ -370,101 +350,68 @@ document.addEventListener("DOMContentLoaded", function(){
   </div>
 
   <!-- ===========================
-       CONTACT SECTION (Refactored)
-       De iframe en contact-form staan nu in aparte container-fluid secties.
-       Pas min-height en scroll-margin-top hieronder aan voor desktop/mobiel.
-  ============================ -->
-  <!--
-    Contact-kaart, socials, feed: behouden in 1 container (optioneel)
-  -->
-  <div class="container-fluid recent fh5co-contact" id="contact" style="min-height: 400px; scroll-margin-top: -950px;">
-    <div class="container">
+       INSTA FEED / SOCIALS (kept as a separate container)
+     ============================ -->
+  <div class="container-fluid fh5co-insta-feed activity">
+    <div class="container recent">
       <div class="row mb-5 pb-5">
         <div class="col-lg-6">
           <div class="twit-box">
-            <div class="media mb-3"> <img class="align-self-start mr-3 rounded-circle" src="assets/img/twit-girl-img.png" alt="">
+            <div class="media mb-3">
+              <img class="align-self-start mr-3 rounded-circle" src="assets/img/twit-girl-img.png" alt="">
               <div class="media-body">
                 <h5 class="mb-0 mt-3">Sdl visuals</h5>
                 <p>@sdl_visuals</p>
               </div>
             </div>
-            <p class="text-justify"> “Sed ut perspiciatis unde omnis iste nats error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut. </p>
-            <div class="clearfix"> <a href="#" class="btn btn-primary mt-2 float-right">Follow</a> </div>
+            <p class="text-justify">“Sed ut perspiciatis unde omnis iste nats error sit voluptatem accusantium doloremque laudantium...”</p>
+            <div class="clearfix"><a href="#" class="btn btn-primary mt-2 float-right">Follow</a></div>
           </div>
         </div>
+
         <div class="col-lg-6 feed-caro">
           <h2>Instagram feed</h2>
           <div class="owl-carousel owl-carousel4 owl-theme">
             <div>
-              <div class="card"> <img class="card-img" src="assets/img/feed-img1.png" alt="">
-                <div class="card-img-overlay"> </div>
-              </div>
+              <div class="card"><img class="card-img" src="assets/img/feed-img1.png" alt=""><div class="card-img-overlay"></div></div>
             </div>
             <div>
-              <div class="card"> <img class="card-img" src="assets/img/feed-img2.png"  alt="">
-                <div class="card-img-overlay"> </div>
-              </div>
+              <div class="card"><img class="card-img" src="assets/img/feed-img2.png" alt=""><div class="card-img-overlay"></div></div>
             </div>
           </div>
         </div>
+
       </div>
+
       <h2 class="text-center d-block">Find me on social media</h2>
       <div class="row social-links">
         <ul class="nav mx-auto">
-          <li class="nav-item"> <a class="nav-link" href="https://www.facebook.com/fh5co"><img src="assets/img/facebook.png" alt=""></a> </li>
-          <li class="nav-item"> <a class="nav-link" href="https://twitter.com/fh5co"><img src="assets/img/twitter.png" alt=""></a> </li>
-          <li class="nav-item"> <a class="nav-link" href="#"><img src="assets/img/pinterest.png" alt=""></a> </li>
-          <li class="nav-item"> <a class="nav-link" href="#"><img src="assets/img/google-plus.png" alt=""></a> </li>
+          <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/facebook.png" alt=""></a></li>
+          <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/twitter.png" alt=""></a></li>
+          <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/pinterest.png" alt=""></a></li>
+          <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/google-plus.png" alt=""></a></li>
         </ul>
       </div>
+
     </div>
   </div>
 
   <!-- ===========================
-       CONTACT MAP SECTION
-       Pas hier de min-height en scroll-margin-top aan voor de map.
-       Gebruik bijv. min-height: 350px; scroll-margin-top: 120px; voor desktop.
-       Voor mobiel kun je eenvoudig de hoogte aanpassen in de inline style hieronder.
-  ============================ -->
-  <!--
-    Mobiele aanpassing: pas min-height en scroll-margin-top aan indien gewenst.
-    Bijvoorbeeld: style="min-height: 220px; scroll-margin-top: 80px;"
-  -->
-  <div class="container-fluid" id="contact-map-section"
-       style="min-height: 350px; scroll-margin-top: 120px;">
-    <!--
-      Voor mobiele aanpassing: wijzig min-height/scroll-margin-top hierboven.
-    -->
-    
-  </div>
-
-  <!-- ===========================
-       CONTACT FORM SECTION
-       Pas hier de min-height en scroll-margin-top aan voor het formulier.
-       Gebruik bijv. min-height: 400px; scroll-margin-top: 120px; voor desktop.
-       Voor mobiel kun je eenvoudig de hoogte aanpassen in de inline style hieronder.
-  ============================ -->
-  <!--
-    Mobiele aanpassing: pas min-height en scroll-margin-top aan indien gewenst.
-    Bijvoorbeeld: style="min-height: 300px; scroll-margin-top: 80px;"
-  -->
-  <div class="container-fluid" id="container-fluid p-0 pr-0"
-       style="min-height: 400px; scroll-margin-top: 8000px;">
-    <!--
-      Voor mobiele aanpassing: wijzig min-height/scroll-margin-top hierboven.
-    -->
-  
-
-  <!-- ===========================
-       FOOTER
-  ============================ -->
+       CONTACT (FOOTER) - contact form placed in footer like the original
+       The #contact anchor here is the canonical target for the nav link.
+     ============================ -->
   <footer class="container-fluid p-0 pr-0">
     <div class="row mr-0 ml-0">
+
+      <!-- MAP column -->
       <div class="col-md-6 pr-0 pl-0 map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13035.46901327725!2d-80.85396551628644!3d35.234674411422155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8856a03af474f38f%3A0xf8301daadf5f7670!2sFourth+Ward%2C+Charlotte%2C+NC%2C+USA!5e0!3m2!1sen!2sin!4v1551001218548"  style="border:0" allowfullscreen></iframe>
+        <!-- Put your map here; keep same aspect ratio/styling as original -->
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13035.46901327725!2d-80.85396551628644!3d35.234674411422155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8856a03af474f38f%3A0xf8301daadf5f7670!2sFourth+Ward%2C+Charlotte%2C+NC%2C+USA!5e0!3m2!1sen!2sin!4v1551001218548" style="border:0; width:100%; height:100%;" allowfullscreen></iframe>
       </div>
+
+      <!-- CONTACT FORM column (original structure & class preserved) -->
       <div class="col-md-6 content-us">
-        <div class="contact-form">
+        <div class="contact-form" id="contact">
           <h3 class="text-uppercase">Contact me</h3>
           <input type="text" class="form-control" placeholder="Your Name">
           <input type="text" class="form-control" placeholder="Your Email">
@@ -472,20 +419,109 @@ document.addEventListener("DOMContentLoaded", function(){
           <button type="submit">Send</button>
         </div>
       </div>
+
     </div>
+
     <div class="copy pt-4 pb-4">
-      <p><a href="" target="_blank"> &copy; 2025 SDL Visuals</a>  &nbsp;  |  &nbsp; Design by <a href="" target="_blank"></a> &nbsp; | &nbsp;  All rights reserved</p>
+      <p><a href="#" target="_blank"> &copy; 2025 SDL Visuals</a>  &nbsp;  |  &nbsp; All rights reserved</p>
     </div>
   </footer>
 
-  <!-- jQuery first, then Popper.js, then Bootstrap JS --> 
-  <script src="assets/js/jquery-3.3.1.slim.min.js"></script> 
-  <script src="assets/js/popper.min.js" ></script> 
-  <script src="assets/js/bootstrap.min.js"></script> 
-  <script src="assets/js/owl.carousel.min.js"></script> 
+  <!-- jQuery, Popper, Bootstrap JS (original order) -->
+  <script src="assets/js/jquery-3.3.1.slim.min.js"></script>
+  <script src="assets/js/popper.min.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+
+  <!-- Optional plugins -->
+  <script src="assets/js/owl.carousel.min.js"></script>
   <script src="assets/js/main.js"></script>
 
-  
+  <script>
+    // Desktop: open dropdown on hover (non-intrusive)
+    (function () {
+      function enableHoverDropdowns() {
+        if (window.innerWidth >= 992) { // desktop
+          document.querySelectorAll('.navbar .dropdown').forEach(function(drop){
+            drop.addEventListener('mouseenter', function(){
+              this.classList.add('show');
+              var menu = this.querySelector('.dropdown-menu');
+              if(menu) menu.classList.add('show');
+              var toggle = this.querySelector('.dropdown-toggle');
+              if(toggle) toggle.setAttribute('aria-expanded','true');
+            });
+            drop.addEventListener('mouseleave', function(){
+              this.classList.remove('show');
+              var menu = this.querySelector('.dropdown-menu');
+              if(menu) menu.classList.remove('show');
+              var toggle = this.querySelector('.dropdown-toggle');
+              if(toggle) toggle.setAttribute('aria-expanded','false');
+            });
+          });
+        } else {
+          // remove the event listeners (no-op if not added)
+          document.querySelectorAll('.navbar .dropdown').forEach(function(drop){
+            // nothing to remove because we added anonymous listeners; safe fallback: ensure menus are closed
+            drop.classList.remove('show');
+            var menu = drop.querySelector('.dropdown-menu');
+            if(menu) menu.classList.remove('show');
+          });
+        }
+      }
+
+      // run once and on resize
+      enableHoverDropdowns();
+      window.addEventListener('resize', enableHoverDropdowns);
+    })();
+
+    // Ensure navbar-brand logo toggles on dark mode preference (optional)
+    (function(){
+      var lightLogo = document.querySelector('.sdl-logo-light');
+      var darkLogo = document.querySelector('.sdl-logo-dark');
+      function setLogo() {
+        var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if(lightLogo && darkLogo){
+          lightLogo.style.display = isDark ? 'none' : '';
+          darkLogo.style.display = isDark ? '' : 'none';
+        }
+      }
+      setLogo();
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setLogo);
+      }
+    })();
+
+    // Improved: Only close menu on non-dropdown nav-link click on mobile; handle dropdown submenu toggle on mobile
+    (function(){
+      // Close collapse on link click, except for dropdown toggles
+      $('#my-nav .nav-link').on('click', function(e){
+        var $link = $(this);
+        var $dropdown = $link.closest('.dropdown');
+        var isDropdownToggle = $link.hasClass('dropdown-toggle');
+        // Only close if not a dropdown-toggle on mobile
+        if($('#my-nav').hasClass('show') && !isDropdownToggle){
+          $('#my-nav').collapse('hide');
+          // reset hamburger button visual
+          var btn = document.querySelector('.navbar-toggler.hamburger');
+          if(btn) btn.classList.remove('is-active');
+        }
+      });
+      // Mobile: toggle dropdown submenu without closing main menu
+      $('.navbar .dropdown > .dropdown-toggle').on('click', function(e){
+        if(window.innerWidth < 992){
+          e.preventDefault();
+          var $parent = $(this).parent();
+          var $menu = $parent.find('.dropdown-menu');
+          // Toggle .show on parent and menu and update aria-expanded
+          var isOpen = !$parent.hasClass('show');
+          $parent.toggleClass('show', isOpen);
+          $menu.toggleClass('show', isOpen);
+          $(this).attr('aria-expanded', isOpen ? 'true' : 'false');
+          // Remove show from other dropdowns (optional, for single open menu)
+          $parent.siblings('.dropdown').removeClass('show').find('.dropdown-menu').removeClass('show');
+        }
+      });
+    })();
+  </script>
 
 </body>
 </html>
