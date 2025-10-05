@@ -30,12 +30,16 @@
       content: "▼";
       font-size: 0.6rem;
       margin-left: 0.3rem;
-      transition: transform 0.3s ease;
       display: inline-block;
-      border: none !important; /* remove Bootstrap default caret */
+      border: none !important;
+      transition: transform 0.35s ease-in-out;
+      transform-origin: center center;
+      transform: rotate(0deg);
     }
-    .sdl-navbar .dropdown.show > .dropdown-toggle::after {
-      transform: rotate(-180deg);
+
+    .sdl-navbar .dropdown.show > .dropdown-toggle::after,
+    .sdl-navbar .dropdown .dropdown-toggle[aria-expanded="true"]::after {
+      transform: rotate(180deg);
     }
 
     /* Dark mode support for navbar */
@@ -173,7 +177,7 @@
        Change min-height below to control banner height.
        Example: style="min-height: 600px;"
      ============================ -->
-  <div class="container-fluid fh5co-home-banner" style="min-height: 600px; margin-bottom:0;">
+  <div class="container-fluid fh5co-home-banner" style="min-height: 00px; margin-bottom:0;">
     <div class="card">
       <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
       <div class="card-img-overlay">
@@ -506,18 +510,23 @@
         }
       });
       // Mobile: toggle dropdown submenu without closing main menu
-      $('.navbar .dropdown > .dropdown-toggle').on('click', function(e){
+      $('.navbar .dropdown > .dropdown-toggle').off('click').on('click', function(e){
         if(window.innerWidth < 992){
           e.preventDefault();
+          e.stopPropagation();
           var $parent = $(this).parent();
-          var $menu = $parent.find('.dropdown-menu');
-          // Toggle .show on parent and menu and update aria-expanded
-          var isOpen = !$parent.hasClass('show');
-          $parent.toggleClass('show', isOpen);
-          $menu.toggleClass('show', isOpen);
-          $(this).attr('aria-expanded', isOpen ? 'true' : 'false');
-          // Remove show from other dropdowns (optional, for single open menu)
-          $parent.siblings('.dropdown').removeClass('show').find('.dropdown-menu').removeClass('show');
+          var $menu = $parent.find('.dropdown-menu').first();
+          var isOpen = $parent.hasClass('show');
+          // Close all other dropdowns first
+          $('.navbar .dropdown').removeClass('show').find('.dropdown-menu').removeClass('show');
+          // Then toggle this one
+          if(!isOpen){
+            $parent.addClass('show');
+            $menu.addClass('show');
+            $(this).attr('aria-expanded','true');
+          } else {
+            $(this).attr('aria-expanded','false');
+          }
         }
       });
     })();
