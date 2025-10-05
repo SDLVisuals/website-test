@@ -376,6 +376,15 @@ for(let i=1;i<=totalImages;i++){
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
   a.appendChild(img); gallery.appendChild(a);
 }
+// Zorg dat pagina bij load start bij de header
+window.addEventListener('load', () => {
+  const header = document.getElementById('portfolio-evenementen');
+  if(header) {
+    const navbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 72;
+    const topPos = header.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+    window.scrollTo({ top: topPos, behavior: 'auto' });
+  }
+});
 </script>
 
 </body>
