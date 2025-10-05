@@ -25,21 +25,34 @@
     .sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; }
     .sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
 
-    .sdl-navbar .dropdown-toggle::after {
-      content: "▼";
-      font-size: 0.6rem;
-      margin-left: 0.3rem;
-      display: inline-block;
-      border: none !important;
-      transition: transform 0.35s ease-in-out;
-      transform-origin: center center;
-      transform: rotate(0deg);
-    }
+   /* ------------------------------
+   Nieuwe dropdown-pijl
+   ------------------------------ */
+.sdl-navbar .dropdown-toggle::after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.3rem;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #111; /* kleur pijltje */
+  transition: transform 0.35s ease-in-out;
+  transform-origin: center center;
+}
 
-    .sdl-navbar .dropdown.show > .dropdown-toggle::after,
-    .sdl-navbar .dropdown .dropdown-toggle[aria-expanded="true"]::after {
-      transform: rotate(180deg);
-    }
+/* Dropdown open: pijltje draait subtiel omhoog */
+.sdl-navbar .dropdown.show > .dropdown-toggle::after,
+.sdl-navbar .dropdown .dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(-180deg); /* draait naar boven */
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .sdl-navbar .dropdown-toggle::after {
+    border-top-color: #fff;
+  }
+}
 
     /* Dark mode support for navbar */
     @media (prefers-color-scheme: dark) {
@@ -219,8 +232,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
 
 <script>
-// Scroll naar boven bij pagina load
-window.addEventListener('load', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
 // Navbar dropdown hover for desktop & hamburger toggle for mobile
 document.addEventListener("DOMContentLoaded", function() {
