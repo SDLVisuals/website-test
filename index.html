@@ -17,6 +17,19 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 
   <style>
+    /* Hero overlay fix: center text + button on all images */
+    .card-img-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+    }
+
+    /* Portfolio: all images same size */
+    .fh5co-portfolio .card-img {
+      height: 260px;
+      object-fit: cover;
+    }
     /* ------------------------------
        NAVBAR + HAMBURGER STYLES
        (kept separate so you can see / tweak)
@@ -161,6 +174,456 @@
       }
     }
   </style>
+  <style>
+  @media (prefers-color-scheme: dark) {
+
+    body {
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    .recent,
+    .fh5co-home-banner,
+    .fh5co-two-img,
+    .fh5co-about,
+    .fh5co-portfolio,
+    footer {
+      background-color: transparent;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+    }
+
+    p {
+      color: #d0d0d0;
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+      color: #ffffff;
+    }
+
+    a {
+      color: #e90e65;
+    }
+  }
+  </style>
+  <style>
+  @media (prefers-color-scheme: dark) {
+
+    body {
+      background-color: #121212 !important;
+      color: #ffffff !important;
+    }
+
+    .recent,
+    .fh5co-home-banner,
+    .fh5co-two-img,
+    .fh5co-about,
+    .fh5co-portfolio,
+    footer {
+      background-color: transparent !important;
+    }
+
+    .card {
+      background-color: #1e1e1e !important;
+    }
+
+    p {
+      color: #d0d0d0 !important;
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+      color: #ffffff !important;
+    }
+
+    a {
+      color: #e90e65 !important;
+    }
+
+    /* DARK MODE BUTTON VISIBILITY */
+    .btn,
+    button,
+    .contact-form button {
+      color: #ffffff !important;
+      border-color: #e90e65 !important;
+      background: transparent !important;
+    }
+
+    .btn:hover,
+    button:hover,
+    .contact-form button:hover {
+      background-color: #e90e65 !important;
+      color: #ffffff !important;
+    }
+
+    /* --- ABOUT SECTION DARK MODE FIXES --- */
+    /* Ensure about section text is visible */
+    .fh5co-about .content,
+    .fh5co-about .content p,
+    .fh5co-about .content h3,
+    .fh5co-about .content h4,
+    .fh5co-about .content hr {
+      color: #fff !important;
+      background: transparent !important;
+    }
+    /* About section background stays visible in dark mode */
+    .fh5co-about {
+      background-color: #181a1b !important;
+    }
+    /* Ensure CONTACT button is visible in about section */
+    .fh5co-about .btn,
+    .fh5co-about .btn.btn-outline-light {
+      color: #fff !important;
+      border-color: #e90e65 !important;
+      background: transparent !important;
+    }
+    .fh5co-about .btn:hover,
+    .fh5co-about .btn.btn-outline-light:hover {
+      background: #e90e65 !important;
+      color: #fff !important;
+    }
+    /* Remove hover effect from about photo (left) */
+    .fh5co-about .card-img,
+    .fh5co-about .card-img:hover,
+    .fh5co-about .card-img:focus {
+      opacity: 1 !important;
+      filter: none !important;
+      transition: none !important;
+    }
+    .fh5co-about .card-img-overlay,
+    .fh5co-about .card-img-overlay:hover,
+    .fh5co-about .card-img-overlay:focus {
+      background: none !important;
+      opacity: 1 !important;
+      transition: none !important;
+    }
+  }
+  </style>
+  <!-- Remove hover effect from about photo (left) - volledig hover-effect uitgeschakeld -->
+</head>
+
+  <!-- Zet About-sectie foto & overlay altijd zonder hover-effect -->
+  <style>
+    .fh5co-about .card-img,
+    .fh5co-about .card-img:hover,
+    .fh5co-about .card-img:focus {
+      opacity: 1 !important;
+      filter: none !important;
+      transition: none !important;
+    }
+    .fh5co-about .card-img-overlay,
+    .fh5co-about .card-img-overlay:hover,
+    .fh5co-about .card-img-overlay:focus {
+      opacity: 1 !important;
+      filter: none !important;
+      transition: none !important;
+    }
+  </style>
+  <!-- Verbeterde About-sectie layout voor mobiel -->
+  <style>
+    @media (max-width: 767px) {
+      .fh5co-about .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      .fh5co-about .col-md-6:first-child {
+        width: 40% !important;
+        max-width: 40% !important;
+        flex: 0 0 40% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      .fh5co-about .col-md-6:first-child .card {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        background: transparent !important;
+      }
+      .fh5co-about .card-img {
+        height: auto !important;
+        max-height: 220px !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        display: block !important;
+      }
+      .fh5co-about .col-md-6:last-child {
+        width: 60% !important;
+        max-width: 60% !important;
+        flex: 1 1 60% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        padding-left: 16px !important;
+        padding-right: 8px !important;
+      }
+      .fh5co-about .col-md-6:last-child .content {
+        flex-grow: 1 !important;
+        width: 100% !important;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+      }
+      .fh5co-about .col-md-6:last-child .content h3,
+      .fh5co-about .col-md-6:last-child .content h4,
+      .fh5co-about .col-md-6:last-child .content p,
+      .fh5co-about .col-md-6:last-child .content a,
+      .fh5co-about .col-md-6:last-child .content hr {
+        text-align: left !important;
+        width: 100% !important;
+      }
+      .fh5co-about .col-md-6:last-child .content a.btn {
+        margin-top: 12px !important;
+        align-self: flex-start !important;
+      }
+    }
+  </style>
+  <!-- Styling voor de CONTACT-knop in de contact form sectie -->
+  <style>
+    /* Contact form knop styling voor zowel light als dark mode */
+    .contact-form button.btn {
+      display: block !important;
+      width: 100% !important;
+      max-width: 220px !important;
+      margin: 24px auto 0 auto !important;
+      padding: 0.75rem 2.5rem !important;
+      font-size: 1.15rem !important;
+      font-weight: 700 !important;
+      border-radius: 2rem !important;
+      border: 2px solid #e90e65 !important;
+      background: #e90e65 !important;
+      color: #fff !important;
+      letter-spacing: 0.04em !important;
+      box-shadow: 0 2px 12px rgba(233,14,101,0.07) !important;
+      transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s !important;
+      cursor: pointer !important;
+      text-transform: uppercase !important;
+    }
+
+    .contact-form button.btn:hover,
+    .contact-form button.btn:focus {
+      background: #fff !important;
+      color: #e90e65 !important;
+      border-color: #e90e65 !important;
+      box-shadow: 0 4px 20px rgba(233,14,101,0.18) !important;
+      outline: none !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .contact-form button.btn {
+        background: #232526 !important;
+        color: #fff !important;
+        border: 2px solid #e90e65 !important;
+        box-shadow: 0 2px 16px rgba(233,14,101,0.10) !important;
+      }
+      .contact-form button.btn:hover,
+      .contact-form button.btn:focus {
+        background: #e90e65 !important;
+        color: #fff !important;
+        border-color: #e90e65 !important;
+        box-shadow: 0 4px 24px rgba(233,14,101,0.23) !important;
+      }
+    }
+  </style>
+  <!-- Styling voor de CONTACT-knop in de About-sectie -->
+  <style>
+    /* Gecentreerde styling voor de CONTACT-knop in de About-sectie */
+    .fh5co-about .btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0.65rem 2.2rem;
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 2rem;
+      border: 2px solid #e90e65;
+      background: #e90e65;
+      color: #fff;
+      letter-spacing: 0.04em;
+      box-shadow: 0 2px 14px rgba(233,14,101,0.10);
+      transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-top: 18px;
+      margin-bottom: 0;
+      text-align: center;
+      min-width: 145px;
+      max-width: 100%;
+    }
+    .fh5co-about .btn:hover,
+    .fh5co-about .btn:focus {
+      background: #fff;
+      color: #e90e65;
+      border-color: #e90e65;
+      box-shadow: 0 4px 20px rgba(233,14,101,0.18);
+      outline: none;
+      text-decoration: none;
+    }
+    @media (max-width: 767px) {
+      .fh5co-about .btn {
+        width: 100%;
+        min-width: 0;
+        margin-top: 14px;
+        padding-left: 0;
+        padding-right: 0;
+        max-width: 320px;
+      }
+    }
+    /* Dark mode variant: altijd goed zichtbaar */
+    @media (prefers-color-scheme: dark) {
+      .fh5co-about .btn {
+        background: #232526;
+        color: #fff;
+        border: 2px solid #e90e65;
+        box-shadow: 0 2px 16px rgba(233,14,101,0.13);
+      }
+      .fh5co-about .btn:hover,
+      .fh5co-about .btn:focus {
+        background: #e90e65;
+        color: #fff;
+        border-color: #e90e65;
+        box-shadow: 0 4px 24px rgba(233,14,101,0.20);
+      }
+    }
+  </style>
+  <!-- Portfolio cards mobiel vierkant en netjes in 2 kolommen -->
+  <style>
+    @media (max-width: 767px) {
+      .fh5co-portfolio .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -1%;
+        margin-right: -1%;
+      }
+      .fh5co-portfolio .col-md-3,
+      .fh5co-portfolio .col-sm-6 {
+        width: 48%;
+        max-width: 48%;
+        flex: 0 0 48%;
+        margin: 1%;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .fh5co-portfolio .card {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+      }
+      .fh5co-portfolio .card-img {
+        width: 100%;
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+      }
+      .fh5co-portfolio .card-img-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 1.5rem 0.5rem;
+        background: linear-gradient(to top,rgba(0,0,0,0.27) 60%,transparent 100%);
+      }
+    }
+  </style>
+  <!-- Portfolio Card Hover Animation -->
+  <style>
+    .fh5co-portfolio .card {
+      transition: transform 0.24s cubic-bezier(0.4,0,0.2,1);
+      will-change: transform;
+    }
+    .fh5co-portfolio .card:hover,
+    .fh5co-portfolio .card:focus-within {
+      transform: scale(1.05);
+      z-index: 2;
+    }
+    /* Zorg dat de afbeelding niet wordt afgesneden/vervormd */
+    .fh5co-portfolio .card {
+      overflow: visible;
+    }
+  </style>
+</head>
+
+  <!-- Responsive: About-sectie foto niet te groot op mobiel -->
+  <style>
+    @media (max-width: 767px) {
+      .fh5co-about .card-img {
+        height: 200px !important;
+        object-fit: cover !important;
+        object-position: center !important;
+      }
+    }
+  </style>
+
+</head>
+
+  <!-- Verbeterde About-sectie layout voor mobiel -->
+  <style>
+    @media (max-width: 767px) {
+      .fh5co-about .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: stretch !important;
+      }
+      .fh5co-about .col-md-6:first-child {
+        width: 40% !important;
+        max-width: 40% !important;
+        flex: 0 0 40% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        display: flex !important;
+        align-items: stretch !important;
+      }
+      .fh5co-about .col-md-6:last-child {
+        width: 60% !important;
+        max-width: 60% !important;
+        flex: 1 1 60% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding-left: 16px !important;
+        padding-right: 8px !important;
+      }
+      .fh5co-about .col-md-6:last-child .content {
+        flex-grow: 1 !important;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+      }
+      .fh5co-about .card-img {
+        height: 100% !important;
+        max-height: 220px !important;
+        object-fit: cover !important;
+        object-position: center !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -202,8 +665,6 @@
               <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
             </div>
           </li>
-
-          <li class="nav-item"> <a class="nav-link" href="#activity">Activity</a></li>
           <li class="nav-item"> <a class="nav-link" href="#contact">Contact</a></li>
         </ul>
       </div>
@@ -215,9 +676,9 @@
        Change min-height below to control banner height.
        Example: style="min-height: 600px;"
      ============================ -->
-  <div class="container-fluid fh5co-home-banner" style="min-height: 00px; margin-bottom:0;">
+  <div class="container-fluid fh5co-home-banner" style="min-height: 85vh; margin-bottom:0;">
     <div class="card">
-      <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
+      <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="" style="height:85vh; object-fit:cover; object-position:center;">
       <div class="card-img-overlay">
         <div class="center-text">
           <h2 class="card-title">ik breng jouw visie tot leven met oog voor detail en passsie voor beeld.</h2>
@@ -278,58 +739,14 @@
             <h4>Fotograaf en videograaf gespecialiseerd in product-, auto- en evenementenfotografie. Gebaseerd in België.</h4>
             <hr />
             <p>Fotografie en videografie zijn voor mij veel meer dan een beroep — het is een passie. Met SDL_Visuals specialiseer ik mij in productfotografie, automotive shoots en evenementenreportages. Ik streef ernaar elk beeld te laten spreken door sfeer, detail en emotie vast te leggen. Binnenkort breid ik mijn portfolio uit met trouw- en communiefotografie, zodat ik ook de mooiste momenten uit het leven voor altijd kan vereeuwigen. Mijn missie? Creatieve, hoogwaardige beelden leveren die écht impact maken.</p>
-            <a href="#contact" class="btn">CONTACT</a>
+            <a href="#contact" class="btn btn-outline-light">CONTACT</a>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===========================
-       RECENT WORK / ACTIVITY
-     ============================ -->
-  <style>
-    /* Desktop: original offset */
-    #activity { scroll-margin-top: 120px; }
-    /* Mobile: adjust so scroll is correct */
-    @media (max-width: 991.98px) {
-      #activity { scroll-margin-top: 70px !important; }
-    }
-  </style>
-  <div class="container-fluid recent fh5co-activity" id="activity" style="min-height: 500px;">
-    <div class="container">
-      <div class="row">
-        <h2>Recent works</h2>
-        <div class="owl-carousel owl-carousel2 owl-theme">
-          <div>
-            <div class="card">
-              <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
-              <div class="card-img-overlay">
-                <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                <div class="bottom-text">
-                  <h5 class="card-title">Model photography</h5>
-                  <p class="card-text">Digital, Photography</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="card">
-              <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
-              <div class="card-img-overlay">
-                <a href="#"><img src="assets/img/heart.png" class="heart" alt="heart icon"></a>
-                <div class="bottom-text">
-                  <h5 class="card-title">Product fotografie</h5>
-                  <p class="card-text">Digital, Photography</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- You can add/remove items here -->
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
 
   <!-- ===========================
@@ -345,7 +762,6 @@
             <a href="evenementen.html">
               <img class="card-img" src="assets/img/Aluvision TeamBuilding 2025-73.JPG" alt="">
               <div class="card-img-overlay">
-                <img src="assets/img/heart.png" class="heart" alt="heart icon">
                 <div class="bottom-text"><h5 class="card-title">Evenement Fotografie</h5></div>
               </div>
             </a>
@@ -357,7 +773,6 @@
             <a href="auto.html">
               <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-11.JPG" alt="">
               <div class="card-img-overlay">
-                <img src="assets/img/heart.png" class="heart" alt="heart icon">
                 <div class="bottom-text"><h5 class="card-title">Auto Motive fotografie</h5></div>
               </div>
             </a>
@@ -369,7 +784,6 @@
             <a href="portret.html">
               <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
               <div class="card-img-overlay">
-                <img src="assets/img/heart.png" class="heart" alt="heart icon">
                 <div class="bottom-text"><h5 class="card-title">Portret fotografie</h5></div>
               </div>
             </a>
@@ -381,7 +795,6 @@
             <a href="product.html">
               <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
               <div class="card-img-overlay">
-                <img src="assets/img/heart.png" class="heart" alt="heart icon">
                 <div class="bottom-text"><h5 class="card-title">Product fotografie</h5></div>
               </div>
             </a>
@@ -391,29 +804,20 @@
     </div>
   </div>
 
-  <!-- ===========================
-     INSTA FEED / SOCIALS
-     ============================ -->
-
-<div class="col-lg-6 feed-caro">
-  <h2>Instagram feed</h2>
-
-  <!-- LightWidget Instagram feed -->
-  <div class="instagram-embed-container" style="margin-top: 20px;">
-    <!-- LightWidget WIDGET -->
-    <script src="https://cdn.lightwidget.com/widgets/lightwidget.js"></script>
-    <iframe src="//lightwidget.com/widgets/b7872668fce159f4994809e7cdbf2dd8.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" style="width:100%;border:0;overflow:hidden;"></iframe>
-  </div>
-</div>
-
 <!-- SOCIAL LINKS -->
 <h2 class="text-center d-block">Find me on social media</h2>
 <div class="row social-links">
   <ul class="nav mx-auto">
-    <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/facebook.png" alt=""></a></li>
-    <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/twitter.png" alt=""></a></li>
-    <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/pinterest.png" alt=""></a></li>
-    <li class="nav-item"><a class="nav-link" href="#"><img src="assets/img/google-plus.png" alt=""></a></li>
+    <li class="nav-item">
+      <a class="nav-link" href="https://www.instagram.com" target="_blank">
+        <img src="assets/img/instagram.png" alt="Instagram">
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="https://www.youtube.com" target="_blank">
+        <img src="assets/img/youtube.png" alt="YouTube">
+      </a>
+    </li>
   </ul>
 </div>
 
@@ -427,26 +831,265 @@
       <!-- MAP column -->
       <div class="col-md-6 pr-0 pl-0 map">
         <!-- Put your map here; keep same aspect ratio/styling as original -->
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13035.46901327725!2d-80.85396551628644!3d35.234674411422155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8856a03af474f38f%3A0xf8301daadf5f7670!2sFourth+Ward%2C+Charlotte%2C+NC%2C+USA!5e0!3m2!1sen!2sin!4v1551001218548" style="border:0; width:100%; height:100%;" allowfullscreen></iframe>
+        <iframe src="" style="border:0; width:100%; height:100%;" allowfullscreen></iframe>
       </div>
 
-      <!-- CONTACT FORM column (original structure & class preserved) -->
+      <!-- CONTACT SECTION: Visueel aantrekkelijke contactbox -->
       <div class="col-md-6 content-us">
-        <div class="contact-form" id="contact">
-          <h3 class="text-uppercase">Contact me</h3>
-          <input type="text" class="form-control" placeholder="Your Name">
-          <input type="text" class="form-control" placeholder="Your Email">
-          <textarea class="form-control" placeholder="Your Message"></textarea>
-          <button type="submit">Send</button>
-        </div>
+        <section id="contact" class="w-100 contact-section-centered">
+          <div class="sdl-contactbox text-center">
+            <h3 class="contactbox-title mb-3">Contacteer mij</h3>
+            <p class="contactbox-desc">
+              Wil je samenwerken, heb je interesse in een fotoshoot of gewoon een vraag? Stuur gerust een e-mail, ik antwoord meestal binnen 24 uur.
+            </p>
+            <a href="mailto:info@sdlvisuals.be" class="sdl-contact-btn">
+              Contacteer me via e-mail
+            </a>
+          </div>
+        </section>
       </div>
+  <!-- Contactbox styling (neutral, minimal, responsive, light/dark mode) -->
+  <style>
+    /* Contactbox centering and layout */
+    .content-us {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 400px;
+    }
+    .contact-section-centered {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 100%;
+    }
+    .sdl-contactbox {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      background: #fafbfc;
+      box-shadow: 0 2px 14px rgba(40,40,50,0.05), 0 1.5px 6px rgba(0,0,0,0.03);
+      border-radius: 18px;
+      border: 1.5px solid #ededed;
+      padding: 38px 30px 30px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.18s, background 0.18s;
+    }
+    .contactbox-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      color: #232323;
+      margin-bottom: 1.15rem;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .contactbox-desc {
+      color: #333;
+      font-size: 1.08rem;
+      margin-bottom: 2rem;
+      max-width: 320px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .sdl-contact-btn {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      max-width: 250px;
+      padding: 0.85rem 1.2rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border-radius: 1.8rem;
+      border: 2px solid #444;
+      background: #232323;
+      color: #fff;
+      letter-spacing: 0.04em;
+      box-shadow: 0 2px 10px rgba(30,30,30,0.06);
+      transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-align: center;
+      text-decoration: none;
+      outline: none;
+    }
+    .sdl-contact-btn:hover,
+    .sdl-contact-btn:focus {
+      background: #fff;
+      color: #232323;
+      border-color: #232323;
+      box-shadow: 0 4px 20px rgba(40,40,40,0.13);
+      text-decoration: none;
+      outline: none;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+      .sdl-contactbox {
+        max-width: 98vw;
+        padding: 24px 5vw 24px 5vw;
+        border-radius: 14px;
+      }
+      .sdl-contact-btn {
+        max-width: 99vw;
+        font-size: 1.04rem;
+        padding: 0.75rem 0.5rem;
+      }
+    }
+    @media (max-width: 600px) {
+      .content-us {
+        min-height: 290px;
+      }
+      .sdl-contactbox {
+        padding: 18px 2vw 18px 2vw;
+        border-radius: 10px;
+      }
+      .contactbox-title {
+        font-size: 1.12rem;
+      }
+      .contactbox-desc {
+        font-size: 0.98rem;
+      }
+    }
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      .sdl-contactbox {
+        background: #232526 !important;
+        box-shadow: 0 2px 16px rgba(20,20,20,0.16) !important;
+        border: 1.5px solid #232323 !important;
+      }
+      .contactbox-title {
+        color: #fafbfc !important;
+      }
+      .contactbox-desc {
+        color: #e0e0e0 !important;
+      }
+      .sdl-contact-btn {
+        background: #fafbfc !important;
+        color: #232323 !important;
+        border: 2px solid #fafbfc !important;
+        box-shadow: 0 2px 12px rgba(240,240,240,0.11) !important;
+      }
+      .sdl-contact-btn:hover,
+      .sdl-contact-btn:focus {
+        background: #232323 !important;
+        color: #fafbfc !important;
+        border-color: #fafbfc !important;
+        box-shadow: 0 4px 20px rgba(230,230,230,0.18) !important;
+      }
+    }
+  </style>
 
     </div>
 
     <div class="copy pt-4 pb-4">
-      <p><a href="#" target="_blank"> &copy; 2025 SDL Visuals</a>  &nbsp;  |  &nbsp; All rights reserved</p>
+      <p><a href="#" target="_blank"> &copy; 2026 SDL Visuals</a>  &nbsp;  |  &nbsp; All rights reserved</p>
+      <!-- Professionele bedrijfsgegevens sectie: minimalistisch & modern -->
+      <section class="sdl-company-info">
+        <div class="company-info-inner">
+          <div class="company-line company-nameowner">SDL_Visuals &ndash; Seppe De Luycker</div>
+          <div class="company-line company-address">Aaltersesteenweg 36, 9800 Deinze</div>
+          <div class="company-line company-email">E-mail: <a href="mailto:de.luycker.seppe@icloud.com">de.luycker.seppe@icloud.com</a></div>
+          <div class="company-line company-vat">BTW: BE1025472518</div>
+        </div>
+      </section>
     </div>
   </footer>
+
+  <!-- Minimalistische bedrijfsgegevens styling (neutral, zonder roze/rood) -->
+  <style>
+    .sdl-company-info {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 0 0 0;
+      background: transparent;
+      margin: 0;
+    }
+    .company-info-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 230px;
+      max-width: 430px;
+      margin: 0 auto;
+      text-align: center;
+      font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+    }
+    .company-line {
+      margin-bottom: 7px;
+      letter-spacing: 0.01em;
+      line-height: 1.5;
+      color: #232323;
+      font-size: 1.07rem;
+      font-weight: 400;
+    }
+    .company-nameowner {
+      font-weight: 700;
+      font-size: 1.11rem;
+      color: #232323;
+      margin-bottom: 7px;
+      letter-spacing: 0.02em;
+    }
+    .company-email a {
+      color: #232323;
+      text-decoration: underline;
+      transition: color 0.16s;
+      word-break: break-all;
+    }
+    .company-email a:hover,
+    .company-email a:focus {
+      color: #666;
+      text-decoration: none;
+    }
+    .company-vat {
+      font-family: inherit;
+      font-size: 1.01rem;
+      color: #494949;
+      margin-bottom: 0;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      .company-info-inner {
+        font-size: 0.99rem;
+      }
+      .sdl-company-info {
+        padding-top: 7px;
+        padding-bottom: 0;
+      }
+      .company-nameowner {
+        font-size: 1.02rem;
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      .company-info-inner {
+        /* No background, color, box-shadow, border */
+      }
+      .company-line,
+      .company-vat {
+        color: #fafbfc;
+      }
+      .company-nameowner {
+        color: #fafbfc;
+      }
+      .company-email a {
+        color: #fafbfc;
+        text-decoration: underline;
+        transition: color 0.16s;
+      }
+      .company-email a:hover,
+      .company-email a:focus {
+        color: #e0e0e0;
+        text-decoration: none;
+      }
+    }
+  </style>
 
   <!-- jQuery, Popper, Bootstrap JS (original order) -->
   <script src="assets/js/jquery-3.3.1.slim.min.js"></script>
