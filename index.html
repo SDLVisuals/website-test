@@ -17,6 +17,74 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 
   <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+  </style>
+
+  <style>
+    /* ===============================
+       Fade-in Animation for Scroll Reveal
+       =============================== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ===============================
+       Button Hover Animations
+       =============================== */
+    .btn,
+    .sdl-contact-btn {
+      transition: background 0.22s cubic-bezier(0.4,0,0.2,1), color 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1), border-color 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.18s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 2px 8px rgba(233,14,101,0.05);
+    }
+    .btn:hover,
+    .btn:focus,
+    .sdl-contact-btn:hover,
+    .sdl-contact-btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 32px rgba(233,14,101,0.18);
+      text-decoration: none !important;
+    }
+
+    /* ===============================
+       Dropdown Menu Fade Effect
+       =============================== */
+    .sdl-navbar .dropdown-menu {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+      display: block; /* Keep menu in flow for animation, hide with opacity/pointer-events */
+      visibility: hidden;
+    }
+    .sdl-navbar .dropdown.show > .dropdown-menu,
+    .sdl-navbar .dropdown .dropdown-menu.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      visibility: visible;
+    }
+    @media (max-width: 991.98px) {
+      .sdl-navbar .dropdown-menu {
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+        display: block !important;
+      }
+    }
+
     /* Hero overlay fix: center text + button on all images */
     .card-img-overlay {
       display: flex;
@@ -178,40 +246,6 @@
   @media (prefers-color-scheme: dark) {
 
     body {
-      background-color: #121212;
-      color: #ffffff;
-    }
-
-    .recent,
-    .fh5co-home-banner,
-    .fh5co-two-img,
-    .fh5co-about,
-    .fh5co-portfolio,
-    footer {
-      background-color: transparent;
-    }
-
-    .card {
-      background-color: #1e1e1e;
-    }
-
-    p {
-      color: #d0d0d0;
-    }
-
-    h1,h2,h3,h4,h5,h6 {
-      color: #ffffff;
-    }
-
-    a {
-      color: #e90e65;
-    }
-  }
-  </style>
-  <style>
-  @media (prefers-color-scheme: dark) {
-
-    body {
       background-color: #121212 !important;
       color: #ffffff !important;
     }
@@ -300,10 +334,7 @@
     }
   }
   </style>
-  <!-- Remove hover effect from about photo (left) - volledig hover-effect uitgeschakeld -->
-</head>
-
-  <!-- Zet About-sectie foto & overlay altijd zonder hover-effect -->
+  <!-- Remove ALL hover/transition/transform/cursor/pointer-events from About photo -->
   <style>
     .fh5co-about .card-img,
     .fh5co-about .card-img:hover,
@@ -311,6 +342,9 @@
       opacity: 1 !important;
       filter: none !important;
       transition: none !important;
+      transform: none !important;
+      pointer-events: none !important;
+      cursor: default !important;
     }
     .fh5co-about .card-img-overlay,
     .fh5co-about .card-img-overlay:hover,
@@ -318,6 +352,9 @@
       opacity: 1 !important;
       filter: none !important;
       transition: none !important;
+      transform: none !important;
+      pointer-events: none !important;
+      cursor: default !important;
     }
   </style>
   <!-- Verbeterde About-sectie layout voor mobiel -->
@@ -568,62 +605,7 @@
       overflow: visible;
     }
   </style>
-</head>
 
-  <!-- Responsive: About-sectie foto niet te groot op mobiel -->
-  <style>
-    @media (max-width: 767px) {
-      .fh5co-about .card-img {
-        height: 200px !important;
-        object-fit: cover !important;
-        object-position: center !important;
-      }
-    }
-  </style>
-
-</head>
-
-  <!-- Verbeterde About-sectie layout voor mobiel -->
-  <style>
-    @media (max-width: 767px) {
-      .fh5co-about .row {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: stretch !important;
-      }
-      .fh5co-about .col-md-6:first-child {
-        width: 40% !important;
-        max-width: 40% !important;
-        flex: 0 0 40% !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        display: flex !important;
-        align-items: stretch !important;
-      }
-      .fh5co-about .col-md-6:last-child {
-        width: 60% !important;
-        max-width: 60% !important;
-        flex: 1 1 60% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        padding-left: 16px !important;
-        padding-right: 8px !important;
-      }
-      .fh5co-about .col-md-6:last-child .content {
-        flex-grow: 1 !important;
-        padding-top: 8px !important;
-        padding-bottom: 8px !important;
-      }
-      .fh5co-about .card-img {
-        height: 100% !important;
-        max-height: 220px !important;
-        object-fit: cover !important;
-        object-position: center !important;
-      }
-    }
-  </style>
 </head>
 
 <body>
@@ -641,7 +623,13 @@
       </a>
 
       <!-- Mobile toggler: keeps the hamburger animation by toggling .is-active -->
-      <button class="navbar-toggler hamburger hamburger--squeeze" type="button" data-toggle="collapse" data-target="#my-nav" aria-controls="my-nav" aria-expanded="false" aria-label="Toggle navigation" onclick="this.classList.toggle('is-active')">
+      <button class="navbar-toggler hamburger hamburger--squeeze"
+        type="button"
+        data-toggle="collapse"
+        data-target="#my-nav"
+        aria-controls="my-nav"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
         <span class="hamburger-box">
           <span class="hamburger-inner"></span>
         </span>
@@ -678,7 +666,7 @@
      ============================ -->
   <div class="container-fluid fh5co-home-banner" style="min-height: 85vh; margin-bottom:0;">
     <div class="card">
-      <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="" style="height:85vh; object-fit:cover; object-position:center;">
+      <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="" style="height:85vh; min-height:420px; object-fit:cover; object-position:center;">
       <div class="card-img-overlay">
         <div class="center-text">
           <h2 class="card-title">ik breng jouw visie tot leven met oog voor detail en passsie voor beeld.</h2>
@@ -727,13 +715,13 @@
   <div class="container-fluid recent fh5co-about scroll-offset" id="about" style="min-height: 500px; scroll-margin-top: 100px;">
     <div class="container contact-pop">
       <div class="row">
-        <div class="col-md-6 pr-0">
+        <div class="col-md-6 pr-0 fade-in">
           <div class="card">
             <img class="card-img w-100" src="assets/img/Aluvision Team Building 2024-38.jpg" alt="">
             <div class="card-img-overlay"></div>
           </div>
         </div>
-        <div class="col-md-6 pl-0">
+        <div class="col-md-6 pl-0 fade-in">
           <div class="content">
             <h3>ik ben seppe de luycker</h3>
             <h4>Fotograaf en videograaf gespecialiseerd in product-, auto- en evenementenfotografie. Gebaseerd in België.</h4>
@@ -757,7 +745,7 @@
     <div class="container">
       <h2>Portfolios</h2>
       <div class="row">
-        <div class="col-md-3 col-sm-6 mb-4">
+        <div class="col-md-3 col-sm-6 mb-4 fade-in">
           <div class="card">
             <a href="evenementen.html">
               <img class="card-img" src="assets/img/Aluvision TeamBuilding 2025-73.JPG" alt="">
@@ -768,18 +756,18 @@
           </div>
         </div>
 
-        <div class="col-md-3 col-sm-6 mb-4">
+        <div class="col-md-3 col-sm-6 mb-4 fade-in">
           <div class="card">
             <a href="auto.html">
               <img class="card-img" src="assets/img/Mercedes CLA 250E Amg Line-11.JPG" alt="">
               <div class="card-img-overlay">
-                <div class="bottom-text"><h5 class="card-title">Auto Motive fotografie</h5></div>
+                <div class="bottom-text"><h5 class="card-title">Automotive fotografie</h5></div>
               </div>
             </a>
           </div>
         </div>
 
-        <div class="col-md-3 col-sm-6 mb-4">
+        <div class="col-md-3 col-sm-6 mb-4 fade-in">
           <div class="card">
             <a href="portret.html">
               <img class="card-img" src="assets/img/Portret_-52.JPG" alt="">
@@ -790,7 +778,7 @@
           </div>
         </div>
 
-        <div class="col-md-3 col-sm-6 mb-4">
+        <div class="col-md-3 col-sm-6 mb-4 fade-in">
           <div class="card">
             <a href="product.html">
               <img class="card-img" src="assets/img/Iphone 16 Pro max-2.jpg" alt="">
@@ -804,289 +792,213 @@
     </div>
   </div>
 
-<!-- SOCIAL LINKS -->
-<h2 class="text-center d-block">Find me on social media</h2>
-<div class="row social-links">
-  <ul class="nav mx-auto">
-    <li class="nav-item">
-      <a class="nav-link" href="https://www.instagram.com" target="_blank">
-        <img src="assets/img/instagram.png" alt="Instagram">
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="https://www.youtube.com" target="_blank">
-        <img src="assets/img/youtube.png" alt="YouTube">
-      </a>
-    </li>
-  </ul>
-</div>
 
   <!-- ===========================
        CONTACT (FOOTER) - contact form placed in footer like the original
        The #contact anchor here is the canonical target for the nav link.
      ============================ -->
   <footer class="container-fluid p-0 pr-0">
-    <div class="row mr-0 ml-0">
-
-      <!-- MAP column -->
-      <div class="col-md-6 pr-0 pl-0 map">
-        <!-- Put your map here; keep same aspect ratio/styling as original -->
-        <iframe src="" style="border:0; width:100%; height:100%;" allowfullscreen></iframe>
-      </div>
-
-      <!-- CONTACT SECTION: Visueel aantrekkelijke contactbox -->
-      <div class="col-md-6 content-us">
+    <div class="container d-flex justify-content-center align-items-center" style="padding: 60px 0;">
+      <!-- CONTACT SECTION -->
+      <div class="col-12 col-md-6 improved-contact">
         <section id="contact" class="w-100 contact-section-centered">
-          <div class="sdl-contactbox text-center">
-            <h3 class="contactbox-title mb-3">Contacteer mij</h3>
+          <div class="sdl-contactbox text-center improved-box">
+            <h3 class="contactbox-title mb-3">Neem contact op</h3>
             <p class="contactbox-desc">
-              Wil je samenwerken, heb je interesse in een fotoshoot of gewoon een vraag? Stuur gerust een e-mail, ik antwoord meestal binnen 24 uur.
+              Interesse in een samenwerking of een shoot? 
+              Stuur me gerust een bericht en ik antwoord zo snel mogelijk.
             </p>
-            <a href="mailto:info@sdlvisuals.be" class="sdl-contact-btn">
-              Contacteer me via e-mail
+            <a href="mailto:info@sdlvisuals.be" class="sdl-contact-btn mt-4">
+              Stuur een e-mail
             </a>
+            <div class="contact-social d-flex justify-content-center mt-4 gap-3">
+              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+                <img src="assets/img/instagram.png" alt="Instagram" class="social-icon">
+              </a>
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+                <img src="assets/img/youtube.png" alt="YouTube" class="social-icon">
+              </a>
+            </div>
           </div>
         </section>
       </div>
-  <!-- Contactbox styling (neutral, minimal, responsive, light/dark mode) -->
+    </div>
+  <!-- Modernized Contactbox & Button styling -->
   <style>
-    /* Contactbox centering and layout */
-    .content-us {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      min-height: 400px;
-    }
-    .contact-section-centered {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      min-height: 100%;
-    }
-    .sdl-contactbox {
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-      background: #fafbfc;
-      box-shadow: 0 2px 14px rgba(40,40,50,0.05), 0 1.5px 6px rgba(0,0,0,0.03);
-      border-radius: 18px;
-      border: 1.5px solid #ededed;
-      padding: 38px 30px 30px 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: box-shadow 0.18s, background 0.18s;
-    }
-    .contactbox-title {
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: 0.07em;
-      color: #232323;
-      margin-bottom: 1.15rem;
-      text-align: center;
-      text-transform: uppercase;
-    }
-    .contactbox-desc {
-      color: #333;
-      font-size: 1.08rem;
-      margin-bottom: 2rem;
-      max-width: 320px;
-      text-align: center;
-      line-height: 1.6;
-    }
-    .sdl-contact-btn {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      width: 100%;
-      max-width: 250px;
-      padding: 0.85rem 1.2rem;
-      font-size: 1.15rem;
-      font-weight: 700;
-      border-radius: 1.8rem;
-      border: 2px solid #444;
-      background: #232323;
+  /* Modern contact box */
+  .improved-box {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 30px;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .improved-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .improved-box {
+      background: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
       color: #fff;
-      letter-spacing: 0.04em;
-      box-shadow: 0 2px 10px rgba(30,30,30,0.06);
-      transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
-      cursor: pointer;
-      text-transform: uppercase;
-      text-align: center;
-      text-decoration: none;
-      outline: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .improved-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+  }
+
+  /* Contact button */
+  .sdl-contact-btn {
+    display: inline-block;
+    padding: 0.55rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 1.5rem;
+    border: 2px solid #e90e65;
+    background-color: #e90e65 !important;
+    color: #fff !important;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.25s ease;
+  }
+
+  .sdl-contact-btn:hover,
+  .sdl-contact-btn:focus {
+    background-color: #fff !important;
+    color: #e90e65 !important;
+    box-shadow: 0 6px 20px rgba(233,14,101,0.3);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .sdl-contact-btn {
+      background-color: #e90e65 !important;
+      color: #fff !important;
     }
     .sdl-contact-btn:hover,
     .sdl-contact-btn:focus {
-      background: #fff;
-      color: #232323;
-      border-color: #232323;
-      box-shadow: 0 4px 20px rgba(40,40,40,0.13);
-      text-decoration: none;
-      outline: none;
+      background-color: #fff !important;
+      color: #e90e65 !important;
     }
-    /* Responsive adjustments */
-    @media (max-width: 991px) {
-      .sdl-contactbox {
-        max-width: 98vw;
-        padding: 24px 5vw 24px 5vw;
-        border-radius: 14px;
-      }
-      .sdl-contact-btn {
-        max-width: 99vw;
-        font-size: 1.04rem;
-        padding: 0.75rem 0.5rem;
-      }
+  }
+
+  /* Responsive: ensure box & spacing scales well */
+  @media (max-width: 991.98px) {
+    .improved-box {
+      padding: 30px 12px;
+      max-width: 98vw;
     }
-    @media (max-width: 600px) {
-      .content-us {
-        min-height: 290px;
-      }
-      .sdl-contactbox {
-        padding: 18px 2vw 18px 2vw;
-        border-radius: 10px;
-      }
-      .contactbox-title {
-        font-size: 1.12rem;
-      }
-      .contactbox-desc {
-        font-size: 0.98rem;
-      }
+    .improved-contact {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
     }
-    /* Dark mode */
-    @media (prefers-color-scheme: dark) {
-      .sdl-contactbox {
-        background: #232526 !important;
-        box-shadow: 0 2px 16px rgba(20,20,20,0.16) !important;
-        border: 1.5px solid #232323 !important;
-      }
-      .contactbox-title {
-        color: #fafbfc !important;
-      }
-      .contactbox-desc {
-        color: #e0e0e0 !important;
-      }
-      .sdl-contact-btn {
-        background: #fafbfc !important;
-        color: #232323 !important;
-        border: 2px solid #fafbfc !important;
-        box-shadow: 0 2px 12px rgba(240,240,240,0.11) !important;
-      }
-      .sdl-contact-btn:hover,
-      .sdl-contact-btn:focus {
-        background: #232323 !important;
-        color: #fafbfc !important;
-        border-color: #fafbfc !important;
-        box-shadow: 0 4px 20px rgba(230,230,230,0.18) !important;
-      }
+    .improved-box h3,
+    .improved-box p {
+      text-align: center !important;
     }
+  }
+  </style>
+
+  <!-- Properly center contact box inside footer using flexbox -->
+  <style>
+  /* Ensure no background color is applied to content-us or improved-contact */
+  footer .col-md-6.content-us,
+  footer .improved-contact {
+    background: transparent !important;
+  }
   </style>
 
     </div>
 
-    <div class="copy pt-4 pb-4">
-      <p><a href="#" target="_blank"> &copy; 2026 SDL Visuals</a>  &nbsp;  |  &nbsp; All rights reserved</p>
-      <!-- Professionele bedrijfsgegevens sectie: minimalistisch & modern -->
-      <section class="sdl-company-info">
-        <div class="company-info-inner">
-          <div class="company-line company-nameowner">SDL_Visuals &ndash; Seppe De Luycker</div>
-          <div class="company-line company-address">Aaltersesteenweg 36, 9800 Deinze</div>
-          <div class="company-line company-email">E-mail: <a href="mailto:de.luycker.seppe@icloud.com">de.luycker.seppe@icloud.com</a></div>
-          <div class="company-line company-vat">BTW: BE1025472518</div>
+    <div class="copy pt-5 pb-5 improved-footer text-center">
+      <div class="footer-inner">
+        <p class="footer-brand">&copy; 2026 SDL Visuals</p>
+
+        <div class="footer-info">
+          <div>SDL_Visuals – Seppe De Luycker</div>
+          <div>Aaltersesteenweg 36, 9800 Deinze</div>
+          <div><a href="mailto:de.luycker.seppe@icloud.com">de.luycker.seppe@icloud.com</a></div>
+          <div>BTW: BE1025472518</div>
         </div>
-      </section>
+      </div>
     </div>
   </footer>
 
-  <!-- Minimalistische bedrijfsgegevens styling (neutral, zonder roze/rood) -->
+
   <style>
-    .sdl-company-info {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px 0 0 0;
-      background: transparent;
-      margin: 0;
+    .improved-footer {
+      padding-top: 50px;
+      padding-bottom: 50px;
+      font-size: 0.95rem;
     }
-    .company-info-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 230px;
-      max-width: 430px;
+
+    .footer-inner {
+      max-width: 600px;
       margin: 0 auto;
-      text-align: center;
-      font-family: 'Montserrat', Arial, Helvetica, sans-serif;
     }
-    .company-line {
-      margin-bottom: 7px;
-      letter-spacing: 0.01em;
-      line-height: 1.5;
-      color: #232323;
-      font-size: 1.07rem;
-      font-weight: 400;
-    }
-    .company-nameowner {
+
+    .footer-brand {
       font-weight: 700;
-      font-size: 1.11rem;
-      color: #232323;
-      margin-bottom: 7px;
-      letter-spacing: 0.02em;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
     }
-    .company-email a {
-      color: #232323;
-      text-decoration: underline;
-      transition: color 0.16s;
-      word-break: break-all;
+
+    .footer-info div {
+      margin-bottom: 0.4rem;
     }
-    .company-email a:hover,
-    .company-email a:focus {
-      color: #666;
+
+    .footer-info a {
       text-decoration: none;
     }
-    .company-vat {
-      font-family: inherit;
-      font-size: 1.01rem;
-      color: #494949;
-      margin-bottom: 0;
-      letter-spacing: 0.01em;
+
+    .footer-info a:hover {
+      text-decoration: underline;
     }
-    @media (max-width: 600px) {
-      .company-info-inner {
-        font-size: 0.99rem;
+
+    @media (prefers-color-scheme: light) {
+      .improved-footer {
+        background: #f8f9fa !important;
+        color: #232323 !important;
       }
-      .sdl-company-info {
-        padding-top: 7px;
-        padding-bottom: 0;
+      .footer-info a {
+        color: #232323 !important;
       }
-      .company-nameowner {
-        font-size: 1.02rem;
+      .footer-brand {
+        color: #232323 !important;
       }
     }
+
     @media (prefers-color-scheme: dark) {
-      .company-info-inner {
-        /* No background, color, box-shadow, border */
+
+      footer {
+        background: #121212 !important;
       }
-      .company-line,
-      .company-vat {
-        color: #fafbfc;
+
+      .improved-footer {
+        background: #121212 !important;
+        color: #f1f1f1 !important;
       }
-      .company-nameowner {
-        color: #fafbfc;
+
+      .footer-info a {
+        color: #f1f1f1 !important;
       }
-      .company-email a {
-        color: #fafbfc;
-        text-decoration: underline;
-        transition: color 0.16s;
+
+      .footer-info a:hover {
+        color: #e90e65 !important;
       }
-      .company-email a:hover,
-      .company-email a:focus {
-        color: #e0e0e0;
-        text-decoration: none;
+    }
+    /* Footer brand visibility in light mode */
+    @media (prefers-color-scheme: light) {
+      .footer-brand {
+        color: #232323 !important;
       }
     }
   </style>
@@ -1139,6 +1051,18 @@
 
     // Ensure navbar-brand logo toggles on dark mode preference (optional)
     (function(){
+      var toggler = document.querySelector('.navbar-toggler');
+      var collapse = document.getElementById('my-nav');
+
+      if (toggler && collapse) {
+        collapse.addEventListener('show.bs.collapse', function () {
+          toggler.classList.add('is-active');
+        });
+
+        collapse.addEventListener('hide.bs.collapse', function () {
+          toggler.classList.remove('is-active');
+        });
+      }
       var lightLogo = document.querySelector('.sdl-logo-light');
       var darkLogo = document.querySelector('.sdl-logo-dark');
       function setLogo() {
@@ -1192,5 +1116,55 @@
     })();
   </script>
 
+  <!-- Scroll Reveal JS for fade-in elements -->
+  <script>
+    (function() {
+      // Helper: reveal .fade-in elements on scroll
+      function revealOnScroll() {
+        var elems = document.querySelectorAll('.fade-in');
+        var windowHeight = window.innerHeight;
+        for (var i = 0; i < elems.length; i++) {
+          var elem = elems[i];
+          var rect = elem.getBoundingClientRect();
+          if (rect.top < windowHeight - 60) {
+            elem.classList.add('visible');
+          }
+        }
+      }
+      // Initial check
+      document.addEventListener('DOMContentLoaded', function() {
+        revealOnScroll();
+      });
+      // On scroll/resize
+      window.addEventListener('scroll', revealOnScroll);
+      window.addEventListener('resize', revealOnScroll);
+    })();
+  </script>
+
 </body>
 </html>
+  <!-- Remove only the gray block behind the contact box, keep box itself -->
+  <style>
+  /* Remove any residual background behind the contact box while keeping the box visible */
+  footer .col-md-6.content-us,
+  footer .improved-contact {
+    background-color: transparent !important; /* matches page background */
+  }
+
+  footer .improved-contact::before,
+  footer .improved-contact::after,
+  footer .sdl-contactbox::before,
+  footer .sdl-contactbox::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  /* Remove gray background from any previous rules on footer .row or .col-md-6.content-us */
+  footer .row,
+  footer .col-md-6.content-us {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+  </style>
