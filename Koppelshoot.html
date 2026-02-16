@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Koppelshoot Fotografie - SDL Visuals</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+<link rel="stylesheet" href="assets/css/style.css" />
+
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+
+<!-- Favicon -->
+<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)" />
+<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)" />
+
+<style>
+/* ------------------------------
+   NAVBAR + HAMBURGER STYLES
+   ------------------------------ */
+.sdl-navbar { background:#fff; padding:0.4rem 0; box-shadow:0 1px 10px rgba(0,0,0,0.03); position:sticky; top:0; z-index:1020; }
+.sdl-navbar .navbar-brand img { height:50px; }
+.sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; }
+.sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
+
+/* Dropdown arrow */
+.sdl-navbar .dropdown-toggle::after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.3rem;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #111;
+  transition: transform 0.35s ease-in-out;
+}
+.sdl-navbar .dropdown.show > .dropdown-toggle::after,
+.sdl-navbar .dropdown .dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(-180deg);
+}
+@media (prefers-color-scheme: dark) {
+  .sdl-navbar { background: #181a1b !important; box-shadow: 0 1px 10px rgba(0,0,0,0.50); }
+  .sdl-navbar .navbar-nav .nav-link { color:#fff !important; }
+  .sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65 !important; }
+  .sdl-navbar .dropdown-toggle::after { border-top-color: #fff; }
+}
+
+/* Hamburger */
+.hamburger { padding:10px; border:0; background:transparent; }
+.hamburger-box { width:30px; height:24px; position:relative; display:inline-block; }
+.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+  width:30px; height:4px; background:#111; border-radius:2px; position:absolute; left:0;
+  transition: transform .22s cubic-bezier(.55,.055,.675,.19), opacity .18s, background-color .18s;
+}
+.hamburger-inner { top:50%; transform:translateY(-50%); }
+.hamburger-inner::before { content:""; top:-10px; }
+.hamburger-inner::after { content:""; bottom:-10px; }
+.hamburger.is-active .hamburger-inner { transform: rotate(45deg); background-color:#e90e65; }
+.hamburger.is-active .hamburger-inner::before { top:0; opacity:0; }
+.hamburger.is-active .hamburger-inner::after { bottom:0; transform: rotate(-90deg); background-color:#e90e65; }
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Gallery Grid */
+.gallery-container { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
+.gallery-container a { flex:1 0 100%; max-width:100%; margin-bottom:15px; display:block; opacity:0; transform:scale(0.95); transition: transform 0.4s ease, opacity 0.4s ease; }
+@media (min-width:576px){ .gallery-container a { flex:1 0 48%; max-width:48%; } }
+@media (min-width:768px){ .gallery-container a { flex:1 0 31%; max-width:31%; } }
+@media (min-width:1200px){ .gallery-container a { flex:1 0 23%; max-width:23%; } }
+.gallery-container a img { width:100%; border-radius:12px; object-fit:cover; display:block; transition: transform 0.4s ease, box-shadow 0.4s ease; }
+.gallery-container a img:hover { transform:scale(1.08) translateY(-4px); box-shadow:0 15px 25px rgba(0,0,0,0.3); }
+.gallery-container a.loaded { opacity:1; transform:scale(1); }
+.fancybox__container .fancybox__content img { border-radius:12px; }
+
+@media (prefers-color-scheme: dark){
+  body { background:#121212; color:#fff; }
+  .card { background-color: #1e1e1e; box-shadow: 0 4px 12px rgba(0,0,0,0.7); }
+  .gallery-container a img { box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+  .fancybox__container { background: rgba(18,18,18,0.95) !important; }
+}
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sdl-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" class="sdl-logo-light">
+      <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" class="sdl-logo-dark" style="display:none;">
+    </a>
+    <button class="navbar-toggler hamburger hamburger--squeeze" type="button" data-toggle="collapse" data-target="#my-nav" aria-controls="my-nav" aria-expanded="false" aria-label="Toggle navigation" onclick="this.classList.toggle('is-active')">
+      <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+    </button>
+    <div id="my-nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item active"><a class="nav-link" href="index.html#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#about">Over</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="index.html#portfolio" id="portfolioDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Portfolio</a>
+          <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
+            <a class="dropdown-item" href="koppelshoot.html#portfolio-koppelshoot">Koppelshoot</a>
+            <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
+            <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
+            <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
+          </div>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <h2 class="text-center mb-4" id="portfolio-koppelshoot">Koppelshoot Fotografie</h2>
+  <div class="gallery-container" id="gallery"></div>
+</div>
+
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+<script>
+// Gallery auto generate
+const totalImages = 5; // Aantal foto's voor Koppelshoot
+const gallery = document.getElementById("gallery");
+for(let i=1;i<=totalImages;i++){
+  const src=`assets/img/koppelshoot/foto${i}.jpg`;
+  const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","koppelshoot");
+  const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
+  img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
+  a.appendChild(img); gallery.appendChild(a);
+}
+</script>
+
+</body>
+</html>
