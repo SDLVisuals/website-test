@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Koppelshoot - SDL Visuals</title>
+<title>koppelshoot - SDL Visuals</title>
 
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
@@ -223,7 +223,7 @@
 <!-- Gallery -->
 <div class="container mt-4">
   <!-- MARK: wijzig hier de header en ID voor andere portfolio categorie -->
-  <h2 class="text-center mb-4" id="portfolio-Koppleshoot">Koppelshoot</h2>
+  <h2 class="text-center mb-4" id="portfolio-koppleshoot">koppelshoot</h2>
   <div class="gallery-container" id="gallery"></div>
 </div>
 
@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function() {
 const totalImages = 5; // MARK: wijzig hier het aantal foto's voor deze categorie
 const gallery = document.getElementById("gallery");
 for(let i=1;i<=totalImages;i++){
-  const src=`assets/img/Koppelshoot/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
+  const src=`assets/img/koppelshoot/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
   const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
   const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
