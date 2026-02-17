@@ -651,7 +651,7 @@
               <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
               <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
               <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
-              <a class="dropdown-item" href="koppelshoot.html#portfolio-koppelshoot">Koppelshoot</a>
+              <a class="dropdown-item" href="Koppelshoot.html">Koppelshoot</a>
             </div>
           </li>
           <li class="nav-item"> <a class="nav-link" href="#contact">Contact</a></li>
@@ -1089,42 +1089,37 @@
       }
     })();
 
-    // Improved: Only close menu on non-dropdown nav-link click on mobile; handle dropdown submenu toggle on mobile
-    (function(){
-      // Close collapse on link click, except for dropdown toggles
-      $('#my-nav .nav-link').on('click', function(e){
-        var $link = $(this);
-        var $dropdown = $link.closest('.dropdown');
-        var isDropdownToggle = $link.hasClass('dropdown-toggle');
-        // Only close if not a dropdown-toggle on mobile
-        if($('#my-nav').hasClass('show') && !isDropdownToggle){
-          $('#my-nav').collapse('hide');
-          // reset hamburger button visual
-          var btn = document.querySelector('.navbar-toggler.hamburger');
-          if(btn) btn.classList.remove('is-active');
+    // ✅ SIMPLE mobile dropdown toggle for Portfolio (initially closed)
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth >= 992) return;
+
+      const portfolioToggle = e.target.closest('#portfolioDropdown');
+      const dropdown = document.querySelector('#portfolioDropdown')?.closest('.dropdown');
+      const menu = dropdown?.querySelector('.dropdown-menu');
+      if (!dropdown || !menu) return;
+
+      // Clicking "Portfolio" link toggles open/close
+      if (portfolioToggle) {
+        e.preventDefault();
+        const isOpen = dropdown.classList.contains('show');
+        if (isOpen) {
+          dropdown.classList.remove('show');
+          menu.classList.remove('show');
+          portfolioToggle.setAttribute('aria-expanded', 'false');
+        } else {
+          dropdown.classList.add('show');
+          menu.classList.add('show');
+          portfolioToggle.setAttribute('aria-expanded', 'true');
         }
-      });
-      // Mobile: toggle dropdown submenu without closing main menu
-      $('.navbar .dropdown > .dropdown-toggle').off('click').on('click', function(e){
-        if(window.innerWidth < 992){
-          e.preventDefault();
-          e.stopPropagation();
-          var $parent = $(this).parent();
-          var $menu = $parent.find('.dropdown-menu').first();
-          var isOpen = $parent.hasClass('show');
-          // Close all other dropdowns first
-          $('.navbar .dropdown').removeClass('show').find('.dropdown-menu').removeClass('show');
-          // Then toggle this one
-          if(!isOpen){
-            $parent.addClass('show');
-            $menu.addClass('show');
-            $(this).attr('aria-expanded','true');
-          } else {
-            $(this).attr('aria-expanded','false');
-          }
-        }
-      });
-    })();
+      }
+      // Clicking outside closes the dropdown if open
+      else if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+        menu.classList.remove('show');
+        const mainToggle = document.querySelector('#portfolioDropdown');
+        if (mainToggle) mainToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
   </script>
 
   <!-- Scroll Reveal JS for fade-in elements -->
