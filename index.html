@@ -67,22 +67,13 @@
       display: block; /* Keep menu in flow for animation, hide with opacity/pointer-events */
       visibility: hidden;
     }
+    
     .sdl-navbar .dropdown.show > .dropdown-menu,
     .sdl-navbar .dropdown .dropdown-menu.show {
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
       visibility: visible;
-    }
-    @media (max-width: 991.98px) {
-      .sdl-navbar .dropdown-menu {
-        transition: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-        display: block !important;
-      }
     }
 
     /* Hero overlay fix: center text + button on all images */
@@ -195,6 +186,7 @@
       .sdl-navbar .dropdown-menu {
         display: none;
       }
+
       .sdl-navbar .dropdown.show .dropdown-menu,
       .sdl-navbar .dropdown .dropdown-menu.show {
         display: block;
@@ -611,9 +603,7 @@
 <body>
 
   <!-- ===========================
-       NAVBAR (clean + Bootstrap collapse on mobile)
-       - Desktop: dropdown opens on hover & click
-       - Mobile: standard bootstrap collapse (click to open)
+       NAVBAR (Koppelshoot.html latest version, hover/click dropdown, hamburger, logo switch)
      ============================ -->
   <nav class="navbar navbar-expand-lg sdl-navbar">
     <div class="container">
@@ -621,8 +611,6 @@
         <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" class="sdl-logo-light">
         <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" class="sdl-logo-dark" style="display:none;">
       </a>
-
-      <!-- Mobile toggler: keeps the hamburger animation by toggling .is-active -->
       <button class="navbar-toggler hamburger hamburger--squeeze"
         type="button"
         data-toggle="collapse"
@@ -634,16 +622,16 @@
           <span class="hamburger-inner"></span>
         </span>
       </button>
-
-      <!-- Collapsible nav (Bootstrap) -->
       <div id="my-nav" class="collapse navbar-collapse">
         <ul class="navbar-nav mx-auto">
-          <li class="nav-item active"> <a class="nav-link" href="#">Home</a> </li>
-          <li class="nav-item"> <a class="nav-link" href="#about">Over</a></li>
-
-          <!-- Portfolio dropdown (works on desktop hover & mobile click) -->
+          <li class="nav-item active">
+            <a class="nav-link" href="index.html#home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html#about">Over</a>
+          </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="portfolioDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="portfolioDropdown" aria-haspopup="true" aria-expanded="false">
               Portfolio
             </a>
             <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
@@ -654,11 +642,80 @@
               <a class="dropdown-item" href="koppelshoot.html#portfolio-koppelshoot">Koppelshoot</a>
             </div>
           </li>
-          <li class="nav-item"> <a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html#contact">Contact</a>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
+  <!-- Navbar scripts: desktop hover dropdown, mobile toggle, hamburger animation, dark/light logo -->
+  <script>
+    // Desktop: open dropdown on hover (non-intrusive)
+    (function () {
+      function enableHoverDropdowns() {
+        if (window.innerWidth >= 992) { // desktop
+          document.querySelectorAll('.navbar .dropdown').forEach(function(drop){
+            drop.addEventListener('mouseenter', function(){
+              this.classList.add('show');
+              var menu = this.querySelector('.dropdown-menu');
+              if(menu) menu.classList.add('show');
+              var toggle = this.querySelector('.dropdown-toggle');
+              if(toggle) toggle.setAttribute('aria-expanded','true');
+            });
+            drop.addEventListener('mouseleave', function(){
+              this.classList.remove('show');
+              var menu = this.querySelector('.dropdown-menu');
+              if(menu) menu.classList.remove('show');
+              var toggle = this.querySelector('.dropdown-toggle');
+              if(toggle) toggle.setAttribute('aria-expanded','false');
+            });
+          });
+        } else {
+          // remove the event listeners (no-op if not added)
+          document.querySelectorAll('.navbar .dropdown').forEach(function(drop){
+            // nothing to remove because we added anonymous listeners; safe fallback: ensure menus are closed
+            drop.classList.remove('show');
+            var menu = drop.querySelector('.dropdown-menu');
+            if(menu) menu.classList.remove('show');
+          });
+        }
+      }
+
+      // run once and on resize
+      enableHoverDropdowns();
+      window.addEventListener('resize', enableHoverDropdowns);
+    })();
+
+    // Ensure navbar-brand logo toggles on dark mode preference (optional)
+    (function(){
+      var toggler = document.querySelector('.navbar-toggler');
+      var collapse = document.getElementById('my-nav');
+
+      if (toggler && collapse) {
+        collapse.addEventListener('show.bs.collapse', function () {
+          toggler.classList.add('is-active');
+        });
+
+        collapse.addEventListener('hide.bs.collapse', function () {
+          toggler.classList.remove('is-active');
+        });
+      }
+      var lightLogo = document.querySelector('.sdl-logo-light');
+      var darkLogo = document.querySelector('.sdl-logo-dark');
+      function setLogo() {
+        var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if(lightLogo && darkLogo){
+          lightLogo.style.display = isDark ? 'none' : '';
+          darkLogo.style.display = isDark ? '' : 'none';
+        }
+      }
+      setLogo();
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setLogo);
+      }
+    })();
+  </script>
 
   <!-- ===========================
        BANNER (home)
@@ -1088,39 +1145,41 @@
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setLogo);
       }
     })();
+  </script>
 
-    // ✅ SIMPLE mobile dropdown toggle for Portfolio (initially closed)
-    document.addEventListener('click', function(e) {
-      if (window.innerWidth >= 992) return;
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  const dropdownToggles = document.querySelectorAll(".sdl-navbar .dropdown-toggle");
 
-      const portfolioToggle = e.target.closest('#portfolioDropdown');
-      const dropdown = document.querySelector('#portfolioDropdown')?.closest('.dropdown');
-      const menu = dropdown?.querySelector('.dropdown-menu');
-      if (!dropdown || !menu) return;
+  dropdownToggles.forEach(toggle => {
+    toggle.addEventListener("click", function(e) {
 
-      // Clicking "Portfolio" link toggles open/close
-      if (portfolioToggle) {
+      if (window.innerWidth < 992) {
         e.preventDefault();
-        const isOpen = dropdown.classList.contains('show');
-        if (isOpen) {
-          dropdown.classList.remove('show');
-          menu.classList.remove('show');
-          portfolioToggle.setAttribute('aria-expanded', 'false');
-        } else {
-          dropdown.classList.add('show');
-          menu.classList.add('show');
-          portfolioToggle.setAttribute('aria-expanded', 'true');
+
+        const parent = this.closest(".dropdown");
+        const menu = parent.querySelector(".dropdown-menu");
+
+        const isOpen = parent.classList.contains("show");
+
+        // Close all dropdowns first
+        document.querySelectorAll(".sdl-navbar .dropdown").forEach(d => {
+          d.classList.remove("show");
+          const m = d.querySelector(".dropdown-menu");
+          if (m) m.classList.remove("show");
+        });
+
+        // Toggle current
+        if (!isOpen) {
+          parent.classList.add("show");
+          menu.classList.add("show");
         }
       }
-      // Clicking outside closes the dropdown if open
-      else if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-        menu.classList.remove('show');
-        const mainToggle = document.querySelector('#portfolioDropdown');
-        if (mainToggle) mainToggle.setAttribute('aria-expanded', 'false');
-      }
+
     });
-  </script>
+  });
+});
+</script>
 
   <!-- Scroll Reveal JS for fade-in elements -->
   <script>
