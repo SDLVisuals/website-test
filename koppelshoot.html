@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function() {
 const totalImages = 5; // MARK: wijzig hier het aantal foto's voor deze categorie
 const gallery = document.getElementById("gallery");
 for(let i=1;i<=totalImages;i++){
-  const src=`assets/img/koppelshoot/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
+  const src=`assets/img/koppelshoot/foto-${i}.jpg`; // MARK: pad aanpassen voor categorie map
   const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
   const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
