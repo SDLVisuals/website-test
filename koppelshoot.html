@@ -370,14 +370,26 @@ document.addEventListener("DOMContentLoaded", function() {
 // Gallery auto generate with lazy load + bounce
 const totalImages = 24; // MARK: wijzig hier het aantal foto's voor deze categorie
 const gallery = document.getElementById("gallery");
+// Maak eerst alle gallery-items aan en zet ze in een array
+const galleryItems = [];
 for(let i=1;i<=totalImages;i++){
   const src=`assets/img/koppelshoot/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
   const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
   const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
-  a.appendChild(img); gallery.appendChild(a);
+  a.appendChild(img); galleryItems.push(a);
 }
+// Shuffle de gallery items zodat de volgorde bij elke paginalaad anders is (auto-shuffle)
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+shuffleArray(galleryItems);
+galleryItems.forEach(a => gallery.appendChild(a));
 </script>
+
 
 </body>
 </html>

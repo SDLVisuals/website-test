@@ -371,13 +371,23 @@ document.addEventListener("DOMContentLoaded", function() {
 // Gallery auto generate with lazy load + bounce
 const totalImages = 40; // MARK: wijzig hier het aantal foto's voor deze categorie
 const gallery = document.getElementById("gallery");
+// Verzamel eerst alle elementen in een array
+let galleryItems = [];
 for(let i=1;i<=totalImages;i++){
   const src=`assets/img/trouw/foto-${i}.jpg`; // MARK: pad aanpassen voor categorie map
   const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
   const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
   img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
-  a.appendChild(img); gallery.appendChild(a);
+  a.appendChild(img);
+  galleryItems.push(a);
 }
+// Shuffle de galleryItems array (Fisher-Yates)
+for(let i = galleryItems.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [galleryItems[i], galleryItems[j]] = [galleryItems[j], galleryItems[i]];
+}
+// Voeg geshuffelde elementen toe aan de gallery
+galleryItems.forEach(a => gallery.appendChild(a));
 // Zorg dat pagina bij load start bij de header
 window.addEventListener('load', () => {
   const header = document.getElementById('portfolio-evenementen');
