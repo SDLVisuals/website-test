@@ -98,6 +98,16 @@ html { scroll-behavior: smooth; }
   overflow-x: auto;
   padding-bottom: 10px;
 }
+/* Center the Trouw section specifically */
+.video-section.trouw-section .video-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.video-section.trouw-section .video-card {
+  margin: 0 auto; /* ensure each card is centered */
+}
 .video-card {
   border-radius: 14px;
   overflow: hidden;
@@ -111,6 +121,13 @@ html { scroll-behavior: smooth; }
   min-width: 0;
   width: 100%;
   max-width: 950px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease, transform 0.22s cubic-bezier(.4,1.6,.5,1);
+}
+.video-card.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 .video-card:hover { transform:scale(1.03); }
 .video-card iframe,
@@ -300,22 +317,22 @@ document.addEventListener("DOMContentLoaded", function() {
 // Video Gallery
 const videoSections = [
   {
-    title: 'Trouw',
+    title: 'Trouw Videografie',
     videos: [
       { type:'youtube', url:'https://www.youtube.com/embed/_O3pIFjfjkg', title:'Gilles & Kiara Wedding', description:'Ceremonie en feest', orientation:'horizontal' }
     ]
   },
   {
-    title: 'Product',
+    title: 'Product Videografie',
     videos: [
-      { type:'youtube', url:'https://www.youtube.com/embed/aJ0hoiX7NQI', title:'Product Short Video', description:'Korte demonstratie', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/YO_3MFa4CfE', title:'Product Short 1', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/15vtmnrDvog', title:'Product Short 2', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/L88UMYofbtY', title:'Product Short 3', description:'YouTube Shorts', orientation:'vertical' }
+      { type:'youtube', url:'https://www.youtube.com/embed/aJ0hoiX7NQI', title:'Product Short 1', description:'Korte demonstratie', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/YO_3MFa4CfE', title:'Product Short 2', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/15vtmnrDvog', title:'Product Short 3', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/L88UMYofbtY', title:'Product Short 4', description:'YouTube Shorts', orientation:'vertical' }
     ]
   },
   {
-    title: 'Auto',
+    title: 'Auto Videografie',
     videos: [
       { type:'youtube', url:'https://www.youtube.com/embed/WFiOihEBtRA', title:'Auto Short 1', description:'YouTube Shorts', orientation:'vertical' },
       { type:'youtube', url:'https://www.youtube.com/embed/qEmgNQHbuZo', title:'Auto Short 2', description:'YouTube Shorts', orientation:'vertical' },
@@ -364,7 +381,8 @@ function createVideoCard(video){
 
 // Generate sections
 videoSections.forEach(section=>{
-  const secDiv=document.createElement('div'); secDiv.className='video-section';
+  const secDiv=document.createElement('div');
+  secDiv.className='video-section ' + (section.title.includes('Trouw') ? 'trouw-section' : '');
   const header=document.createElement('h2'); header.textContent=section.title; secDiv.appendChild(header);
   const grid=document.createElement('div'); grid.className='video-grid';
   section.videos.forEach(video=>{ grid.appendChild(createVideoCard(video)); });
@@ -381,8 +399,41 @@ function onYouTubeIframeAPIReady(){
       }
     });
   });
+  // After YouTube API ready, run scroll animations setup (in case videos are in view)
+  if (typeof setupScrollAnimations === 'function') setupScrollAnimations();
 }
 window.onYouTubeIframeAPIReady=onYouTubeIframeAPIReady;
+
+// Scroll-based animation and autoplay for videos
+function setupScrollAnimations(){
+  // Avoid multiple observers
+  if (window._videoScrollObserverSetup) return;
+  window._videoScrollObserverSetup = true;
+  const observerOptions = { root:null, rootMargin:'0px', threshold:0.5 };
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const card = entry.target;
+      const iframe = card.querySelector('iframe');
+      const video = card.querySelector('video');
+
+      if(entry.isIntersecting){
+        card.classList.add('visible');
+        if(iframe && ytPlayers[iframe.id] && ytPlayers[iframe.id].playVideo) ytPlayers[iframe.id].playVideo();
+        if(video && video.play) video.play();
+      } else {
+        if(iframe && ytPlayers[iframe.id] && ytPlayers[iframe.id].pauseVideo) { ytPlayers[iframe.id].pauseVideo(); ytPlayers[iframe.id].seekTo(0); }
+        if(video && video.pause) { video.pause(); video.currentTime = 0; }
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
+}
+
+// Run setup after page load and after YouTube API ready
+window.addEventListener('load', function() {
+  setupScrollAnimations();
+});
 </script>
 
 </body>
