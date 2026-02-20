@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trouw Fotografie - SDL Visuals</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+<link rel="stylesheet" href="assets/css/style.css" />
+
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+
+<!-- Favicon -->
+<link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)" />
+<link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)" />
+ <style>
+    /* Small helper: smooth scrolling */
+    html { scroll-behavior: smooth; }
+
+    /* Global dark mode for entire page */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #121212;
+        color: #ffffff;
+      }
+      /* Cards and gallery images contrast */
+      .card {
+        background-color: #1e1e1e;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+        color: #fff;
+      }
+      .gallery-container a img {
+        box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+        background-color: #1e1e1e;
+      }
+      /* Fancybox dark background */
+      .fancybox__container {
+        background: rgba(18,18,18,0.95) !important;
+      }
+    }
+  </style>
+
+  <!-- NOTE:
+       Per-section min-heights & scroll-margin-top values are set inline per section below.
+       Change them inline where marked if you want different heights/offsets for mobile/desktop.
+  -->
+</head>
+
+<body>
+
+
+
+<style>
+/* Video Gallery Styling */
+.video-section { margin:50px 0; }
+.video-section h2 { text-align:center; font-weight:700; margin-bottom:25px; }
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 32px 32px;
+  justify-content: center;
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+.video-card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(.4,1.6,.5,1);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  max-width: 950px;
+}
+.video-card:hover { transform:scale(1.03); }
+.video-card iframe,
+.video-card video {
+  width:100%;
+  min-height: 320px;
+  max-height: 520px;
+  border:none;
+  display:block;
+  object-fit:cover;
+  background: #000;
+}
+.video-card.horizontal iframe, .video-card.horizontal video { height:420px; }
+.video-card.vertical iframe, .video-card.vertical video { height:560px; }
+.video-card .video-info {
+  padding: 16px 18px;
+  color: #fff;
+  text-align: center;
+  background: rgba(0,0,0,0.5);
+  position: relative;
+  z-index: 2;
+}
+.video-card .video-info h3 { font-size:1.20rem; margin:0 0 6px 0; font-weight: 600; }
+.video-card .video-info p { font-size:1rem; margin:0; }
+@media (prefers-color-scheme: dark) {
+  .video-card { background:#232526; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+  .video-card .video-info { color:#fff; }
+}
+@media (max-width:1100px) {
+  .video-grid { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+  .video-card.horizontal iframe, .video-card.horizontal video { height:280px; }
+  .video-card.vertical iframe, .video-card.vertical video { height:370px; }
+}
+@media (max-width:768px) {
+  .video-grid { grid-template-columns: 1fr; }
+  .video-card { max-width: 100%; }
+  .video-card.horizontal iframe, .video-card.horizontal video { height:200px; }
+  .video-card.vertical iframe, .video-card.vertical video { height:260px; }
+}
+</style>
+
+<!-- Video Sections -->
+<div class="container mt-4">
+  <div id="video-gallery"></div>
+</div>
+
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+// Video Data
+const videoSections = [
+  {
+    title: 'Trouw',
+    videos: [
+      { type:'youtube', url:'https://www.youtube.com/embed/_O3pIFjfjkg', title:'Gilles & Kiara Wedding', description:'Ceremonie en feest', orientation:'horizontal' }
+    ]
+  },
+  {
+    title: 'Product',
+    videos: [
+      // Existing product videos
+      { type:'youtube', url:'https://www.youtube.com/embed/aJ0hoiX7NQI', title:'Product Short Video', description:'Korte demonstratie', orientation:'vertical' },
+      // New YouTube Shorts for Product - corrected links
+      { type:'youtube', url:'https://www.youtube.com/embed/YO_3MFa4CfE', title:'Product Short 1', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/15vtmnrDvog', title:'Product Short 2', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/L88UMYofbtY', title:'Product Short 3', description:'YouTube Shorts', orientation:'vertical' }
+    ]
+  },
+  {
+    title: 'Auto',
+    videos: [
+      // Corrected YouTube Shorts links to embed format
+      { type:'youtube', url:'https://www.youtube.com/embed/WFiOihEBtRA', title:'Auto Short 1', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/qEmgNQHbuZo', title:'Auto Short 2', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/fgOPzRW8h_8', title:'Auto Short 3', description:'YouTube Shorts', orientation:'vertical' },
+      { type:'youtube', url:'https://www.youtube.com/embed/YCHqbgKUQHE', title:'Auto Short 4', description:'YouTube Shorts', orientation:'vertical' }
+    ]
+  }
+];
+
+const galleryDiv = document.getElementById('video-gallery');
+const ytPlayers = {};
+let ytQueue = [];
+
+// Create video card
+function createVideoCard(video){
+  const card = document.createElement('div');
+  card.className='video-card '+(video.orientation==='vertical'?'vertical':'horizontal');
+
+  let embedElement;
+  if(video.type==='youtube'){
+    embedElement=document.createElement('iframe');
+    embedElement.src=video.url+'?rel=0&modestbranding=1&enablejsapi=1&playsinline=1';
+    embedElement.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    embedElement.allowFullscreen=true;
+    embedElement.id='yt-'+Math.random().toString(36).substr(2,9);
+    card.appendChild(embedElement);
+    ytQueue.push(embedElement.id);
+
+    card.addEventListener('mouseenter',()=>{ const p=ytPlayers[embedElement.id]; if(p&&p.playVideo)p.playVideo(); });
+    card.addEventListener('mouseleave',()=>{ const p=ytPlayers[embedElement.id]; if(p&&p.pauseVideo){ p.pauseVideo(); p.seekTo(0); } });
+  } else if(video.type==='mp4'){
+    embedElement=document.createElement('video');
+    embedElement.src=video.url;
+    embedElement.setAttribute('playsinline','');
+    embedElement.setAttribute('muted','');
+    embedElement.setAttribute('preload','metadata');
+    embedElement.controls=true;
+    card.appendChild(embedElement);
+
+    card.addEventListener('mouseenter',()=>{ embedElement.play(); });
+    card.addEventListener('mouseleave',()=>{ embedElement.pause(); embedElement.currentTime=0; });
+    embedElement.addEventListener('ended',()=>{ embedElement.currentTime=0; });
+  }
+
+  const info=document.createElement('div');
+  info.className='video-info';
+  info.innerHTML=`<h3>${video.title}</h3><p>${video.description}</p>`;
+  card.appendChild(info);
+
+  return card;
+}
+
+// Generate sections
+videoSections.forEach(section=>{
+  const secDiv=document.createElement('div'); secDiv.className='video-section';
+  const header=document.createElement('h2'); header.textContent=section.title; secDiv.appendChild(header);
+  const grid=document.createElement('div'); grid.className='video-grid';
+  section.videos.forEach(video=>{ grid.appendChild(createVideoCard(video)); });
+  secDiv.appendChild(grid);
+  galleryDiv.appendChild(secDiv);
+});
+
+// YouTube IFrame API
+function onYouTubeIframeAPIReady(){
+  ytQueue.forEach(id=>{
+    ytPlayers[id] = new YT.Player(id,{
+      events:{
+        'onStateChange':function(e){ if(e.data===YT.PlayerState.ENDED){ e.target.seekTo(0); } }
+      }
+    });
+  });
+}
+window.onYouTubeIframeAPIReady=onYouTubeIframeAPIReady;
+</script>
+
+</body>
+</html>
