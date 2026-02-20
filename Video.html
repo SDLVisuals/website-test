@@ -15,44 +15,77 @@
 <!-- Favicon -->
 <link rel="icon" href="assets/img/SDL Visuals Black .png" media="(prefers-color-scheme: light)" />
 <link rel="icon" href="assets/img/SDL Visuals White .png" media="(prefers-color-scheme: dark)" />
- <style>
-    /* Small helper: smooth scrolling */
-    html { scroll-behavior: smooth; }
-
-    /* Global dark mode for entire page */
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: #121212;
-        color: #ffffff;
-      }
-      /* Cards and gallery images contrast */
-      .card {
-        background-color: #1e1e1e;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.7);
-        color: #fff;
-      }
-      .gallery-container a img {
-        box-shadow: 0 4px 15px rgba(255,255,255,0.1);
-        background-color: #1e1e1e;
-      }
-      /* Fancybox dark background */
-      .fancybox__container {
-        background: rgba(18,18,18,0.95) !important;
-      }
-    }
-  </style>
-
-  <!-- NOTE:
-       Per-section min-heights & scroll-margin-top values are set inline per section below.
-       Change them inline where marked if you want different heights/offsets for mobile/desktop.
-  -->
-</head>
-
-<body>
-
-
 
 <style>
+/* ------------------------------
+   NAVBAR + HAMBURGER STYLES
+------------------------------ */
+.sdl-navbar { background:#fff; padding:0.4rem 0; box-shadow:0 1px 10px rgba(0,0,0,0.03); position:sticky; top:0; z-index:1020; }
+.sdl-navbar .navbar-brand img { height:50px; }
+.sdl-navbar .navbar-nav .nav-link { font-weight:600; font-size:1rem; margin:0 1rem; transition:color 0.2s; color:#111; }
+.sdl-navbar .navbar-nav .nav-link:hover { color:#e90e65; }
+
+/* Dropdown arrow */
+.sdl-navbar .dropdown-toggle::after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.3rem;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #111;
+  transition: transform 0.35s ease-in-out;
+  transform-origin: center center;
+}
+.sdl-navbar .dropdown.show > .dropdown-toggle::after,
+.sdl-navbar .dropdown .dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(-180deg);
+}
+
+/* Hamburger styling */
+.hamburger { padding: 10px; border:0; background:transparent; }
+.hamburger-box { width:30px; height:24px; display:inline-block; position:relative; }
+.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+  width: 30px; height:4px; background-color:#111; border-radius:2px; position:absolute; left:0; transition: transform .22s cubic-bezier(.55,.055,.675,.19), opacity .18s, background-color .18s;
+}
+.hamburger-inner { top:50%; transform:translateY(-50%); }
+.hamburger-inner::before { content:""; top:-10px; }
+.hamburger-inner::after { content:""; bottom:-10px; }
+.hamburger.is-active .hamburger-inner { transform: rotate(45deg); background-color:#e90e65; }
+.hamburger.is-active .hamburger-inner::before { top:0; opacity:0; }
+.hamburger.is-active .hamburger-inner::after { bottom:0; transform: rotate(-90deg); background-color:#e90e65; }
+
+/* Navbar dropdown */
+.sdl-navbar .dropdown-menu { min-width:185px; border-radius:.5rem; box-shadow:0 6px 32px rgba(0,0,0,0.13); }
+.sdl-navbar .dropdown-menu .dropdown-item:hover { color:#e90e65; background:#f3e8f0; }
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .sdl-navbar { background: #181a1b !important; box-shadow: 0 1px 10px rgba(0,0,0,0.50); }
+  .sdl-navbar .navbar-nav .nav-link { color: #fff !important; }
+  .sdl-navbar .navbar-nav .nav-link:hover { color: #e90e65 !important; }
+  .sdl-navbar .dropdown-toggle::after { border-top-color: #fff; }
+  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after { background-color:#fff !important; }
+  .hamburger.is-active .hamburger-inner,
+  .hamburger.is-active .hamburger-inner::after { background-color:#e90e65 !important; }
+  .sdl-navbar .dropdown-menu { background: #232526 !important; color: #fff; border-color: #222; }
+  .sdl-navbar .dropdown-menu .dropdown-item { color: #fff !important; }
+  .sdl-navbar .dropdown-menu .dropdown-item:hover { color: #e90e65 !important; background: #31202a !important; }
+  body { background-color: #121212; color:#fff; }
+  .video-card { background:#232526; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+  .video-card .video-info { color:#fff; }
+}
+
+/* Small helper: smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Responsive tweak: hide toggler on desktop */
+@media (min-width: 992px) { .navbar-toggler { display: none; } }
+
+/* Navbar height variable */
+:root { --navbar-height: 72px; }
+
 /* Video Gallery Styling */
 .video-section { margin:50px 0; }
 .video-section h2 { text-align:center; font-weight:700; margin-bottom:25px; }
@@ -102,10 +135,6 @@
 }
 .video-card .video-info h3 { font-size:1.20rem; margin:0 0 6px 0; font-weight: 600; }
 .video-card .video-info p { font-size:1rem; margin:0; }
-@media (prefers-color-scheme: dark) {
-  .video-card { background:#232526; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
-  .video-card .video-info { color:#fff; }
-}
 @media (max-width:1100px) {
   .video-grid { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
   .video-card.horizontal iframe, .video-card.horizontal video { height:280px; }
@@ -119,6 +148,49 @@
 }
 </style>
 
+</head>
+
+<body>
+
+<!-- ===========================
+     NAVBAR
+============================ -->
+<nav class="navbar navbar-expand-lg sdl-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="assets/img/SDL Visuals Black .png" alt="SDL Visuals" class="sdl-logo-light">
+      <img src="assets/img/SDL Visuals White .png" alt="SDL Visuals" class="sdl-logo-dark" style="display:none;">
+    </a>
+
+    <button class="navbar-toggler hamburger hamburger--squeeze" type="button" data-toggle="collapse" data-target="#my-nav" aria-controls="my-nav" aria-expanded="false" aria-label="Toggle navigation" onclick="this.classList.toggle('is-active')">
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </button>
+
+    <div id="my-nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item active"> <a class="nav-link" href="index.html#home">Home</a> </li>
+        <li class="nav-item"> <a class="nav-link" href="index.html#about">Over</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="index.html#portfolio" id="portfolioDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Portfolio
+          </a>
+          <div class="dropdown-menu" aria-labelledby="portfolioDropdown">
+            <a class="dropdown-item" href="evenementen.html#portfolio-evenementen">Evenementen</a>
+            <a class="dropdown-item" href="auto.html#portfolio-auto">Auto</a>
+            <a class="dropdown-item" href="portret.html#portfolio-portret">Portret</a>
+            <a class="dropdown-item" href="product.html#portfolio-product">Product</a>
+            <a class="dropdown-item" href="koppelshoot.html#portfolio-koppelshoot">Koppelshoot</a>
+            <a class="dropdown-item" href="trouw.html">Trouw</a>
+          </div>
+        </li>
+        <li class="nav-item"> <a class="nav-link" href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
 <!-- Video Sections -->
 <div class="container mt-4">
   <div id="video-gallery"></div>
@@ -127,7 +199,105 @@
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-// Video Data
+// Navbar dropdown hover & hamburger
+document.addEventListener("DOMContentLoaded", function() {
+  const navbar = document.querySelector('.sdl-navbar');
+  const dropdowns = navbar.querySelectorAll('.dropdown');
+  const hamburger = document.querySelector(".navbar-toggler.hamburger");
+  const collapseMenu = document.getElementById("my-nav");
+
+  function handleDropdownHover() {
+    if(window.innerWidth >= 992) {
+      dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('mouseenter', () => {
+          dropdown.classList.add('show');
+          const toggle = dropdown.querySelector('.dropdown-toggle');
+          const menu = dropdown.querySelector('.dropdown-menu');
+          toggle.setAttribute('aria-expanded', 'true');
+          menu.classList.add('show');
+        });
+        dropdown.addEventListener('mouseleave', () => {
+          dropdown.classList.remove('show');
+          const toggle = dropdown.querySelector('.dropdown-toggle');
+          const menu = dropdown.querySelector('.dropdown-menu');
+          toggle.setAttribute('aria-expanded', 'false');
+          menu.classList.remove('show');
+        });
+      });
+    } else {
+      dropdowns.forEach(dropdown => {
+        dropdown.classList.remove('show');
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        toggle.setAttribute('aria-expanded', 'false');
+        menu.classList.remove('show');
+      });
+    }
+  }
+
+  handleDropdownHover();
+  window.addEventListener('resize', handleDropdownHover);
+
+  hamburger.addEventListener('click', function() {
+    const isExpanded = collapseMenu.classList.contains('show');
+    if(isExpanded) {
+      collapseMenu.classList.remove('show');
+      hamburger.classList.remove('is-active');
+      hamburger.setAttribute('aria-expanded', 'false');
+    } else {
+      collapseMenu.classList.add('show');
+      hamburger.classList.add('is-active');
+      hamburger.setAttribute('aria-expanded', 'true');
+    }
+  });
+
+  dropdowns.forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle');
+    toggle.addEventListener('click', function(e) {
+      if(window.innerWidth < 992) {
+        e.preventDefault();
+        const isOpen = dropdown.classList.toggle('show');
+        this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if(isOpen) { menu.classList.add('show'); } else { menu.classList.remove('show'); }
+      }
+    });
+  });
+
+  const navLinks = navbar.querySelectorAll('.navbar-nav a:not(.dropdown-toggle)');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if(window.innerWidth < 992) {
+        collapseMenu.classList.remove('show');
+        hamburger.classList.remove('is-active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        dropdowns.forEach(dropdown => {
+          dropdown.classList.remove('show');
+          const toggle = dropdown.querySelector('.dropdown-toggle');
+          toggle.setAttribute('aria-expanded', 'false');
+          const menu = dropdown.querySelector('.dropdown-menu');
+          menu.classList.remove('show');
+        });
+      }
+    });
+  });
+
+  function updateLogo() {
+    const lightLogo = document.querySelector('.sdl-logo-light');
+    const darkLogo = document.querySelector('.sdl-logo-dark');
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      if(lightLogo) lightLogo.style.display = 'none';
+      if(darkLogo) darkLogo.style.display = 'inline';
+    } else {
+      if(lightLogo) lightLogo.style.display = 'inline';
+      if(darkLogo) darkLogo.style.display = 'none';
+    }
+  }
+  updateLogo();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateLogo);
+});
+
+// Video Gallery
 const videoSections = [
   {
     title: 'Trouw',
@@ -138,9 +308,7 @@ const videoSections = [
   {
     title: 'Product',
     videos: [
-      // Existing product videos
       { type:'youtube', url:'https://www.youtube.com/embed/aJ0hoiX7NQI', title:'Product Short Video', description:'Korte demonstratie', orientation:'vertical' },
-      // New YouTube Shorts for Product - corrected links
       { type:'youtube', url:'https://www.youtube.com/embed/YO_3MFa4CfE', title:'Product Short 1', description:'YouTube Shorts', orientation:'vertical' },
       { type:'youtube', url:'https://www.youtube.com/embed/15vtmnrDvog', title:'Product Short 2', description:'YouTube Shorts', orientation:'vertical' },
       { type:'youtube', url:'https://www.youtube.com/embed/L88UMYofbtY', title:'Product Short 3', description:'YouTube Shorts', orientation:'vertical' }
@@ -149,7 +317,6 @@ const videoSections = [
   {
     title: 'Auto',
     videos: [
-      // Corrected YouTube Shorts links to embed format
       { type:'youtube', url:'https://www.youtube.com/embed/WFiOihEBtRA', title:'Auto Short 1', description:'YouTube Shorts', orientation:'vertical' },
       { type:'youtube', url:'https://www.youtube.com/embed/qEmgNQHbuZo', title:'Auto Short 2', description:'YouTube Shorts', orientation:'vertical' },
       { type:'youtube', url:'https://www.youtube.com/embed/fgOPzRW8h_8', title:'Auto Short 3', description:'YouTube Shorts', orientation:'vertical' },
@@ -162,40 +329,34 @@ const galleryDiv = document.getElementById('video-gallery');
 const ytPlayers = {};
 let ytQueue = [];
 
-// Create video card
 function createVideoCard(video){
   const card = document.createElement('div');
-  card.className='video-card '+(video.orientation==='vertical'?'vertical':'horizontal');
+  card.className = 'video-card ' + (video.orientation==='vertical'?'vertical':'horizontal');
+  card.setAttribute('data-title', video.title); // Add title for CodeTab reference
 
   let embedElement;
   if(video.type==='youtube'){
-    embedElement=document.createElement('iframe');
-    embedElement.src=video.url+'?rel=0&modestbranding=1&enablejsapi=1&playsinline=1';
-    embedElement.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-    embedElement.allowFullscreen=true;
-    embedElement.id='yt-'+Math.random().toString(36).substr(2,9);
+    embedElement = document.createElement('iframe');
+    embedElement.src = video.url + '?rel=0&modestbranding=1&enablejsapi=1&playsinline=1';
+    embedElement.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    embedElement.allowFullscreen = true;
+    embedElement.id = 'yt-' + Math.random().toString(36).substr(2,9);
     card.appendChild(embedElement);
     ytQueue.push(embedElement.id);
-
-    card.addEventListener('mouseenter',()=>{ const p=ytPlayers[embedElement.id]; if(p&&p.playVideo)p.playVideo(); });
-    card.addEventListener('mouseleave',()=>{ const p=ytPlayers[embedElement.id]; if(p&&p.pauseVideo){ p.pauseVideo(); p.seekTo(0); } });
   } else if(video.type==='mp4'){
-    embedElement=document.createElement('video');
-    embedElement.src=video.url;
+    embedElement = document.createElement('video');
+    embedElement.src = video.url;
     embedElement.setAttribute('playsinline','');
     embedElement.setAttribute('muted','');
     embedElement.setAttribute('preload','metadata');
-    embedElement.controls=true;
+    embedElement.controls = true;
     card.appendChild(embedElement);
-
-    card.addEventListener('mouseenter',()=>{ embedElement.play(); });
-    card.addEventListener('mouseleave',()=>{ embedElement.pause(); embedElement.currentTime=0; });
-    embedElement.addEventListener('ended',()=>{ embedElement.currentTime=0; });
   }
 
-  const info=document.createElement('div');
-  info.className='video-info';
-  info.innerHTML=`<h3>${video.title}</h3><p>${video.description}</p>`;
+  // Video title below the video
+  const info = document.createElement('div');
+  info.className = 'video-info';
+  info.innerHTML = `<h3>${video.title}</h3><p>${video.description}</p>`;
   card.appendChild(info);
 
   return card;
