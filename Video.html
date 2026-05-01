@@ -89,15 +89,14 @@ html { scroll-behavior: smooth; }
 /* Video Gallery Styling */
 .video-section { margin:50px 0; }
 .video-section h2 { text-align:center; font-weight:700; margin-bottom:25px; }
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-  gap: 32px 32px;
-  justify-content: center;
-  align-items: stretch;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
+  .video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    padding-bottom: 10px;
+  }
 /* Center the Trouw section specifically */
 .video-section.trouw-section .video-grid {
   display: flex;
@@ -108,60 +107,62 @@ html { scroll-behavior: smooth; }
 .video-section.trouw-section .video-card {
   margin: 0 auto; /* ensure each card is centered */
 }
-.video-card {
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.22s cubic-bezier(.4,1.6,.5,1);
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  width: 100%;
-  max-width: 950px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease, transform 0.22s cubic-bezier(.4,1.6,.5,1);
-}
+  .video-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background: transparent;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.35s ease, opacity 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    max-width: 950px;
+    opacity: 0;
+    transform: translateY(20px);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  .video-frame {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background: #151515;
+    overflow: hidden;
+    border-radius: 14px;
+    position: relative;
+  }
+
+  .video-card.horizontal .video-frame {
+    aspect-ratio: 16 / 9;
+  }
 .video-card.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 .video-card:hover { transform:scale(1.03); }
-.video-card iframe,
-.video-card video {
-  width:100%;
-  min-height: 320px;
-  max-height: 520px;
-  border:none;
-  display:block;
-  object-fit:cover;
-  background: #000;
+  .video-card iframe,
+  .video-card video {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: transparent;
+  }
+
+/* Vertical video card max width and centering */
+.video-card.vertical {
+  max-width: 420px;
+  margin: 0 auto;
 }
-.video-card.horizontal iframe, .video-card.horizontal video { height:420px; }
-.video-card.vertical iframe, .video-card.vertical video { height:560px; }
-.video-card .video-info {
-  padding: 16px 18px;
-  color: #fff;
-  text-align: center;
-  background: rgba(0,0,0,0.5);
-  position: relative;
-  z-index: 2;
-}
-.video-card .video-info h3 { font-size:1.20rem; margin:0 0 6px 0; font-weight: 600; }
-.video-card .video-info p { font-size:1rem; margin:0; }
 @media (max-width:1100px) {
   .video-grid { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
-  .video-card.horizontal iframe, .video-card.horizontal video { height:280px; }
-  .video-card.vertical iframe, .video-card.vertical video { height:370px; }
 }
 @media (max-width:768px) {
   .video-grid { grid-template-columns: 1fr; }
   .video-card { max-width: 100%; }
-  .video-card.horizontal iframe, .video-card.horizontal video { height:200px; }
-  .video-card.vertical iframe, .video-card.vertical video { height:260px; }
 }
 </style>
 
@@ -215,7 +216,6 @@ html { scroll-behavior: smooth; }
 </div>
 
 <script src="assets/js/bootstrap.min.js"></script>
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 // Navbar dropdown hover & hamburger
 document.addEventListener("DOMContentLoaded", function() {
@@ -316,51 +316,138 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // Video Gallery
+/* =========================
+   🎬 ADD NEW VIDEOS HERE
+   Simply copy one object and paste inside a section
+   type: 'gumlet'
+   url: your Gumlet embed link
+========================= */
+
 const videoSections = [
   {
     title: 'Trouw Videografie',
     videos: [
-      { type:'youtube', url:'https://www.youtube.com/embed/_O3pIFjfjkg', title:'Gilles & Kiara Wedding', description:'Ceremonie en feest', orientation:'horizontal' }
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c2c0c530a8d6d2d37912',
+        title: 'Wedding Film',
+        description: 'Cinematic trouwfilm',
+        orientation: 'horizontal'
+      }
     ]
   },
   {
     title: 'Product Videografie',
     videos: [
-      { type:'youtube', url:'https://www.youtube.com/embed/aJ0hoiX7NQI', title:'Product Short 1', description:'Korte demonstratie', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/YO_3MFa4CfE', title:'Product Short 2', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/15vtmnrDvog', title:'Product Short 3', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/L88UMYofbtY', title:'Product Short 4', description:'YouTube Shorts', orientation:'vertical' }
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/REPLACE_ID_1',
+        title: 'Product Video 1',
+        description: 'Clean product showcase',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/REPLACE_ID_2',
+        title: 'Product Video 2',
+        description: 'Detail shots',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c8cc1dfaccdc9558d465',
+        title: 'Product Video 3',
+        description: 'Cinematic product showcase',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c8ae1dfaccdc9558d1e5',
+        title: 'Product Video 4',
+        description: 'Cinematic product showcase',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c925609709b32f6adf91',
+        title: 'Product Video 5',
+        description: 'Cinematic product showcase',
+        orientation: 'vertical'
+      }
     ]
   },
   {
     title: 'Auto Videografie',
     videos: [
-      { type:'youtube', url:'https://www.youtube.com/embed/WFiOihEBtRA', title:'Auto Short 1', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/qEmgNQHbuZo', title:'Auto Short 2', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/fgOPzRW8h_8', title:'Auto Short 3', description:'YouTube Shorts', orientation:'vertical' },
-      { type:'youtube', url:'https://www.youtube.com/embed/YCHqbgKUQHE', title:'Auto Short 4', description:'YouTube Shorts', orientation:'vertical' }
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/REPLACE_ID_4',
+        title: 'Car Video 2',
+        description: 'Cinematic drive',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c7931dfaccdc9558bf72',
+        title: 'Car Video 3',
+        description: 'Cinematic driving shots',
+        orientation: 'vertical'
+      }
+    ]
+  },
+  {
+    title: 'Bedrijf Videografie',
+    videos: [
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c44d609709b32f6a8d09',
+        title: 'Bedrijf Video',
+        description: 'Corporate video',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c580609709b32f6aa2d7',
+        title: 'Bedrijf Video 2',
+        description: 'Cinematic business shots',
+        orientation: 'vertical'
+      },
+      {
+        type: 'gumlet',
+        url: 'https://play.gumlet.io/embed/69f4c9dc609709b32f6aec1a',
+        title: 'Bedrijf Video 3',
+        description: 'Cinematic business shots',
+        orientation: 'vertical'
+      }
     ]
   }
 ];
 
 const galleryDiv = document.getElementById('video-gallery');
-const ytPlayers = {};
-let ytQueue = [];
 
 function createVideoCard(video){
+  // Skip invalid / empty embeds (prevents black boxes)
+  if (!video || !video.url || video.url.includes('REPLACE') || video.url.trim() === '' || video.url.length < 10) {
+    return null;
+  }
   const card = document.createElement('div');
   card.className = 'video-card ' + (video.orientation==='vertical'?'vertical':'horizontal');
-  card.setAttribute('data-title', video.title); // Add title for CodeTab reference
+  card.setAttribute('data-title', video.title);
+
+  const frame = document.createElement('div');
+  frame.className = 'video-frame ' + (video.orientation === 'vertical' ? 'vertical' : 'horizontal');
 
   let embedElement;
-  if(video.type==='youtube'){
+  if(video.type==='gumlet'){
     embedElement = document.createElement('iframe');
-    embedElement.src = video.url + '?rel=0&modestbranding=1&enablejsapi=1&playsinline=1';
-    embedElement.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    embedElement.src = video.url;
+    embedElement.allow = "accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write";
     embedElement.allowFullscreen = true;
-    embedElement.id = 'yt-' + Math.random().toString(36).substr(2,9);
-    card.appendChild(embedElement);
-    ytQueue.push(embedElement.id);
+    embedElement.loading = "lazy";
+    embedElement.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write");
+    embedElement.style.border = "none";
+    frame.appendChild(embedElement);
+    card.appendChild(frame);
   } else if(video.type==='mp4'){
     embedElement = document.createElement('video');
     embedElement.src = video.url;
@@ -368,61 +455,64 @@ function createVideoCard(video){
     embedElement.setAttribute('muted','');
     embedElement.setAttribute('preload','metadata');
     embedElement.controls = true;
-    card.appendChild(embedElement);
+    frame.appendChild(embedElement);
+    card.appendChild(frame);
   }
-
-  // Video title below the video
-  const info = document.createElement('div');
-  info.className = 'video-info';
-  info.innerHTML = `<h3>${video.title}</h3><p>${video.description}</p>`;
-  card.appendChild(info);
-
   return card;
 }
 
 // Generate sections
-videoSections.forEach(section=>{
-  const secDiv=document.createElement('div');
-  secDiv.className='video-section ' + (section.title.includes('Trouw') ? 'trouw-section' : '');
-  const header=document.createElement('h2'); header.textContent=section.title; secDiv.appendChild(header);
-  const grid=document.createElement('div'); grid.className='video-grid';
-  section.videos.forEach(video=>{ grid.appendChild(createVideoCard(video)); });
+videoSections.forEach(section => {
+
+  const validVideos = section.videos
+    .map(v => createVideoCard(v))
+    .filter(card => card !== null && card !== undefined);
+
+  // Skip empty or broken sections safely
+  if (!validVideos || validVideos.length === 0) return;
+
+  const secDiv = document.createElement('div');
+  secDiv.className = 'video-section ' + (section.title.includes('Trouw') ? 'trouw-section' : '');
+
+  const header = document.createElement('h2');
+  header.textContent = section.title;
+  secDiv.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.className = 'video-grid';
+
+  validVideos.forEach(card => {
+    if (card) grid.appendChild(card);
+  });
+
   secDiv.appendChild(grid);
   galleryDiv.appendChild(secDiv);
 });
 
-// YouTube IFrame API
-function onYouTubeIframeAPIReady(){
-  ytQueue.forEach(id=>{
-    ytPlayers[id] = new YT.Player(id,{
-      events:{
-        'onStateChange':function(e){ if(e.data===YT.PlayerState.ENDED){ e.target.seekTo(0); } }
-      }
-    });
-  });
-  // After YouTube API ready, run scroll animations setup (in case videos are in view)
-  if (typeof setupScrollAnimations === 'function') setupScrollAnimations();
-}
-window.onYouTubeIframeAPIReady=onYouTubeIframeAPIReady;
 
 // Scroll-based animation and autoplay for videos
 function setupScrollAnimations(){
   // Avoid multiple observers
   if (window._videoScrollObserverSetup) return;
   window._videoScrollObserverSetup = true;
-  const observerOptions = { root:null, rootMargin:'0px', threshold:0.5 };
+  const observerOptions = { root:null, rootMargin:'200px 0px', threshold:0.25 };
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       const card = entry.target;
       const iframe = card.querySelector('iframe');
+      if (!card) return;
       const video = card.querySelector('video');
 
       if(entry.isIntersecting){
         card.classList.add('visible');
-        if(iframe && ytPlayers[iframe.id] && ytPlayers[iframe.id].playVideo) ytPlayers[iframe.id].playVideo();
+        if (iframe && !iframe.dataset.loaded) {
+          iframe.dataset.loaded = "true";
+        }
         if(video && video.play) video.play();
       } else {
-        if(iframe && ytPlayers[iframe.id] && ytPlayers[iframe.id].pauseVideo) { ytPlayers[iframe.id].pauseVideo(); ytPlayers[iframe.id].seekTo(0); }
+        if(iframe){
+          iframe.dataset.loaded = "false";
+        }
         if(video && video.pause) { video.pause(); video.currentTime = 0; }
       }
     });
@@ -435,6 +525,17 @@ function setupScrollAnimations(){
 window.addEventListener('load', function() {
   setupScrollAnimations();
 });
+
+/* =========================
+   🎬 EASY ADD SECTION TEMPLATE
+   Copy this and paste into videoSections:
+   {
+     title: 'New Section',
+     videos: [
+       { type:'gumlet', url:'YOUR_URL', title:'Title', description:'Desc', orientation:'vertical' }
+     ]
+   }
+========================= */
 </script>
 
 </body>
