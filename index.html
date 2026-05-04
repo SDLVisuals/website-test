@@ -24,6 +24,186 @@
     }
   </style>
 
+  <!-- ===============================
+     TYPOGRAPHY ANIMATION (SUBTLE + PREMIUM FEEL)
+     =============================== -->
+
+  <style>
+  /* ===============================
+     TYPOGRAPHY ANIMATION (SUBTLE + PREMIUM FEEL)
+     =============================== */
+
+  /* Smooth text entrance */
+  h1, h2, h3, h4, h5, h6, p {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: textRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Stagger effect for natural flow */
+  h1 { animation-delay: 0.05s; }
+  h2 { animation-delay: 0.10s; }
+  h3 { animation-delay: 0.15s; }
+  h4 { animation-delay: 0.20s; }
+  p  { animation-delay: 0.25s; }
+
+  /* Hero title extra effect */
+  .center-text h2 {
+    letter-spacing: -0.5px;
+    animation: heroText 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Subtle gradient movement on hero text */
+  .center-text h2 {
+    background: linear-gradient(90deg, #ffffff, #e90e65, #ffffff);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: heroGradient 4s ease infinite, heroText 1.2s ease forwards;
+  }
+
+  /* Keyframes */
+  @keyframes textRise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes heroText {
+    from {
+      opacity: 0;
+      letter-spacing: -3px;
+      transform: translateY(25px);
+    }
+    to {
+      opacity: 1;
+      letter-spacing: -0.5px;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes heroGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Respect reduced motion users */
+  @media (prefers-reduced-motion: reduce) {
+    h1, h2, h3, h4, h5, h6, p {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /* ===============================
+     PREMIUM TYPOGRAPHY UPGRADE (FONTS + SCALE + FEEL)
+     =============================== */
+
+  /* Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+  /* Root typography system */
+  :root {
+    --font-body: 'Inter', sans-serif;
+    --font-heading: 'Manrope', sans-serif;
+
+    --text-sm: clamp(14px, 1vw, 18px);
+    --text-base: clamp(18px, 1.4vw, 22px);
+    --text-lg: clamp(22px, 2vw, 32px);
+    --text-xl: clamp(32px, 2.6vw, 52px);
+    --text-xxl: clamp(52px, 4vw, 88px);
+  }
+
+  /* Base font */
+  body {
+    font-family: var(--font-body) !important;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings upgrade */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading) !important;
+    letter-spacing: -1px;
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  /* Responsive hierarchy */
+  h1 { font-size: var(--text-xxl); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-lg); }
+  h4 { font-size: 1.2rem; }
+  p  { font-size: var(--text-base); }
+
+  /* Softer, more premium animation (fixes current harsh fade) */
+  h1, h2, h3, h4, h5, h6, p {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: softRise 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* stagger improved (less aggressive than before) */
+  h1 { animation-delay: 0.05s; }
+  h2 { animation-delay: 0.08s; }
+  h3 { animation-delay: 0.11s; }
+  h4 { animation-delay: 0.14s; }
+  p  { animation-delay: 0.18s; }
+
+  /* smoother keyframe */
+  @keyframes softRise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  /* subtle hover for headings (premium feel) */
+  h2:hover, h3:hover {
+    letter-spacing: 0px;
+    transition: all 0.25s ease;
+    color: #e90e65;
+  }
+
+  /* mobile readability boost */
+  @media (max-width: 767px) {
+    h1 { font-size: 3.0rem !important; }
+    h2 { font-size: 2.4rem !important; }
+    h3 { font-size: 1.9rem !important; }
+
+    body {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+  }
+
+  /* respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    h1, h2, h3, h4, h5, h6, p {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+  </style>
+
   <style>
     /* ===============================
        Fade-in Animation for Scroll Reveal
@@ -388,8 +568,8 @@
       }
       .fh5co-about .card-img {
         height: auto !important;
-        max-height: 220px !important;
-        object-fit: cover !important;
+        max-height: none !important;
+        object-fit: contain !important;
         object-position: center !important;
         width: 100% !important;
         margin: 0 auto !important;
@@ -663,7 +843,13 @@
 
 @media (max-width: 767px) {
   .scroll-indicator {
-    display: none !important;
+    display: block;
+    height: 90px;
+    opacity: 0.35;
+  }
+
+  .scroll-indicator::after {
+    animation: none !important;
   }
 }
   </style>
@@ -1346,4 +1532,44 @@ document.addEventListener("DOMContentLoaded", function() {
     background: transparent !important;
     background-color: transparent !important;
   }
+    /* Custom hero card-title responsive typography */
+    .fh5co-home-banner .center-text h2.card-title {
+      font-size: clamp(2.6rem, 3.8vw, 4.2rem);
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      text-align: center;
+    }
+
+    @media (max-width: 767px) {
+      .fh5co-home-banner .center-text h2.card-title {
+        font-size: 2.9rem !important;
+        line-height: 1.2;
+        text-align: center;
+      }
+    }
+
+    /* Fix "Ontdek" button going out of screen on mobile */
+    .fh5co-home-banner .center-text .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 90vw;
+    }
+
+    .fh5co-home-banner .center-text .btn svg {
+      width: 100%;
+      max-width: 201px;
+      height: auto;
+      display: block;
+    }
+
+    @media (max-width: 767px) {
+      .fh5co-home-banner .center-text .btn {
+        max-width: 280px;
+      }
+
+      .fh5co-home-banner .center-text .btn svg {
+        max-width: 220px;
+      }
+    }
   </style>
