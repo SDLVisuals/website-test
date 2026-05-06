@@ -211,13 +211,36 @@
 <style>
 
 /* Gallery Grid */
-.gallery-container { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
-.gallery-container a { flex:1 0 100%; max-width:100%; margin-bottom:15px; display:block; opacity:0; transform:scale(0.95); transition: transform 0.4s ease, opacity 0.4s ease; }
-@media (min-width:576px){ .gallery-container a { flex:1 0 48%; max-width:48%; } }
-@media (min-width:768px){ .gallery-container a { flex:1 0 31%; max-width:31%; } }
-@media (min-width:1200px){ .gallery-container a { flex:1 0 23%; max-width:23%; } }
-.gallery-container a img { width:100%; border-radius:12px; object-fit:cover; display:block; transition: transform 0.4s ease, box-shadow 0.4s ease; }
-.gallery-container a img:hover { transform:scale(1.08) translateY(-4px); box-shadow:0 15px 25px rgba(0,0,0,0.3); }
+.gallery-container {
+  column-gap: 15px;
+  column-count: 1;
+}
+@media (min-width:576px){ .gallery-container { column-count: 2; } }
+@media (min-width:768px){ .gallery-container { column-count: 3; } }
+@media (min-width:1200px){ .gallery-container { column-count: 4; } }
+.gallery-container a {
+  display:block;
+  width:100%;
+  margin-bottom:15px;
+  break-inside: avoid;
+  opacity:0;
+  transform:scale(0.96);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  overflow:hidden;
+  border-radius:12px;
+}
+.gallery-container a img {
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:12px;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  will-change: transform;
+}
+.gallery-container a img:hover {
+  transform:scale(1.05);
+  box-shadow:0 12px 20px rgba(0,0,0,0.25);
+}
 .gallery-container a.loaded { opacity:1; transform:scale(1); }
 .fancybox__container .fancybox__content img { border-radius:12px; }
 @media (prefers-color-scheme: dark){ .fancybox__container { background: rgba(18,18,18,0.95) !important; } }
@@ -375,8 +398,16 @@ const galleryItems = [];
 for(let i=1;i<=totalImages;i++){
   const src=`assets/img/evenementen/foto${i}.jpg`; // MARK: pad aanpassen voor categorie map
   const a=document.createElement("a"); a.href=src; a.setAttribute("data-fancybox","product");
-  const img=document.createElement("img"); img.src=src; img.alt=`foto${i}.jpg`; img.loading="lazy";
-  img.addEventListener("load", ()=>{ a.classList.add("loaded"); });
+  const img=document.createElement("img");
+  img.src = src;
+  img.decoding = "async";
+  img.loading = "lazy";
+  img.fetchPriority = "low";
+  img.alt=`foto${i}.jpg`;
+  img.style.background = "#111"; // prevents white flash while loading
+  img.addEventListener("load", ()=>{
+    requestAnimationFrame(() => a.classList.add("loaded"));
+  });
   a.appendChild(img);
   galleryItems.push(a);
 }
