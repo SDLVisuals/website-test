@@ -4,7 +4,7 @@
   const start = () => {
     const triggers = [...document.querySelectorAll('button[data-photo],button[data-video],button[data-video-src]')];
     if (!triggers.length || document.getElementById('work-viewer')) return;
-    const media = [];
+    const library = [];
     const lookup = new Map();
     const triggerIndexes = new Map();
     triggers.forEach(button => {
@@ -20,13 +20,20 @@
         const image = button.querySelector('img');
         const poster = button.dataset.poster || image?.getAttribute('src') || button.querySelector('video')?.getAttribute('poster') || '';
         const title = button.dataset.caption || button.dataset.title || image?.alt || (photo ? 'Fotografie · SDL Visuals' : 'Een film van SDL Visuals');
-        index = media.length;
+        index = library.length;
         lookup.set(key, index);
-        media.push({ type, src, poster: type === 'photo' ? src : poster, title, alt: image?.alt || title, format: button.dataset.format || 'portrait' });
+        library.push({ type, src, poster: type === 'photo' ? src : poster, title, alt: image?.alt || title, format: button.dataset.format || 'portrait' });
       }
       triggerIndexes.set(button, index);
     });
-    if (!media.length) return;
+    if (!library.length) return;
+    // Keep browsing inside the kind of work the visitor opened.
+    const collections = {
+      photo: library.filter(item => item.type === 'photo'),
+      film: library.filter(item => item.type !== 'photo')
+    };
+    let media = [];
+    let collection = null;
 
     const dialog = document.createElement('dialog');
     dialog.id = 'work-viewer';
@@ -60,7 +67,10 @@
     let pan = null;
     let swipe = null;
 
-    const thumbnails = media.map((item, index) => {
+    let thumbnails = [];
+    const buildThumbnails = () => {
+      strip.replaceChildren();
+      thumbnails = media.map((item, index) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'work-viewer-thumb';
@@ -88,7 +98,8 @@
       button.addEventListener('click', () => show(index));
       strip.append(button);
       return button;
-    });
+      });
+    };
 
     const fit = () => {
       if (!dialog.open) return;
@@ -237,8 +248,17 @@
 
     triggerIndexes.forEach((index, button) => button.addEventListener('click', () => {
       opener = button;
+      const item = library[index];
+      const selectedCollection = item.type === 'photo' ? 'photo' : 'film';
+      if (collection !== selectedCollection) {
+        collection = selectedCollection;
+        media = collections[collection];
+        dialog.dataset.mediaType = collection;
+        strip.setAttribute('aria-label', collection === 'photo' ? 'Fotogalerij' : 'Filmselectie');
+        buildThumbnails();
+      }
       if (!dialog.open) dialog.showModal();
-      show(index);
+      show(media.indexOf(item));
       close.focus({ preventScroll: true });
     }));
     close.addEventListener('click', () => dialog.close());
@@ -262,7 +282,7 @@
     stage.addEventListener('pointerup', stopPan);
     stage.addEventListener('pointercancel', stopPan);
     stage.addEventListener('lostpointercapture', stopPan);
-    /* Touch swipes only browse photos at their fitted size. Native vertical/pinch gestures remain available. */
+    /* Touch swipes only browse photos at their fitted size. Vertical scrolling and the viewer zoom buttons remain available. */
     stage.addEventListener('pointerdown', event => {
       if (event.isPrimary === false) { swipe = null; return; }
       if (!['touch', 'pen'].includes(event.pointerType) || scale !== 1 || !photoImage?.naturalWidth || media[active].type !== 'photo') return;

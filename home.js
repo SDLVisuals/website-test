@@ -21,7 +21,7 @@
     const collection = hero.querySelector('[data-showcase-collection]');
     const detail = hero.querySelector('[data-showcase-detail]');
     const ambient = hero.querySelector('[data-showcase-ambient]');
-    const interval = 5600;
+    const interval = 4800;
     const count = slides.length;
     if (count < 2 || !controls.length) return;
     const categoryOf = index => slides[index].dataset.category;
@@ -49,11 +49,11 @@
     slides.forEach(slide => { slide.querySelectorAll('img').forEach(image => image.draggable = false); });
     const clones = [...track.querySelectorAll('[data-home-clone]')];
 
-    let active = 0, physical = 1, elapsed = 0, photoElapsed = 0, holdUntil = 0, lastTick = 0;
-    let userPaused = false, focused = false, visible = true, windowActive = true;
+    let active = 0, physical = 1, elapsed = 0, photoElapsed = 0, lastTick = 0;
+    let userPaused = false, focused = false, visible = true, keyboardNavigation = false;
     let introPending = !reduce.matches;
     let moving = false, pending = null, drag = null, suppressUntil = 0;
-    let frame = 0, fallback = 0;
+    let frame = 0, fallback = 0, autoTimer = 0, deadline = 0, remaining = interval;
     const unavailable = new Set();
     const nextAvailable = (from,direction = 1) => {
       for (let step = 1; step <= count; step++) {
@@ -62,10 +62,40 @@
       }
       return null;
     };
-    const canMovePhoto = () => !introPending && !userPaused && visible && windowActive && !moving && !drag && !document.hidden && !document.body.classList.contains('menu-open') && !reduce.matches && !document.querySelector('dialog[open]');
-    const canPlay = () => unavailable.size < count-1 && canMovePhoto() && !focused && performance.now() >= holdUntil;
+    const blockReason = () => {
+      if (userPaused) return 'paused';
+      if (document.hidden) return 'background';
+      if (!visible) return 'offscreen';
+      if (moving) return 'transition';
+      if (drag) return 'gesture';
+      if (document.body.classList.contains('menu-open')) return 'menu';
+      if (document.querySelector('dialog[open]')) return 'viewer';
+      return '';
+    };
+    const canMovePhoto = () => !introPending && !blockReason() && !reduce.matches;
+    const stopAuto = (preserve = true) => {
+      clearTimeout(autoTimer); autoTimer = 0;
+      if (preserve && deadline) remaining = Math.max(0,deadline-performance.now());
+      deadline = 0;
+    };
+    const scheduleAuto = () => {
+      const reason = blockReason() || (focused ? 'keyboard' : '') || (unavailable.size >= count-1 ? 'unavailable' : '');
+      hero.dataset.autoplay = reason || 'playing';
+      if (reason) { stopAuto(); return; }
+      if (autoTimer) return;
+      // A wall-clock timer advances the photos even when animation frames are throttled.
+      deadline = performance.now()+remaining;
+      autoTimer = setTimeout(() => {
+        autoTimer = 0; deadline = 0; remaining = interval;
+        if (blockReason() || focused) { sync(); return; }
+        const next = nextAvailable(active);
+        if (next !== null) go(next,false,1);
+        else sync();
+      },remaining);
+    };
     const paint = () => {
-      const progress = Math.min(1,elapsed / interval);
+      elapsed = interval-(deadline ? Math.max(0,deadline-performance.now()) : remaining);
+      const progress = Math.min(1,Math.max(0,elapsed / interval));
       hero.style.setProperty('--home-slide-progress',String(progress));
       // A separate, continuous photo clock also keeps manual selections alive.
       const phase = (1-Math.cos(photoElapsed / 9000*Math.PI))/2;
@@ -79,13 +109,15 @@
     const stopClock = () => { cancelAnimationFrame(frame); frame = 0; lastTick = 0; };
     const sync = () => {
       stopClock();
+      scheduleAuto();
       const playing = canMovePhoto();
       hero.classList.toggle('is-paused',!playing);
-      pause.hidden = reduce.matches;
+      pause.hidden = false;
       pause.textContent = userPaused ? 'Speel' : 'Pauze';
       pause.setAttribute('aria-label',userPaused ? 'Foto’s automatisch laten schuiven' : 'Automatisch schuiven van foto’s pauzeren');
       pause.setAttribute('aria-pressed',String(userPaused));
       if (playing) frame = requestAnimationFrame(tick);
+      else paint();
     };
     const tick = now => {
       frame = 0;
@@ -93,11 +125,9 @@
       if (lastTick) {
         const delta = Math.min(now-lastTick,100);
         photoElapsed += delta;
-        if (canPlay()) elapsed += delta;
       }
       lastTick = now;
       paint();
-      if (elapsed >= interval) { const next = nextAvailable(active); if (next !== null) go(next,false,1); else sync(); return; }
       frame = requestAnimationFrame(tick);
     };
     const position = (immediate = false) => {
@@ -176,9 +206,10 @@
     };
     const go = (index,manual = false,direction = 0) => {
       if (index === null || index < 0 || index >= count || unavailable.has(index)) { sync(); return; }
-      if (manual) { holdUntil = performance.now()+4500; introPending = false; }
+      if (manual) { introPending = false; }
       if (moving) { pending = {index,manual,direction}; sync(); return; }
-      if (index === active) { position(); sync(); return; }
+      if (index === active) { stopAuto(false); remaining = interval; position(); sync(); return; }
+      stopAuto(false); remaining = interval;
       const steps = direction < 0 ? (active-index+count)%count : (index-active+count)%count;
       const skipBrokenFrames = unavailable.has(active) || (unavailable.size > 0 && steps > 1);
       let nextPhysical = index+1;
@@ -230,9 +261,10 @@
     });
     nextButton.addEventListener('click',() => go(nextAvailable(active),true,1));
     pause.addEventListener('click',() => { userPaused = !userPaused; if (!userPaused) focused = false; sync(); });
-    hero.addEventListener('focusin',event => { focused = event.target.matches(':focus-visible'); sync(); });
-    hero.addEventListener('focusout',() => requestAnimationFrame(() => { focused = hero.contains(document.activeElement) && document.activeElement.matches(':focus-visible'); sync(); }));
-    hero.addEventListener('pointerdown',() => { if (focused) { focused = false; sync(); } },{passive:true});
+    document.addEventListener('keydown',event => { if (['Tab','ArrowLeft','ArrowRight','Home','End'].includes(event.key)) keyboardNavigation = true; },true);
+    hero.addEventListener('focusin',() => { focused = keyboardNavigation; sync(); });
+    hero.addEventListener('focusout',() => requestAnimationFrame(() => { focused = hero.contains(document.activeElement) && keyboardNavigation; sync(); }));
+    document.addEventListener('pointerdown',() => { keyboardNavigation = false; if (focused) { focused = false; sync(); } },{passive:true,capture:true});
 
     /* A tap opens the photograph; a horizontal gesture slides the track. */
     viewport.addEventListener('pointerdown',event => {
@@ -266,7 +298,6 @@
       if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
       if (!gesture.locked) { sync(); return; }
       suppressUntil = performance.now()+550;
-      holdUntil = performance.now()+4500;
       const speed = Math.abs(gesture.dx)/Math.max(1,performance.now()-gesture.started);
       const advance = !cancelled && (Math.abs(gesture.dx)>viewport.clientWidth*.15 || (Math.abs(gesture.dx)>35 && speed>.45));
       if (advance) {
@@ -277,13 +308,31 @@
     viewport.addEventListener('pointerup',event => endDrag(event));
     viewport.addEventListener('pointercancel',event => endDrag(event,true));
     viewport.addEventListener('lostpointercapture',event => endDrag(event,true));
+    window.addEventListener('pointerup',event => endDrag(event));
+    window.addEventListener('pointercancel',event => endDrag(event,true));
     hero.addEventListener('click',event => {
       if (viewport.contains(event.target) && performance.now()<suppressUntil) { event.preventDefault(); event.stopImmediatePropagation(); }
     },true);
-    document.addEventListener('visibilitychange',sync);
+    const recover = () => {
+      drag = null; pending = null; moving = false;
+      clearTimeout(fallback);
+      physical = active+1;
+      track.classList.remove('is-dragging','is-moving');
+      hero.classList.remove('is-hero-dragging');
+      position(true);
+      const bounds = hero.getBoundingClientRect();
+      visible = bounds.bottom > 0 && bounds.top < innerHeight;
+      sync();
+    };
+    document.addEventListener('visibilitychange',() => { if (document.hidden) recover(); else { introPending = false; recover(); } });
     new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});
-    window.addEventListener('blur',() => { windowActive = false; sync(); });
-    window.addEventListener('focus',() => { windowActive = true; sync(); });
+    // Dialogs may be added after the carousel, and closing one must reliably resume it.
+    new MutationObserver(records => {
+      if (records.some(record => record.type === 'attributes' || [...record.addedNodes,...record.removedNodes].some(node => node.nodeType === 1 && (node.matches('dialog') || node.querySelector('dialog'))))) sync();
+    }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['open']});
+    window.addEventListener('pagehide',() => { stopAuto(); stopClock(); });
+    window.addEventListener('pageshow',() => { introPending = false; recover(); });
+    window.addEventListener('focus',() => { if (drag) recover(); else sync(); });
     reduce.addEventListener('change',() => { if (moving) finish(); sync(); });
     let measuredWidth = viewport.clientWidth;
     window.addEventListener('resize',() => {
