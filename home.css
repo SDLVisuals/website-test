@@ -118,7 +118,7 @@
 @media(max-width:1050px){.home-work-ordered{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .home-collection-controls{display:none}
 @media(max-width:760px){
- .home-work-ordered{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:6vw;margin-inline:-6vw;padding:4px 6vw 20px;scrollbar-width:none;overscroll-behavior-x:contain}
+ .home-work-ordered{--collection-inset:5.4vw;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--collection-inset);margin-inline:calc(-1 * var(--collection-inset));padding:4px var(--collection-inset) 20px;scrollbar-width:none;overscroll-behavior-x:contain}
  .home-work-ordered::-webkit-scrollbar{display:none}
  .home-work-ordered .home-work-card{flex:0 0 88%;min-width:0;scroll-snap-align:start;scroll-snap-stop:normal}
  .home-work-ordered .home-work-image,.home-work-ordered .home-work-card:first-child .home-work-image{aspect-ratio:4/5;border-radius:28px}
@@ -137,6 +137,7 @@
  .home-collection-track{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
  .home-collection-track i{display:block;width:16.6667%;height:100%;background:var(--accent);transform:translateX(calc(var(--collection-progress,0) * 500%));transition:transform .18s ease-out;border-radius:inherit}
 }
+@media(max-width:480px){.home-work-ordered{--collection-inset:6vw}}
 @media(max-width:360px){.home-collection-hint{display:none}.home-work-ordered .home-work-card h3{font-size:25px}.home-work-ordered .home-work-card p{font-size:12px}}
 
 /* Video is a primary service: a large playable film, then specific examples. */
