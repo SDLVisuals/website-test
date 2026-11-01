@@ -16,7 +16,7 @@
 
     /* Native horizontal browsing on phones; the full grid remains on desktop. */
     const collectionRail = document.querySelector('.home-work-ordered');
-    if (collectionRail) {
+    if (collectionRail && !document.querySelector('[data-collection-browser]')) {
       const cards = [...collectionRail.querySelectorAll('.home-work-card')];
       const controls = document.querySelector('.home-collection-controls');
       const count = controls?.querySelector('[data-collection-current]');

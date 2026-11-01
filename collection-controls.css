@@ -1,0 +1,33 @@
+/* The full desktop grid needs no paging controls. JS reveals this only for an overflowing rail. */
+.collection-browser[hidden]{display:none!important}
+.collection-browser{display:grid;gap:13px;margin-top:5px;padding:17px;border:1px solid var(--pane-rim,var(--line));border-radius:25px;background:var(--glass);color:var(--ink);box-shadow:inset 0 1px 0 var(--pane-highlight,#ffffff25),0 9px 26px #00000006;backdrop-filter:blur(24px) saturate(115%);-webkit-backdrop-filter:blur(24px) saturate(115%)}
+.collection-browser-status{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
+.collection-browser-name{font:500 18px/1.3 Manrope,Arial,sans-serif;letter-spacing:-.45px}
+.collection-browser-position{flex-shrink:0;font:400 11px/1.5 'DM Sans',Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--muted)}
+.collection-browser-choices{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+.collection-browser .collection-choice{display:grid;place-items:center;min-width:0;min-height:44px;padding:0;border:1px solid var(--line);border-radius:13px;background:var(--soft);color:var(--muted);font:500 12px/1 'DM Sans',Arial,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer;touch-action:manipulation;transition:color .2s,background .2s,border-color .2s}
+.collection-browser .collection-choice[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg);box-shadow:inset 0 -3px 0 var(--accent)}
+.collection-browser-navigation{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.collection-browser-navigation button{display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 15px;border:1px solid var(--line);border-radius:999px;background:var(--glass-strong,var(--glass));color:var(--ink);font:600 14px/1.4 'DM Sans',Arial,sans-serif;cursor:pointer;touch-action:manipulation;transition:background .2s,border-color .2s,opacity .2s}
+.collection-browser-navigation button:disabled{opacity:.35;cursor:default}
+.collection-browser-hint{display:none;margin:0;text-align:center;color:var(--muted);font:400 11px/1.5 'DM Sans',Arial,sans-serif}
+.collection-browser button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* The entire card is a link; the visible pill makes its destination explicit. */
+.home-work-ordered .home-work-card .home-work-open{display:inline-flex;align-items:center;justify-content:center;width:fit-content;max-width:100%;min-height:50px;margin-top:17px;padding:13px 21px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--bg);font:600 14px/1.4 'DM Sans',Arial,sans-serif;box-shadow:0 5px 18px #00000008;transition:background .25s,border-color .25s,color .25s}
+.home-work-ordered .home-work-card .home-work-open::after{display:none}
+.home-work-ordered .home-work-card:focus-visible{outline:2px solid var(--accent);outline-offset:7px;border-radius:20px}
+.home-work-ordered .home-work-card:focus-visible .home-work-open{background:var(--accent);border-color:var(--accent);color:#fff}
+@media(hover:hover) and (pointer:fine){
+ .collection-browser .collection-choice:hover:not([aria-pressed=true]){border-color:var(--muted);color:var(--ink)}
+ .collection-browser-navigation button:hover:not(:disabled){background:var(--soft);border-color:var(--muted)}
+ .home-work-ordered .home-work-card:hover .home-work-open{background:var(--accent);border-color:var(--accent);color:#fff}
+}
+@media(hover:none) and (pointer:coarse){.collection-browser-hint{display:block}}
+@media(max-width:360px){
+ .collection-browser{padding:13px;gap:11px;border-radius:22px}
+ .collection-browser-choices{gap:3px}
+ .collection-browser-name{font-size:17px}
+ .collection-browser-position{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.collection-browser button,.home-work-ordered .home-work-card .home-work-open{transition:none}}
