@@ -132,7 +132,7 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
 /* Immersive opening: one continuous photographic stage, glass over the image. */
 @media(min-width:761px){
  .showcase-layout{inset:0;display:block}
- .showcase-frame{position:absolute;inset:0 0 0 18%;border:0;border-radius:0;animation:showcase-immersive-in 1.6s cubic-bezier(.2,.75,.2,1) both}
+ .showcase-frame{position:absolute;inset:0;border:0;border-radius:0;animation:showcase-immersive-in 1.6s cubic-bezier(.2,.75,.2,1) both}
  .showcase-frame::after{border-radius:0;box-shadow:none;background:linear-gradient(90deg,#1b1b1b55,transparent 24%),linear-gradient(0deg,#0009,transparent 43%,transparent 83%,#0003)}
  .showcase-ambience>img{filter:blur(15px) saturate(.85);opacity:.8}
  .showcase-editorial{display:contents}
@@ -146,12 +146,12 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
  .showcase-next-image{width:68px;height:88px;border-radius:15px;box-shadow:none}
  .showcase-next-copy{gap:7px}.showcase-next-copy strong{font-size:23px}.showcase-next-counter{display:none}.showcase-next-invite{font-size:9px}
  .showcase-frame-top{top:114px;left:28px;right:28px;justify-content:end;gap:18px}
- .showcase-frame-bottom{left:23%;right:278px;bottom:137px;display:block}
+ .showcase-frame-bottom{left:37%;right:278px;bottom:137px;display:block}
  .showcase-frame-bottom .showcase-small{display:none}.showcase-series{font-size:31px;margin:0 0 8px}.showcase-detail{display:none}.showcase-collection{min-height:44px;padding:11px 17px}
  .showcase-footer{z-index:5;background:linear-gradient(120deg,#ffffff17,#ffffff06),#17171780}
 }
 @media(min-width:761px) and (max-width:1100px){
- .showcase-frame{left:8%}.showcase-copy{left:24px;width:39%;padding:25px}.showcase-hero h1{font-size:4.6vw}.showcase-next{right:24px;width:200px}.showcase-frame-bottom{left:47%;right:238px}.showcase-frame-bottom .showcase-series{font-size:25px}.showcase-collection{font-size:10px;padding-inline:13px}.showcase-next-copy strong{font-size:20px}.showcase-next-image{width:60px;height:83px}.showcase-next-invite{display:none}.showcase-frame-top{top:113px}
+ .showcase-frame{left:0}.showcase-copy{left:24px;width:39%;padding:25px}.showcase-hero h1{font-size:4.6vw}.showcase-next{right:24px;width:200px}.showcase-frame-bottom{left:51%;right:238px}.showcase-frame-bottom .showcase-series{font-size:25px}.showcase-collection{font-size:10px;padding-inline:13px}.showcase-next-copy strong{font-size:20px}.showcase-next-image{width:60px;height:83px}.showcase-next-invite{display:none}.showcase-frame-top{top:113px}
 }
 @media(max-width:760px){
  .showcase-layout{inset:0;display:block}
@@ -200,3 +200,5 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
  .showcase-tab-progress{left:10px;right:10px;bottom:2px;border-radius:2px}
 }
 @media(max-width:360px){.showcase-copy{padding:18px}.showcase-hero h1{font-size:34px}.showcase-eyebrow{font-size:8px}.showcase-intro{font-size:11px}.showcase-actions{gap:18px;margin-top:15px}.showcase-primary{padding-inline:17px}.showcase-contact{font-size:10.5px}.showcase-tabs button{font-size:9.5px;padding-inline:3px}.showcase-frame-bottom{left:21px;right:21px}.showcase-series{font-size:23px}}
+/* Keep both faces in view when this portrait-format couple photo spans a wide screen. */
+@media(min-width:1101px){.showcase-slide-couple .showcase-desktop-photo img{object-position:50% 20%!important}}
