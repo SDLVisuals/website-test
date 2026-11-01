@@ -1,0 +1,107 @@
+/* Finishing layer. Load after the page styles; motion remains in its own stylesheet. */
+:root{
+  --refinement-rim:rgba(255,255,255,.14);
+  --refinement-highlight:rgba(255,255,255,.09);
+  --refinement-card:rgba(31,31,35,.86);
+  --refinement-shadow:0 9px 28px rgba(0,0,0,.1);
+}
+html[data-theme="light"]{
+  --refinement-rim:rgba(29,29,34,.1);
+  --refinement-highlight:rgba(255,255,255,.95);
+  --refinement-card:rgba(255,255,255,.83);
+  --refinement-shadow:0 9px 28px rgba(30,30,35,.045);
+}
+
+/* 1. The same fine edge and legible surface across service and equipment cards. */
+.film-service,.gear-tool{
+  border-color:var(--refinement-rim);
+  background:var(--refinement-card);
+  box-shadow:inset 0 1px 0 var(--refinement-highlight),var(--refinement-shadow);
+}
+.drone-equipment,.gear-drone,.gear-next,.home-contact-inner,.contact-panel{
+  border-color:var(--refinement-rim);
+  box-shadow:inset 0 1px 0 var(--refinement-highlight);
+}
+.home-work-image,.film-featured-play,.film-project-play,.drone-film-button,.gear-photo{
+  outline:1px solid var(--refinement-rim);
+  outline-offset:-1px;
+}
+
+/* 2. A consistent reading rhythm, while retaining each section's scale. */
+.home-heading h2,.home-drone h2,.home-about h2,.film-section-heading h2,
+.film-approach h2,.gear-section-heading h2,.drone-film-copy h2,.portfolio-process h2{
+  text-wrap:balance;
+}
+.home-work-card h3,.home-film-caption h3,.film-project-caption h3,
+.film-service h3,.gear-tool h3,.drone-services h3{
+  letter-spacing:-.025em;
+  line-height:1.3;
+}
+.film-service p,.gear-tool>p,.drone-services p{line-height:1.75}
+.home-heading>p,.film-section-heading>p{max-width:34ch}
+.home-film-caption,.film-featured-caption,.portfolio-video-caption{column-gap:24px}
+.home-film-caption>div,.portfolio-video-caption>div{min-width:0}
+.portfolio-gallery figcaption{column-gap:10px;padding-top:13px;line-height:1.55}
+.portfolio-gallery figcaption>span{min-width:2ch;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.portfolio-gallery figcaption>p{min-width:0;overflow-wrap:break-word}
+.film-caption-duration,.gallery-category-current small,.home-collection-status{font-variant-numeric:tabular-nums}
+
+/* 3. Clear active controls and a quieter, compact gallery rail. */
+.photo-gallery-page .gallery-toolbar{
+  border-color:var(--refinement-rim);
+  box-shadow:inset 0 1px 0 var(--refinement-highlight),0 7px 25px rgba(0,0,0,.055);
+}
+.photo-gallery-page .gallery-view-switch{border-color:var(--refinement-rim)}
+.photo-gallery-page .gallery-view-switch button[aria-pressed="true"]{font-weight:600}
+.photo-gallery-page .gallery-category-current small{letter-spacing:.01em}
+
+/* 4. Related-page navigation shares one comfortable pill treatment. */
+.gear-section-nav a,.drone-sections a,.portfolio-more-links a{
+  min-height:46px;
+  border-color:var(--refinement-rim);
+  font-weight:500;
+  line-height:1.4;
+}
+.gear-section-nav,.drone-sections{gap:9px}
+.portfolio-more-links{gap:10px}
+
+/* 5. Contact details and footer links align cleanly and remain easy to tap. */
+.home-contact-bottom,.contact-bottom{align-items:flex-start}
+.home-email,.contact-mail{line-height:1.4;overflow-wrap:anywhere}
+.footer-links,.home-footer nav{align-items:center;gap:4px 22px}
+.footer-links a,.home-footer nav a{display:inline-flex;align-items:center;min-height:44px}
+
+/* 6. A visible focus ring follows the actionable element, not its photo crop. */
+.home-work-card:focus-visible,.home-film-button:focus-visible,
+.film-featured-play:focus-visible,.film-project-play:focus-visible,
+.drone-film-button:focus-visible,.gear-photo:focus-visible,
+.gallery-category-trigger:focus-visible,.gallery-view-switch button:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:4px;
+}
+
+@media(max-width:600px){
+  .photo-gallery-page .gallery-toolbar{padding:6px 8px;gap:8px;border-radius:19px}
+  .photo-gallery-page .gallery-toolbar .gallery-category-trigger{min-height:48px;gap:7px;padding-inline:4px}
+  .photo-gallery-page .gallery-category-current strong{font-size:13px;line-height:1.35}
+  .photo-gallery-page .gallery-category-current small{font-size:10px;line-height:1.5;margin-top:2px}
+  .photo-gallery-page .gallery-toolbar .gallery-view-switch{gap:1px;padding:2px;background:var(--glass)}
+  .photo-gallery-page .gallery-toolbar .gallery-view-switch button{min-height:44px;font-size:10px;padding-inline:10px}
+  .photo-gallery-page .portfolio-gallery figcaption{padding-top:10px;column-gap:9px}
+  .photo-gallery-page .portfolio-gallery[data-view="overview"] figcaption{column-gap:6px;line-height:1.5}
+  .home-work-ordered .home-work-card h3{margin-top:17px;margin-bottom:6px}
+  .film-project-caption{padding-top:13px}
+  .film-project-caption h3{line-height:1.4}
+  .gear-section-nav a,.drone-sections a{padding-inline:15px;font-size:11px}
+  .portfolio-more-links a{padding-inline:17px;font-size:12px}
+  .home-contact-bottom,.contact-bottom{gap:24px}
+  .footer,.home-footer{row-gap:14px}
+  .footer-links,.home-footer nav{column-gap:20px}
+}
+@media(max-width:360px){
+  .photo-gallery-page .gallery-toolbar{padding-inline:6px;gap:6px}
+  .photo-gallery-page .gallery-category-current strong{font-size:12px}
+  .photo-gallery-page .gallery-toolbar .gallery-view-switch button{font-size:10px;padding-inline:7px}
+  .photo-gallery-page .gallery-toolbar .gallery-category-trigger svg{width:14px;height:14px}
+  .footer-links,.home-footer nav{column-gap:17px}
+}

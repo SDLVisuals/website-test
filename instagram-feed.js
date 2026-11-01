@@ -18,7 +18,6 @@
     if ([...url.searchParams.keys()].some(key => /^(token|accesstoken|refreshtoken|apikey|clientsecret|authorization|auth|password|secret|signature)$/.test(key.toLowerCase().replace(/[^a-z]/g, '')))) return null;
     const origin = new URL(base).origin;
     if (url.origin === origin && /\.json$/i.test(url.pathname)) return url.href;
-    if (url.protocol === 'https:' && url.hostname === 'feeds.behold.so' && !url.port && !url.search && !url.hash && /^\/[a-zA-Z0-9]+\/?$/.test(url.pathname)) return url.href;
     return null;
   }
   function safeMediaUrl(value, base = document.baseURI) {
@@ -45,7 +44,7 @@
     const large = raw.sizes?.large;
     const small = raw.sizes?.small;
     const media = values => values.map(value => safeMediaUrl(value, base)).find(Boolean) || null;
-    // Behold's VIDEO sizes are posters. Only mediaUrl is a playable video.
+    // VIDEO image sizes are posters. Only mediaUrl is a playable video.
     const src = video ? safeMediaUrl(raw.mediaUrl, base) : media([full?.mediaUrl, large?.mediaUrl, medium?.mediaUrl, raw.mediaUrl, small?.mediaUrl]);
     if (!src) return null;
     const thumbnail = video ? media([medium?.mediaUrl, small?.mediaUrl, large?.mediaUrl, full?.mediaUrl, raw.thumbnailUrl]) : media([medium?.mediaUrl, small?.mediaUrl, large?.mediaUrl, full?.mediaUrl, raw.thumbnailUrl, src]);
@@ -65,8 +64,14 @@
       isReel: video && (raw.isReel === true || post.isReel === true)
     };
   }
-  function normalizeFeed(payload, username, maxPosts = 6, base = document.baseURI) {
+  function normalizeFeed(payload, username, maxPosts = 12, base = document.baseURI) {
     if (!payload || payload.username !== username || !Array.isArray(payload.posts)) throw new Error('Invalid feed identity');
+    // Instagram CDN links expire. Do not show an old feed after sync stops.
+    if (payload.source === 'instagram-direct') {
+      const generated = Date.parse(payload.generatedAt);
+      const age = Date.now() - generated;
+      if (!Number.isFinite(generated) || age > 48 * 60 * 60 * 1000 || age < -5 * 60 * 1000) throw new Error('Feed needs a fresh sync');
+    }
     const result = { photos: [], videos: [], photoCards: [], videoCards: [] };
     const seen = new Set();
     let accepted = 0;
@@ -240,7 +245,7 @@
     const username = asText(config.username, 80);
     const feedUrl = safeFeedUrl(config.feedUrl);
     if (!feedUrl || !/^[a-zA-Z0-9._]{1,30}$/.test(username)) { section.dataset.instagramState = 'disabled'; return; }
-    const maxPosts = Number.isFinite(Number(config.maxPosts)) ? Math.max(1, Math.min(6, Math.floor(Number(config.maxPosts)))) : 6;
+    const maxPosts = Number.isFinite(Number(config.maxPosts)) ? Math.max(1, Math.min(12, Math.floor(Number(config.maxPosts)))) : 12;
     section.dataset.instagramState = 'loading';
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000);

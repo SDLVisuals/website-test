@@ -1,0 +1,63 @@
+/* Refined motion is opt-in per component. No new content is hidden before JS runs. */
+html.refinement-ready body [data-refine-reveal]{opacity:1;transform:none;transition:none}
+html.refinement-ready body [data-refine-reveal][data-reveal],
+html.refinement-ready body [data-refine-reveal][data-scroll-scene],
+html.refinement-ready body [data-refine-reveal] [data-scroll-scene]{opacity:1;transform:none;transition:none}
+html.refinement-ready body .home-work-card[data-refine-reveal]>h3,
+html.refinement-ready body .home-work-card[data-refine-reveal]>p,
+html.refinement-ready body .home-work-card[data-refine-reveal]>.home-work-open,
+html.refinement-ready body .home-contact-inner[data-refine-reveal]>*{opacity:1;transform:none;transition:none}
+html.refinement-ready body [data-refine-reveal]>.home-work-image img,
+html.refinement-ready body [data-refine-reveal][data-scene-photo] img,
+html.refinement-ready body [data-refine-reveal] [data-scene-photo] img{opacity:1}
+html.refinement-ready body .portfolio-gallery [data-refine-reveal] .portfolio-image img{clip-path:none}
+.is-refine-entering{will-change:opacity,translate}
+
+/* Only cover images drift. Gallery originals, product photos and viewer media retain their framing. */
+html.refinement-ready .refine-media{overflow:hidden}
+html.refinement-ready .refine-media>img{transform:translate3d(0,var(--refine-photo-shift,0%),0) scale(var(--refine-photo-scale,1.032));transition:none}
+html.refinement-ready .refine-media.is-refine-media-near>img{will-change:transform}
+
+/* A frame responds to an actual pointer, without changing its layout or moving its caption. */
+html.refinement-ready .refine-lift{translate:0 0;scale:1;transition:translate .45s cubic-bezier(.2,.7,.2,1),scale .2s ease,box-shadow .35s,border-color .3s}
+@media(hover:hover) and (pointer:fine){
+ html.refinement-ready .refine-lift.is-refine-hover{translate:0 -4px;box-shadow:0 18px 38px #0000001a;border-color:var(--muted)}
+}
+html.refinement-ready .refine-lift.is-refine-pressed{scale:.992;box-shadow:0 5px 18px #00000012}
+html.refinement-ready .refine-lift:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+
+/* Glass layers arrive together; their text remains intact and readable. */
+html.refinement-ready .theme-options:not([hidden]),
+html.refinement-ready .mobile-menu:not([hidden]){animation:refine-menu-enter .32s cubic-bezier(.19,.75,.24,1) both;transform-origin:top right}
+html.refinement-ready .mobile-menu:not([hidden])>a{animation:refine-menu-link .3s ease both}
+html.refinement-ready .mobile-menu:not([hidden])>a:nth-child(2){animation-delay:35ms}
+html.refinement-ready .mobile-menu:not([hidden])>a:nth-child(3){animation-delay:70ms}
+html.refinement-ready .mobile-menu:not([hidden])>a:nth-child(4){animation-delay:105ms}
+html.refinement-ready .mobile-menu:not([hidden])>a:nth-child(5){animation-delay:140ms}
+html.refinement-ready .mobile-menu:not([hidden])>a:nth-child(6){animation-delay:175ms}
+html.refinement-ready .work-viewer[open],
+html.refinement-ready .ig-viewer[open]{animation:refine-viewer-enter .32s cubic-bezier(.19,.75,.24,1) both}
+html.refinement-ready .work-viewer[open]::backdrop,
+html.refinement-ready .ig-viewer[open]::backdrop{animation:refine-backdrop-enter .3s ease both}
+html.refinement-ready .gallery-collections-dialog[open]:not(.is-closing) .gallery-collections-panel{animation:refine-sheet-enter .42s cubic-bezier(.19,.75,.24,1) both}
+@keyframes refine-menu-enter{from{opacity:0;transform:translateY(-7px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes refine-menu-link{from{opacity:.2}to{opacity:1}}
+@keyframes refine-viewer-enter{from{opacity:0;transform:translateY(7px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes refine-backdrop-enter{from{opacity:0}to{opacity:1}}
+@keyframes refine-sheet-enter{from{opacity:.15;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){html.refinement-ready .refine-lift.is-refine-pressed{scale:.995}}
+@media(prefers-reduced-motion:reduce){
+ html.refinement-ready .refine-media>img{transform:none;transition:none;will-change:auto}
+ html.refinement-ready .refine-lift,
+ html.refinement-ready .refine-lift.is-refine-hover,
+ html.refinement-ready .refine-lift.is-refine-pressed{translate:none;scale:none;transition:none}
+ html.refinement-ready .theme-options:not([hidden]),
+ html.refinement-ready .mobile-menu:not([hidden]),
+ html.refinement-ready .mobile-menu:not([hidden])>a,
+ html.refinement-ready .work-viewer[open],
+ html.refinement-ready .ig-viewer[open],
+ html.refinement-ready .work-viewer[open]::backdrop,
+ html.refinement-ready .ig-viewer[open]::backdrop,
+ html.refinement-ready .gallery-collections-dialog[open]:not(.is-closing) .gallery-collections-panel{animation:none}
+ .is-refine-entering{will-change:auto}
+}
