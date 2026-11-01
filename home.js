@@ -13,6 +13,7 @@
     const counter = hero.querySelector('[data-home-counter]');
     const status = hero.querySelector('[data-home-status]');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const mobilePhoto = matchMedia('(max-width:1100px)');
     const labels = slides.map(slide => slide.dataset.label);
     const nextButton = hero.querySelector('[data-showcase-next]');
     const nextImage = hero.querySelector('[data-showcase-preview]');
@@ -39,7 +40,7 @@
       element.querySelectorAll('*').forEach(child => {
         ['id','data-photo','data-caption','fetchpriority'].forEach(name => child.removeAttribute(name));
         if (child.tagName === 'BUTTON') child.tabIndex = -1;
-        if (child.tagName === 'IMG') { child.alt = ''; child.draggable = false; }
+        if (child.tagName === 'IMG') { child.alt = ''; child.draggable = false; child.loading = 'lazy'; child.decoding = 'async'; child.setAttribute('fetchpriority','low'); }
       });
       return element;
     };
@@ -47,11 +48,44 @@
     track.append(clone(slides[0],0));
     slides.forEach(slide => { slide.querySelectorAll('img').forEach(image => image.draggable = false); });
     const clones = [...track.querySelectorAll('[data-home-clone]')];
+    const photoElements = slides.map((slide,index) => [slide,...clones.filter(element => Number(element.dataset.homeClone) === index)]);
+    const motionImages = photoElements.map(elements => elements.flatMap(element => [...element.querySelectorAll('img')]));
+    const photoClocks = slides.map(() => 0);
+    const decoded = new WeakMap();
+    // CSS chooses the visible wrapper; picture/srcset chooses that image's currentSrc.
+    const visibleImages = index => photoElements[index].flatMap(element => [...element.querySelectorAll('.showcase-photo img')].filter(image => image.getClientRects().length > 0));
+    const sourceOf = image => image.currentSrc || image.src;
+    const imageReady = image => {
+      const cached = decoded.get(image);
+      return image.complete && image.naturalWidth > 0 && cached?.ready && cached.source === sourceOf(image);
+    };
+    const decodeImage = image => {
+      // Neighbours must start loading before native lazy-loading brings them on screen.
+      image.loading = 'eager';
+      if (imageReady(image)) return Promise.resolve(true);
+      const source = sourceOf(image);
+      const cached = decoded.get(image);
+      if (cached?.source === source && cached.pending) return cached.pending;
+      const record = {source,ready:false,pending:null};
+      record.pending = Promise.resolve().then(() => image.decode ? image.decode() : undefined).then(() => {
+        record.source = sourceOf(image);
+        record.ready = image.complete && image.naturalWidth > 0;
+        return record.ready;
+      },() => false).finally(() => { record.pending = null; });
+      decoded.set(image,record);
+      return record.pending;
+    };
+    const prepareSlide = index => Promise.all(visibleImages(index).map(decodeImage)).then(results => results.every(Boolean));
+    const slideReady = index => visibleImages(index).every(imageReady);
+    // Decode the neighbours while the current photograph is being viewed.
+    const warmNeighbours = () => [active,nextAvailable(active),nextAvailable(active,-1)].forEach(index => {
+      if (index !== null) prepareSlide(index);
+    });
 
     let active = 0, physical = 1, elapsed = 0, photoElapsed = 0, lastTick = 0;
     let focused = false, visible = true, keyboardNavigation = false;
     let introPending = !reduce.matches;
-    let moving = false, pending = null, drag = null, suppressUntil = 0;
+    let moving = false, pending = null, preparing = null, drag = null, suppressUntil = 0;
     let frame = 0, fallback = 0, autoTimer = 0, deadline = 0, remaining = interval;
     const unavailable = new Set();
     const nextAvailable = (from,direction = 1) => {
@@ -65,6 +99,7 @@
       if (document.hidden) return 'background';
       if (!visible) return 'offscreen';
       if (moving) return 'transition';
+      if (preparing) return 'loading';
       if (drag) return 'gesture';
       if (document.body.classList.contains('menu-open')) return 'menu';
       if (document.querySelector('dialog[open]')) return 'viewer';
@@ -99,10 +134,10 @@
       const phase = (1-Math.cos(photoElapsed / 9000*Math.PI))/2;
       const direction = active % 2 ? -1 : 1;
       const amplitude = Number(slides[active].dataset.motion || .055);
-      const zoom = 1.025 + phase * amplitude;
-      const transform = `translate3d(${direction*(phase-.5)*1.2}%,${(phase-.5)*-.5}%,0) scale(${zoom})`;
-      slides[active].querySelectorAll('img').forEach(image => image.style.transform = transform);
-      clones.forEach(element => { if (Number(element.dataset.homeClone) === active) element.querySelectorAll('img').forEach(image => image.style.transform = transform); });
+      const mobile = mobilePhoto.matches;
+      const zoom = (mobile ? 1.012 : 1.025) + phase * (mobile ? Math.min(amplitude,.018) : amplitude);
+      const transform = `translate3d(${direction*(phase-.5)*(mobile ? .5 : 1.2)}%,${(phase-.5)*(mobile ? -.18 : -.5)}%,0) scale(${zoom})`;
+      motionImages[active].forEach(image => image.style.transform = transform);
     };
     const stopClock = () => { cancelAnimationFrame(frame); frame = 0; lastTick = 0; };
     const sync = () => {
@@ -120,6 +155,7 @@
       if (lastTick) {
         const delta = Math.min(now-lastTick,100);
         photoElapsed += delta;
+        photoClocks[active] = photoElapsed;
       }
       lastTick = now;
       paint();
@@ -165,7 +201,7 @@
         ambient.parentElement.querySelectorAll('.showcase-ambient-out').forEach(image => image.remove());
         ambient.parentElement.insertBefore(old,ambient);
         ambient.src = ambienceSource;
-        if (!reduce.matches && ambient.animate) {
+        if (!mobilePhoto.matches && !reduce.matches && ambient.animate) {
           ambient.animate([{opacity:0},{opacity:.55}],{duration:900,easing:'ease-out'});
           old.animate([{opacity:.55},{opacity:0}],{duration:1000,easing:'ease-out'}).onfinish=() => old.remove();
         } else old.remove();
@@ -178,6 +214,7 @@
       if (manual) status.textContent = `${active+1} van ${count}. ${labels[active]}.`;
       paint();
       revealControl();
+      warmNeighbours();
     };
     const finish = () => {
       clearTimeout(fallback);
@@ -203,7 +240,24 @@
       if (index === null || index < 0 || index >= count || unavailable.has(index)) { sync(); return; }
       if (manual) { introPending = false; }
       if (moving) { pending = {index,manual,direction}; sync(); return; }
-      if (index === active) { stopAuto(false); remaining = interval; position(); sync(); return; }
+      if (index === active) { preparing = null; stopAuto(false); remaining = interval; position(); sync(); return; }
+      if (!slideReady(index)) {
+        if (preparing?.index === index) return;
+        const request = {index,manual,direction};
+        preparing = request;
+        stopAuto(false); remaining = interval;
+        // A slow connection keeps the current photo visible instead of sliding into a blank frame.
+        if (manual) position();
+        sync();
+        prepareSlide(index).then(ready => {
+          if (preparing !== request) return;
+          preparing = null;
+          if (ready && slideReady(index) && (manual || (!blockReason() && !focused))) go(index,manual,direction);
+          else { remaining = ready ? interval : 1000; sync(); }
+        });
+        return;
+      }
+      preparing = null;
       stopAuto(false); remaining = interval;
       const steps = direction < 0 ? (active-index+count)%count : (index-active+count)%count;
       const skipBrokenFrames = unavailable.has(active) || (unavailable.size > 0 && steps > 1);
@@ -212,7 +266,7 @@
       if (active === 0 && index === count-1 && direction <= 0) nextPhysical = 0;
       active = index;
       physical = nextPhysical;
-      elapsed = 0; photoElapsed = 0;
+      elapsed = 0; photoElapsed = photoClocks[index];
       mark(manual);
       const jump = manual && direction === 0 && steps > 1;
       beginMove(skipBrokenFrames || jump);
@@ -308,12 +362,12 @@
       if (viewport.contains(event.target) && performance.now()<suppressUntil) { event.preventDefault(); event.stopImmediatePropagation(); }
     },true);
     const recover = () => {
-      drag = null; pending = null; moving = false;
+      drag = null; pending = null; preparing = null; moving = false;
       clearTimeout(fallback);
       physical = active+1;
       track.classList.remove('is-dragging','is-moving');
       hero.classList.remove('is-hero-dragging');
-      position(true);
+      position(true); warmNeighbours();
       const bounds = hero.getBoundingClientRect();
       visible = bounds.bottom > 0 && bounds.top < innerHeight;
       sync();
@@ -333,10 +387,10 @@
       const width = viewport.clientWidth;
       if (Math.abs(width-measuredWidth) < 1) return;
       measuredWidth = width;
-      clearTimeout(fallback); moving = false; pending = null; drag = null;
+      clearTimeout(fallback); moving = false; pending = null; preparing = null; drag = null;
       physical = active+1;
       track.classList.remove('is-dragging','is-moving'); hero.classList.remove('is-hero-dragging');
-      position(true); revealControl(); sync();
+      position(true); revealControl(); warmNeighbours(); sync();
     },{passive:true});
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); },{threshold:.1}).observe(hero);
@@ -369,8 +423,11 @@
         if (retried.has(image) && !image.complete) return;
         if (!retried.has(image)) {
           retried.add(image);
-          const retry = new URL(image.getAttribute('src'),document.baseURI);
+          const retry = new URL(sourceOf(image),document.baseURI);
           retry.searchParams.set('home_retry',String(Date.now()));
+          // Retry the selected responsive candidate, not a small fallback hidden by srcset.
+          image.removeAttribute('srcset');
+          image.closest('picture')?.querySelectorAll('source').forEach(source => source.removeAttribute('srcset'));
           image.src = retry.href;
           return;
         }
