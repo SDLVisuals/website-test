@@ -140,3 +140,23 @@ body{--ui-radius:24px}
 /* Prevent accidental double-tap zoom; keep deliberate pinch zoom available. */
 html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}a,button,input,select,textarea,label{touch-action:manipulation}
 @media(max-width:760px){input,select,textarea{font-size:16px}}
+
+/* Theme choices belong to the site's glass interface, including system mode. */
+.theme-btn[aria-expanded="true"]{background:var(--soft);border-color:var(--muted)}
+.theme-btn .theme-mode-icon{display:block;width:20px;height:20px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;color:var(--ink)}
+.theme-options{position:fixed;z-index:120;padding:9px;border:1px solid var(--pane-rim,var(--line));border-radius:23px;background:var(--pane-solid,var(--glass-strong));color:var(--ink);box-shadow:inset 0 1px 0 var(--pane-highlight,#ffffff20),0 18px 55px #00000026;backdrop-filter:blur(32px) saturate(125%);-webkit-backdrop-filter:blur(32px) saturate(125%);isolation:isolate}
+.theme-options[hidden]{display:none}
+.theme-options:not([hidden]){animation:theme-options-in .2s ease-out}
+.theme-options-heading{padding:8px 12px 11px;font-size:11px;font-weight:500;line-height:1.5;letter-spacing:.02em;color:var(--muted)}
+.theme-option{display:flex;width:100%;align-items:center;gap:12px;padding:12px;min-height:63px;border:1px solid transparent;border-radius:15px;background:transparent;color:var(--ink);text-align:left;transition:background .18s,border-color .18s}
+.theme-option+.theme-option{margin-top:3px}
+.theme-option>.theme-mode-icon{width:22px;height:22px;flex:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.theme-option>span{display:flex;flex-direction:column;gap:3px;flex:1}
+.theme-option strong{font-size:13px;font-weight:500;line-height:1.3}
+.theme-option small{font-size:11px;line-height:1.35;color:var(--muted)}
+.theme-option:hover,.theme-option[aria-checked="true"]{background:var(--soft);border-color:var(--line)}
+.theme-option:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.theme-option-check{width:18px;height:18px;flex:none;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.theme-option[aria-checked="true"] .theme-option-check{opacity:1}
+@keyframes theme-options-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.theme-options:not([hidden]){animation:none}.theme-option{transition:none}}

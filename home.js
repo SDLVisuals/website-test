@@ -9,7 +9,6 @@
     const slides = [...track.querySelectorAll('[data-home-slide]')];
     const controls = [...hero.querySelectorAll('[data-home-select]')];
     const rail = hero.querySelector('.home-photo-rail');
-    const pause = hero.querySelector('[data-home-pause]');
     const label = hero.querySelector('[data-home-photo-label]');
     const counter = hero.querySelector('[data-home-counter]');
     const status = hero.querySelector('[data-home-status]');
@@ -50,7 +49,7 @@
     const clones = [...track.querySelectorAll('[data-home-clone]')];
 
     let active = 0, physical = 1, elapsed = 0, photoElapsed = 0, lastTick = 0;
-    let userPaused = false, focused = false, visible = true, keyboardNavigation = false;
+    let focused = false, visible = true, keyboardNavigation = false;
     let introPending = !reduce.matches;
     let moving = false, pending = null, drag = null, suppressUntil = 0;
     let frame = 0, fallback = 0, autoTimer = 0, deadline = 0, remaining = interval;
@@ -63,7 +62,6 @@
       return null;
     };
     const blockReason = () => {
-      if (userPaused) return 'paused';
       if (document.hidden) return 'background';
       if (!visible) return 'offscreen';
       if (moving) return 'transition';
@@ -112,10 +110,7 @@
       scheduleAuto();
       const playing = canMovePhoto();
       hero.classList.toggle('is-paused',!playing);
-      pause.hidden = false;
-      pause.textContent = userPaused ? 'Speel' : 'Pauze';
-      pause.setAttribute('aria-label',userPaused ? 'Foto’s automatisch laten schuiven' : 'Automatisch schuiven van foto’s pauzeren');
-      pause.setAttribute('aria-pressed',String(userPaused));
+
       if (playing) frame = requestAnimationFrame(tick);
       else paint();
     };
@@ -260,7 +255,6 @@
       controlFor(active)?.focus({preventScroll:true});
     });
     nextButton.addEventListener('click',() => go(nextAvailable(active),true,1));
-    pause.addEventListener('click',() => { userPaused = !userPaused; if (!userPaused) focused = false; sync(); });
     document.addEventListener('keydown',event => { if (['Tab','ArrowLeft','ArrowRight','Home','End'].includes(event.key)) keyboardNavigation = true; },true);
     hero.addEventListener('focusin',() => { focused = keyboardNavigation; sync(); });
     hero.addEventListener('focusout',() => requestAnimationFrame(() => { focused = hero.contains(document.activeElement) && keyboardNavigation; sync(); }));
@@ -389,6 +383,10 @@
         if (image.complete && image.naturalWidth === 0 && !retried.has(image)) failed();
       },0);
     });
+    const copy = hero.querySelector('.showcase-copy');
+    if (copy && 'ResizeObserver' in window) {
+      new ResizeObserver(() => hero.style.setProperty('--showcase-copy-height', `${copy.offsetHeight}px`)).observe(copy);
+    }
     mark(false); position(true); sync();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true});

@@ -176,3 +176,27 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
 @media(max-width:760px){.showcase-tabs{flex:1}.showcase-tabs button{min-width:52px;font-size:10.5px;padding-inline:10px}.showcase-next-copy strong{font-size:12px}.showcase-next-copy .showcase-small{font-size:7px}}
 
 @media(max-width:760px){.showcase-tabs{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent);mask-image:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent)}}
+
+/* Give the photograph room: one compact glass panel and a quiet collection rail. */
+.showcase-footer{gap:18px}
+@media(max-width:760px){
+ .showcase-hero{height:100svh;min-height:600px}
+ .showcase-editorial{left:12px;right:12px;bottom:80px}
+ .showcase-next{display:none}
+ .showcase-copy{min-height:0;padding:20px 22px;border-radius:25px;background:linear-gradient(135deg,#ffffff16,#ffffff05),#1818189c;backdrop-filter:blur(24px) saturate(120%);-webkit-backdrop-filter:blur(24px) saturate(120%)}
+ html[data-theme="light"] .showcase-copy{background:linear-gradient(135deg,#ffffffdf,#ffffff9c)}
+ .showcase-hero h1{max-width:none;font-size:clamp(36px,9vw,48px);line-height:1.03;margin:12px 0 11px;letter-spacing:-.055em}
+ .showcase-intro{max-width:none;font-size:12px;line-height:1.5;opacity:.75}
+ .showcase-actions{gap:24px;margin-top:17px;justify-content:start}
+ .showcase-primary{min-height:44px;padding:12px 20px;font-size:11px}
+ .showcase-contact{font-size:11px;min-height:44px}
+ .showcase-frame-top{display:none}
+ .showcase-frame-bottom{bottom:calc(102px + var(--showcase-copy-height,230px));left:24px;right:24px;align-items:center}
+ .showcase-series{font-size:25px;font-weight:500}
+ .showcase-collection{min-height:40px;padding:10px 15px;font-size:10px}
+ .showcase-footer{left:12px;right:12px;bottom:12px;min-height:56px;padding:5px 6px;border-radius:19px}
+ .showcase-tabs{width:100%;flex:1;gap:2px;mask-image:none;-webkit-mask-image:none;scroll-snap-type:none}
+ .showcase-tabs button{flex:1 0 auto;min-width:0;padding:10px 7px;font-size:10.5px;min-height:44px;border-radius:13px;overflow:visible}
+ .showcase-tab-progress{left:10px;right:10px;bottom:2px;border-radius:2px}
+}
+@media(max-width:360px){.showcase-copy{padding:18px}.showcase-hero h1{font-size:34px}.showcase-eyebrow{font-size:8px}.showcase-intro{font-size:11px}.showcase-actions{gap:18px;margin-top:15px}.showcase-primary{padding-inline:17px}.showcase-contact{font-size:10.5px}.showcase-tabs button{font-size:9.5px;padding-inline:3px}.showcase-frame-bottom{left:21px;right:21px}.showcase-series{font-size:23px}}

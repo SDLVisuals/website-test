@@ -7,52 +7,12 @@
     const body = document.body;
     if (!body) return;
 
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const themeKey = 'sdl-glass-theme';
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeLabel = document.getElementById('theme-label');
-    const validTheme = value => value === 'dark' || value === 'light';
-    const readTheme = () => {
-      try {
-        const value = localStorage.getItem(themeKey);
-        return validTheme(value) ? value : null;
-      } catch (_) {
-        return null;
-      }
-    };
-    let userTheme = readTheme();
-
-    const applyTheme = theme => {
-      const dark = theme === 'dark';
-      body.dataset.theme = theme;
-      root.dataset.theme = theme;
-      root.style.colorScheme = theme;
-      themeToggle?.setAttribute('aria-pressed', String(dark));
-      themeToggle?.setAttribute('aria-label', `Schakel over naar ${dark ? 'lichte' : 'donkere'} modus`);
-      if (themeLabel) themeLabel.textContent = dark ? 'Licht' : 'Donker';
-    };
-
-    applyTheme(userTheme || (prefersDark.matches ? 'dark' : 'light'));
-    themeToggle?.addEventListener('click', () => {
-      userTheme = body.dataset.theme === 'dark' ? 'light' : 'dark';
-      applyTheme(userTheme);
-      try { localStorage.setItem(themeKey, userTheme); } catch (_) { /* Private mode can deny storage. */ }
-    });
-
     const listen = (query, callback) => {
       if (query.addEventListener) query.addEventListener('change', callback);
       else if (query.addListener) query.addListener(callback);
     };
-    listen(prefersDark, () => {
-      if (!userTheme) applyTheme(prefersDark.matches ? 'dark' : 'light');
-    });
-    window.addEventListener('storage', event => {
-      if (event.key !== themeKey && event.key !== null) return;
-      userTheme = readTheme();
-      applyTheme(userTheme || (prefersDark.matches ? 'dark' : 'light'));
-    });
 
     /* Headings enter as complete, readable blocks instead of separate clipped lines. */
     document.querySelectorAll('.portfolio-intro').forEach(intro => intro.setAttribute('data-reveal',''));
