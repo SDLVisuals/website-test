@@ -1,0 +1,58 @@
+/* Homepage only. Progressive enhancement leaves every item visible without JS. */
+.home-page [data-scene-shell][data-reveal],
+.home-page [data-scroll-scene][data-reveal]{opacity:1;transform:none;transition:none}
+
+.home-scenes-enabled .home-page [data-scroll-scene="copy"]{
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity .75s ease,transform 1.05s cubic-bezier(.2,.75,.2,1);
+  transition-delay:var(--scene-delay,0ms);
+}
+.home-scenes-enabled .home-page [data-scroll-scene="copy"].is-scene-visible{
+  opacity:1;
+  transform:none;
+}
+
+/* Cards never translate or tilt. Only their image and caption become visible. */
+.home-scenes-enabled .home-work-card[data-scroll-scene]>.home-work-image img,
+.home-scenes-enabled [data-scene-photo] img{
+  opacity:0;
+  transition:opacity 1s ease;
+  transition-delay:var(--scene-delay,0ms);
+}
+.home-scenes-enabled .home-work-card.is-scene-visible>.home-work-image img,
+.home-scenes-enabled [data-scene-photo].is-scene-visible img{opacity:1}
+.home-scenes-enabled .home-work-card[data-scroll-scene]>h4,
+.home-scenes-enabled .home-work-card[data-scroll-scene]>p,
+.home-scenes-enabled .home-work-card[data-scroll-scene]>.home-work-open{
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .7s ease,transform .9s cubic-bezier(.2,.75,.2,1);
+  transition-delay:calc(var(--scene-delay,0ms) + 100ms);
+}
+.home-scenes-enabled .home-work-card[data-scroll-scene]>p{transition-delay:calc(var(--scene-delay,0ms) + 160ms)}
+.home-scenes-enabled .home-work-card[data-scroll-scene]>.home-work-open{transition-delay:calc(var(--scene-delay,0ms) + 220ms)}
+.home-scenes-enabled .home-work-card.is-scene-visible>h4,
+.home-scenes-enabled .home-work-card.is-scene-visible>p,
+.home-scenes-enabled .home-work-card.is-scene-visible>.home-work-open{opacity:1;transform:none}
+
+.home-motion-enhanced .home-page [data-home-media] img{
+  transform:scale(var(--home-media-scale,1.085));
+  clip-path:inset(var(--home-media-inset,0%) 0 round 18px);
+  will-change:auto;
+}
+.home-motion-enhanced .home-page [data-home-media].is-media-near img{will-change:transform,clip-path}
+
+@media(max-width:760px){
+  .home-scenes-enabled .home-page [data-scroll-scene="copy"]{transform:translateY(15px)}
+  .home-scenes-enabled .home-page [data-scroll-scene="copy"].is-scene-visible{transform:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-page [data-scroll-scene],
+  .home-page [data-scroll-scene]>*{
+    opacity:1!important;
+    transform:none!important;
+    transition:none!important;
+  }
+  .home-page [data-home-media] img{transform:none!important;clip-path:none!important;will-change:auto}
+}

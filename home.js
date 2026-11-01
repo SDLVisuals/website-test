@@ -1,0 +1,318 @@
+/* Seamless photo track, quiet autoplay and native photo-viewer clicks. */
+(() => {
+  'use strict';
+  const start = () => {
+    const hero = document.querySelector('.home-hero');
+    const track = hero?.querySelector('.home-slide-track');
+    if (!track) return;
+    const viewport = hero.querySelector('.home-hero-slides');
+    const slides = [...track.querySelectorAll('[data-home-slide]')];
+    const controls = [...hero.querySelectorAll('[data-home-select]')];
+    const rail = hero.querySelector('.home-photo-rail');
+    const pause = hero.querySelector('[data-home-pause]');
+    const label = hero.querySelector('[data-home-photo-label]');
+    const counter = hero.querySelector('[data-home-counter]');
+    const status = hero.querySelector('[data-home-status]');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const labels = slides.map(slide => slide.dataset.label);
+    const nextButton = hero.querySelector('[data-showcase-next]');
+    const nextImage = hero.querySelector('[data-showcase-preview]');
+    const nextTitle = hero.querySelector('[data-showcase-next-title]');
+    const collection = hero.querySelector('[data-showcase-collection]');
+    const detail = hero.querySelector('[data-showcase-detail]');
+    const ambient = hero.querySelector('[data-showcase-ambient]');
+    const interval = 6800;
+    const count = slides.length;
+    if (count < 2 || controls.length !== count) return;
+
+    /* Clones are inert divs: no duplicate IDs or viewer data attributes. */
+    const clone = (slide,index) => {
+      const element = slide.cloneNode(true);
+      element.removeAttribute('id');
+      element.removeAttribute('data-home-slide');
+      element.classList.remove('is-active');
+      element.classList.add('home-slide-clone');
+      element.dataset.homeClone = String(index);
+      element.setAttribute('aria-hidden','true');
+      element.inert = true;
+      element.querySelectorAll('*').forEach(child => {
+        ['id','data-photo','data-caption','fetchpriority'].forEach(name => child.removeAttribute(name));
+        if (child.tagName === 'BUTTON') child.tabIndex = -1;
+        if (child.tagName === 'IMG') { child.alt = ''; child.draggable = false; }
+      });
+      return element;
+    };
+    track.prepend(clone(slides[count-1],count-1));
+    track.append(clone(slides[0],0));
+    slides.forEach(slide => { slide.querySelectorAll('img').forEach(image => image.draggable = false); });
+    const clones = [...track.querySelectorAll('[data-home-clone]')];
+
+    let active = 0, physical = 1, elapsed = 0, lastTick = 0;
+    let userPaused = false, focused = false, visible = true, windowActive = true;
+    let introPending = !reduce.matches;
+    let moving = false, pending = null, drag = null, suppressUntil = 0;
+    let frame = 0, fallback = 0;
+    const unavailable = new Set();
+    const nextAvailable = (from,direction = 1) => {
+      for (let step = 1; step <= count; step++) {
+        const index = (from+direction*step+count*2)%count;
+        if (!unavailable.has(index)) return index;
+      }
+      return null;
+    };
+    const canPlay = () => unavailable.size < count-1 && !introPending && !userPaused && !focused && visible && windowActive && !moving && !drag && !document.hidden && !document.body.classList.contains('menu-open') && !reduce.matches && !document.querySelector('dialog[open]');
+    const paint = () => {
+      const progress = Math.min(1,elapsed / interval);
+      hero.style.setProperty('--home-slide-progress',String(progress));
+      const scale = `scale(${1.025 + progress * .025})`;
+      slides[active].querySelectorAll('img').forEach(image => image.style.transform = scale);
+      clones.forEach(element => { if (Number(element.dataset.homeClone) === active) element.querySelectorAll('img').forEach(image => image.style.transform = scale); });
+    };
+    const stopClock = () => { cancelAnimationFrame(frame); frame = 0; lastTick = 0; };
+    const sync = () => {
+      stopClock();
+      const playing = canPlay();
+      hero.classList.toggle('is-paused',!playing);
+      pause.hidden = reduce.matches;
+      pause.textContent = userPaused ? 'Speel' : 'Pauze';
+      pause.setAttribute('aria-label',userPaused ? 'Foto’s automatisch laten schuiven' : 'Automatisch schuiven van foto’s pauzeren');
+      pause.setAttribute('aria-pressed',String(userPaused));
+      if (playing) frame = requestAnimationFrame(tick);
+    };
+    const tick = now => {
+      frame = 0;
+      if (!canPlay()) { lastTick = 0; return; }
+      if (lastTick) elapsed += now - lastTick;
+      lastTick = now;
+      paint();
+      if (elapsed >= interval) { const next = nextAvailable(active); if (next !== null) go(next,false,1); else sync(); return; }
+      frame = requestAnimationFrame(tick);
+    };
+    const position = (immediate = false) => {
+      if (immediate) track.classList.add('is-resetting');
+      track.style.transform = `translate3d(${-physical*100}%,0,0)`;
+      if (immediate) { track.getBoundingClientRect(); track.classList.remove('is-resetting'); }
+    };
+    const revealControl = () => {
+      const button = controls[active];
+      const left = button.offsetLeft - (rail.clientWidth-button.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,left),behavior:reduce.matches?'auto':'smooth'});
+    };
+    const mark = manual => {
+      slides.forEach((slide,index) => {
+        const current = index === active;
+        slide.classList.toggle('is-active',current);
+        slide.setAttribute('aria-hidden',String(!current));
+        slide.tabIndex = -1;
+        slide.inert = !current;
+      });
+      controls.forEach((button,index) => button.setAttribute('aria-pressed',String(index === active)));
+      label.textContent = labels[active];
+      collection.href = slides[active].dataset.route;
+      collection.setAttribute('aria-label',`Bekijk de serie ${labels[active].toLowerCase()}`);
+      detail.textContent = slides[active].dataset.detail;
+      const upcoming = nextAvailable(active);
+      if (upcoming !== null) {
+        nextImage.src = slides[upcoming].dataset.preview;
+        nextImage.alt = `Voorbeeld uit de volgende serie: ${labels[upcoming].toLowerCase()}`;
+        nextTitle.textContent = labels[upcoming];
+        nextButton.setAttribute('aria-label',`Bekijk de volgende serie: ${labels[upcoming].toLowerCase()}`);
+        hero.querySelector('.showcase-next-counter').textContent = String(upcoming+1).padStart(2,'0');
+      }
+      const ambienceSource = slides[active].dataset.ambient;
+      if (ambient.getAttribute('src') !== ambienceSource) {
+        const old = ambient.cloneNode();
+        old.removeAttribute('data-showcase-ambient');
+        old.classList.add('showcase-ambient-out');
+        ambient.parentElement.querySelectorAll('.showcase-ambient-out').forEach(image => image.remove());
+        ambient.parentElement.insertBefore(old,ambient);
+        ambient.src = ambienceSource;
+        if (!reduce.matches && ambient.animate) {
+          ambient.animate([{opacity:0},{opacity:.55}],{duration:900,easing:'ease-out'});
+          old.animate([{opacity:.55},{opacity:0}],{duration:1000,easing:'ease-out'}).onfinish=() => old.remove();
+        } else old.remove();
+      }
+      if (!reduce.matches && nextImage.animate) {
+        nextImage.animate([{opacity:.25,transform:'translateX(12px) scale(1.04)'},{opacity:1,transform:'translateX(0) scale(1)'}],{duration:650,easing:'cubic-bezier(.2,.75,.2,1)'});
+        label.parentElement.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:650,easing:'ease-out'});
+      }
+      if (counter) counter.textContent = `${String(active+1).padStart(2,'0')} / ${String(count).padStart(2,'0')}`;
+      if (manual) status.textContent = `${active+1} van ${count}. ${labels[active]}.`;
+      paint();
+      revealControl();
+    };
+    const finish = () => {
+      clearTimeout(fallback);
+      if (!moving) return;
+      if (physical === 0) { physical = count; position(true); }
+      else if (physical === count+1) { physical = 1; position(true); }
+      moving = false;
+      track.classList.remove('is-moving');
+      const next = pending;
+      pending = null;
+      if (next) go(next.index,next.manual,next.direction);
+      else sync();
+    };
+    const beginMove = (immediate = false) => {
+      moving = !reduce.matches && !immediate;
+      track.classList.toggle('is-moving',moving);
+      position(reduce.matches || immediate);
+      sync();
+      if (moving) fallback = setTimeout(finish,1200);
+      else { moving = true; finish(); }
+    };
+    const go = (index,manual = false,direction = 0) => {
+      if (index === null || index < 0 || index >= count || unavailable.has(index)) { sync(); return; }
+      if (manual) { userPaused = true; introPending = false; }
+      if (moving) { pending = {index,manual,direction}; sync(); return; }
+      if (index === active) { position(); sync(); return; }
+      const steps = direction < 0 ? (active-index+count)%count : (index-active+count)%count;
+      const skipBrokenFrames = unavailable.has(active) || (unavailable.size > 0 && steps > 1);
+      let nextPhysical = index+1;
+      if (active === count-1 && index === 0 && direction >= 0) nextPhysical = count+1;
+      if (active === 0 && index === count-1 && direction <= 0) nextPhysical = 0;
+      active = index;
+      physical = nextPhysical;
+      elapsed = 0;
+      mark(manual);
+      beginMove(skipBrokenFrames);
+    };
+    hero.addEventListener('home:intro-complete',() => { introPending = false; sync(); });
+    setTimeout(() => { if (introPending) { introPending = false; sync(); } },2200);
+    track.addEventListener('transitionend',event => { if (event.target === track && event.propertyName === 'transform') finish(); });
+
+    controls.forEach((button,index) => {
+      button.addEventListener('click',() => go(index,true));
+      button.addEventListener('keydown',event => {
+        let next = index, direction = 0;
+        if (event.key === 'ArrowRight') { next = nextAvailable(index,1); direction = 1; }
+        else if (event.key === 'ArrowLeft') { next = nextAvailable(index,-1); direction = -1; }
+        else if (event.key === 'Home') next = nextAvailable(count-1,1);
+        else if (event.key === 'End') next = nextAvailable(0,-1);
+        else return;
+        event.preventDefault(); event.stopPropagation();
+        go(next,true,direction);
+        if (next !== null) controls[next].focus({preventScroll:true});
+      });
+    });
+    hero.addEventListener('keydown',event => {
+      if (!event.target.closest('[data-home-slide]')) return;
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      const direction = event.key === 'ArrowRight' ? 1 : -1;
+      go(nextAvailable(active,direction),true,direction);
+      controls[active].focus({preventScroll:true});
+    });
+    nextButton.addEventListener('click',() => go(nextAvailable(active),true,1));
+    pause.addEventListener('click',() => { userPaused = !userPaused; if (!userPaused) focused = false; sync(); });
+    slides.forEach(slide => slide.addEventListener('click',() => { userPaused = true; sync(); }));
+    hero.addEventListener('focusin',() => { focused = true; sync(); });
+    hero.addEventListener('focusout',() => requestAnimationFrame(() => { focused = hero.contains(document.activeElement); sync(); }));
+
+    /* A tap opens the photograph; a horizontal gesture slides the track. */
+    viewport.addEventListener('pointerdown',event => {
+      if (event.isPrimary === false && drag) { drag = null; track.classList.remove('is-dragging'); hero.classList.remove('is-hero-dragging'); position(); sync(); return; }
+      if (moving || event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      drag = {id:event.pointerId,x:event.clientX,y:event.clientY,dx:0,started:performance.now(),locked:false};
+      sync();
+    });
+    viewport.addEventListener('pointermove',event => {
+      if (!drag || event.pointerId !== drag.id) return;
+      const dx = event.clientX-drag.x, dy = event.clientY-drag.y;
+      if (!drag.locked) {
+        if (Math.max(Math.abs(dx),Math.abs(dy)) < 9) return;
+        if (Math.abs(dy) > Math.abs(dx)) { drag = null; sync(); return; }
+        drag.locked = true;
+        viewport.setPointerCapture(event.pointerId);
+        track.classList.add('is-dragging');
+        hero.classList.add('is-hero-dragging');
+      }
+      event.preventDefault();
+      const width = viewport.clientWidth;
+      drag.dx = Math.sign(dx)*Math.min(Math.abs(dx),width*.95);
+      track.style.transform = `translate3d(calc(${-physical*100}% + ${drag.dx}px),0,0)`;
+    });
+    const endDrag = (event,cancelled = false) => {
+      if (!drag || event.pointerId !== drag.id) return;
+      const gesture = drag;
+      drag = null;
+      track.classList.remove('is-dragging');
+      hero.classList.remove('is-hero-dragging');
+      if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
+      if (!gesture.locked) { sync(); return; }
+      suppressUntil = performance.now()+550;
+      userPaused = true;
+      const speed = Math.abs(gesture.dx)/Math.max(1,performance.now()-gesture.started);
+      const advance = !cancelled && (Math.abs(gesture.dx)>viewport.clientWidth*.15 || (Math.abs(gesture.dx)>35 && speed>.45));
+      if (advance) {
+        const direction = gesture.dx < 0 ? 1 : -1;
+        go(nextAvailable(active,direction),true,direction);
+      } else beginMove();
+    };
+    viewport.addEventListener('pointerup',event => endDrag(event));
+    viewport.addEventListener('pointercancel',event => endDrag(event,true));
+    viewport.addEventListener('lostpointercapture',event => endDrag(event,true));
+    hero.addEventListener('click',event => {
+      if (viewport.contains(event.target) && performance.now()<suppressUntil) { event.preventDefault(); event.stopImmediatePropagation(); }
+    },true);
+    document.addEventListener('visibilitychange',sync);
+    new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});
+    window.addEventListener('blur',() => { windowActive = false; sync(); });
+    window.addEventListener('focus',() => { windowActive = true; sync(); });
+    reduce.addEventListener('change',() => { if (moving) finish(); sync(); });
+    let measuredWidth = viewport.clientWidth;
+    window.addEventListener('resize',() => {
+      const width = viewport.clientWidth;
+      if (Math.abs(width-measuredWidth) < 1) return;
+      measuredWidth = width;
+      clearTimeout(fallback); moving = false; pending = null; drag = null;
+      physical = active+1;
+      track.classList.remove('is-dragging','is-moving'); hero.classList.remove('is-hero-dragging');
+      position(true); revealControl(); sync();
+    },{passive:true});
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); },{threshold:.1}).observe(hero);
+    }
+    /* Recover one failed request per image without changing its viewer source. */
+    const retried = new WeakSet();
+    const markUnavailable = index => {
+      unavailable.add(index);
+      controls[index].disabled = true;
+      controls[index].setAttribute('aria-disabled','true');
+      controls[index].title = 'Foto momenteel niet beschikbaar';
+      if (active === index) {
+        const next = nextAvailable(index);
+        if (next !== null) {
+          clearTimeout(fallback); moving = false; pending = null;
+          track.classList.remove('is-moving');
+          go(next,false,1);
+        } else {
+          status.textContent = 'De foto’s konden niet worden geladen.';
+          sync();
+        }
+      } else sync();
+    };
+    [...track.querySelectorAll('img'),...rail.querySelectorAll('img')].forEach(image => {
+      const failed = () => {
+        if (retried.has(image) && !image.complete) return;
+        if (!retried.has(image)) {
+          retried.add(image);
+          const retry = new URL(image.getAttribute('src'),document.baseURI);
+          retry.searchParams.set('home_retry',String(Date.now()));
+          image.src = retry.href;
+          return;
+        }
+        const slide = image.closest('[data-home-slide],[data-home-clone]');
+        if (slide) markUnavailable(Number(slide.dataset.homeSlide ?? slide.dataset.homeClone));
+        else image.style.opacity = '0';
+      };
+      image.addEventListener('error',failed);
+      if (image.complete && image.naturalWidth === 0) setTimeout(() => {
+        if (image.complete && image.naturalWidth === 0 && !retried.has(image)) failed();
+      },0);
+    });
+    mark(false); position(true); sync();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
+})();

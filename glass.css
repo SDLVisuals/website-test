@@ -1,0 +1,88 @@
+/* One quiet material language: clear glass, a fine rim, and grounded surfaces. */
+:root{
+  --pane:linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.025)),rgba(25,25,28,.52);
+  --pane-solid:rgba(27,27,30,.83);
+  --pane-rim:rgba(255,255,255,.24);
+  --pane-highlight:rgba(255,255,255,.17);
+  --pane-shadow:0 18px 48px rgba(0,0,0,.16);
+  --pane-shadow-hover:0 20px 54px rgba(0,0,0,.23);
+}
+html[data-theme="light"]{
+  --pane:linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.15)),rgba(255,255,255,.32);
+  --pane-solid:rgba(251,251,252,.86);
+  --pane-rim:rgba(255,255,255,.78);
+  --pane-highlight:rgba(255,255,255,.95);
+  --pane-shadow:0 16px 45px rgba(30,30,35,.075);
+  --pane-shadow-hover:0 20px 55px rgba(30,30,35,.11);
+}
+body{
+  background-image:radial-gradient(ellipse 1100px 750px at 90% 36%,rgba(150,150,160,.045),transparent 75%),radial-gradient(ellipse 900px 650px at 5% 82%,rgba(171,43,56,.035),transparent 75%);
+  background-repeat:no-repeat;
+}
+.nav-glass,.home-page .nav-glass,.gear-page .nav-glass{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:var(--pane);border:1px solid var(--pane-rim);border-radius:28px;
+  -webkit-backdrop-filter:blur(34px) saturate(150%);backdrop-filter:blur(34px) saturate(150%);
+  box-shadow:inset 0 1px 0 var(--pane-highlight),inset 0 -1px 0 rgba(0,0,0,.05),var(--pane-shadow);
+  transition:background .35s,box-shadow .35s,border-color .25s;
+}
+.nav-glass::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.13),transparent 32%,transparent 70%,rgba(255,255,255,.035));
+}
+.is-scrolled .nav-glass{background:var(--pane-solid);box-shadow:inset 0 1px 0 var(--pane-highlight),var(--pane-shadow)}
+.mobile-menu{
+  background:var(--pane-solid);border-color:var(--pane-rim);border-radius:25px;
+  -webkit-backdrop-filter:blur(36px) saturate(150%);backdrop-filter:blur(36px) saturate(150%);
+  box-shadow:inset 0 1px 0 var(--pane-highlight),var(--pane-shadow);
+}
+.theme-btn,.menu-btn{background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 var(--pane-highlight);transition:background .2s,border-color .2s}
+.theme-btn:hover,.menu-btn:hover{border-color:var(--pane-rim);background:rgba(160,160,165,.13)}
+.nav-contact,.home-page .nav-contact,.gear-page .nav-contact{border-radius:999px;background:var(--ink);color:var(--bg);transition:background .2s,color .2s}
+.nav-contact:hover,.home-page .nav-contact:hover,.gear-page .nav-contact:hover{background:var(--accent);color:#fff}
+.home-btn-primary,.gear-contact{box-shadow:inset 0 1px 0 rgba(255,255,255,.23),0 8px 24px rgba(106,11,24,.12)}
+.home-contact-inner,.contact-panel,.gear-next,.gear-drone,.portfolio-drone-detail{
+  position:relative;isolation:isolate;background:var(--pane);border-color:var(--pane-rim);
+  -webkit-backdrop-filter:blur(24px) saturate(125%);backdrop-filter:blur(24px) saturate(125%);
+  box-shadow:inset 0 1px 0 var(--pane-highlight),var(--pane-shadow);
+}
+.contact-panel::before{background:radial-gradient(ellipse at 100% 0,rgba(255,255,255,.07),transparent 65%)}
+.portfolio-feature[data-photo],.portfolio-gallery figure .portfolio-image{
+  background:var(--pane);border:1px solid var(--pane-rim);
+  box-shadow:inset 0 1px 0 var(--pane-highlight),var(--pane-shadow);
+  transition:border-color .24s,box-shadow .24s;
+}
+.portfolio-feature[data-photo]:hover,.portfolio-gallery .portfolio-image:hover,
+.portfolio-feature[data-photo]:focus-visible,.portfolio-gallery .portfolio-image:focus-visible{border-color:var(--muted);box-shadow:inset 0 1px 0 var(--pane-highlight),var(--pane-shadow-hover)}
+.home-work-image,.home-film-button,.gear-photo{box-shadow:0 12px 36px rgba(0,0,0,.07);isolation:isolate}
+.home-work-image::after,.gear-photo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.17),inset 0 1px 0 rgba(255,255,255,.17);
+  transition:box-shadow .24s;
+}
+.home-work-card:hover .home-work-image::after,.home-work-card:focus-visible .home-work-image::after,.gear-photo:hover::after{box-shadow:inset 0 0 0 1px rgba(255,255,255,.40),inset 0 1px 0 rgba(255,255,255,.33)}
+.home-play,.portfolio-play,.home-film-watch>span:first-child{
+  background:linear-gradient(145deg,rgba(255,255,255,.25),rgba(255,255,255,.055));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 6px 20px rgba(0,0,0,.10);
+}
+.portfolio-category{background:var(--pane);box-shadow:inset 0 1px 0 var(--pane-highlight);transition:border-color .2s,background .2s}
+.portfolio-category[aria-current="page"]{background:var(--ink);box-shadow:none}
+.portfolio-gallery{gap:34px}
+.portfolio-gallery figcaption{font-size:12px;line-height:1.7;padding-top:16px}
+.portfolio-gallery figcaption span{font-size:9px;letter-spacing:.04em}
+.portfolio-feature[data-photo] .portfolio-feature-label{font-size:11px}
+.home-work-card p{font-size:12px}
+.work-viewer{background:linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.015)),rgba(17,17,20,.78);border-color:rgba(255,255,255,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 35px 150px rgba(0,0,0,.5)}
+.work-viewer::backdrop{background:rgba(5,5,7,.72);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
+.work-viewer-header,.work-viewer-toolbar{background:linear-gradient(110deg,rgba(255,255,255,.045),transparent)}
+.work-viewer-button{border-radius:999px;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.work-viewer-thumb{opacity:.72;border-color:rgba(255,255,255,.2)}
+.work-viewer-thumb.is-active{opacity:1;border-color:#ef6670;box-shadow:0 0 0 1px rgba(239,102,112,.25),inset 0 0 0 1px rgba(255,255,255,.12)}
+@media(max-width:760px){
+  .nav-glass,.home-page .nav-glass,.gear-page .nav-glass{border-radius:24px}
+  .portfolio-gallery{gap:28px 17px}
+  .portfolio-gallery figcaption{font-size:11px;padding-top:12px}
+  .portfolio-feature[data-photo] .portfolio-feature-label{font-size:10px}
+  .home-work-card p{font-size:11px}
+}
+@media(prefers-reduced-transparency:reduce){.nav-glass,.home-page .nav-glass,.gear-page .nav-glass,.mobile-menu{background:var(--pane-solid);-webkit-backdrop-filter:none;backdrop-filter:none}}
