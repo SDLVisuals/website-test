@@ -20,3 +20,46 @@
 .desktop-nav{gap:23px}
 @media(max-width:1100px) and (min-width:701px){.desktop-nav{gap:16px;font-size:11px}.nav-glass{gap:17px;padding-inline:19px}.nav-actions{gap:9px}.nav-contact{padding-inline:12px;font-size:10px}}
 @media(max-width:600px){.portfolio-feature[data-photo]{padding:9px}.portfolio-feature[data-photo] img{height:clamp(270px,50svh,500px);border-radius:17px}.portfolio-feature[data-photo] .portfolio-feature-label{font-size:9px;margin:10px 4px 3px}.portfolio-gallery figure .portfolio-image,.portfolio-gallery figure:nth-child(3n+1) .portfolio-image{padding:6px}.portfolio-gallery .portfolio-image img{border-radius:14px}}
+
+/* Photo collections: one clear introduction, then the photography itself. */
+.photo-gallery-page .portfolio-lead-short,
+.photo-gallery-page .gallery-category-picker{display:none}
+.photo-gallery-page #galerij{padding-top:26px;scroll-margin-top:100px}
+.photo-gallery-page .gallery-toolbar{padding:13px 15px 13px 22px}
+.photo-gallery-page .gallery-collection-title{display:flex;align-items:baseline;gap:15px;min-width:0}
+.photo-gallery-page .gallery-collection-title h2{font:500 18px/1.35 Manrope,sans-serif;letter-spacing:-.5px;margin:0}
+.photo-gallery-page .gallery-collection-title p{font-size:12px;line-height:1.5;color:var(--muted);white-space:nowrap;margin:0}
+@media(max-width:600px){
+  .photo-gallery-page .portfolio-main{padding-top:17px}
+  .photo-gallery-page .portfolio-breadcrumb{font-size:10px;gap:10px}
+  .photo-gallery-page .portfolio-breadcrumb a{padding-block:5px}
+  .photo-gallery-page .portfolio-intro{padding-block:18px 24px}
+  .photo-gallery-page .portfolio-intro .eyebrow{font-size:9px;letter-spacing:.12em}
+  .photo-gallery-page .portfolio-intro h1{font-size:clamp(34px,9.8vw,44px);line-height:1.08;letter-spacing:-.055em;margin-top:12px}
+  .photo-gallery-page .portfolio-lead{margin-top:15px;font-size:13px;line-height:1.65;max-width:360px}
+  .photo-gallery-page .portfolio-lead-full{display:none}
+  .photo-gallery-page .portfolio-lead-short{display:block;max-width:330px}
+  .photo-gallery-page .portfolio-intro-actions{margin-top:17px;gap:0}
+  .photo-gallery-page .portfolio-intro-actions .text-link{display:none}
+  .photo-gallery-page .portfolio-intro-actions .ui-button{min-height:44px;padding:11px 19px;font-size:12px}
+  .photo-gallery-page .gallery-nav-ready .portfolio-categories{display:none}
+  .photo-gallery-page .gallery-category-picker:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 12px 8px 17px;min-height:62px;border:1px solid var(--pane-rim);border-radius:19px;background:var(--glass);box-shadow:inset 0 1px 0 var(--pane-highlight)}
+  .photo-gallery-page .gallery-category-picker label{font-size:12px;color:var(--muted);line-height:1.4}
+  .photo-gallery-page .gallery-category-picker select{font:500 16px/1.4 'DM Sans',sans-serif;min-height:44px;max-width:62%;padding:10px 6px 10px 12px;border:0;border-radius:11px;color:var(--ink);background:transparent;cursor:pointer;appearance:auto}
+  .photo-gallery-page .gallery-category-picker select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .photo-gallery-page .gallery-category-picker option{color:var(--ink);background:var(--bg)}
+  .photo-gallery-page #galerij{padding-top:22px;scroll-margin-top:88px}
+  .photo-gallery-page .gallery-toolbar{top:91px;margin:0 0 15px;padding:6px 0;gap:10px;border:0;border-radius:0;background:var(--bg);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .photo-gallery-page .gallery-collection-title{display:block}
+  .photo-gallery-page .gallery-collection-title h2{font-size:15px;line-height:1.4;letter-spacing:-.3px}
+  .photo-gallery-page .gallery-collection-title p{font-size:11px;margin-top:3px}
+  .photo-gallery-page .gallery-view-switch{border-color:var(--line);padding:3px}
+  .photo-gallery-page .gallery-view-switch button{font-size:10px;min-height:44px;padding:10px 11px}
+}
+@media(max-width:360px){
+  .photo-gallery-page .portfolio-intro{padding-bottom:20px}
+  .photo-gallery-page .portfolio-lead-short{max-width:280px}
+  .photo-gallery-page .gallery-category-picker:not([hidden]){padding-inline:12px;gap:8px}
+  .photo-gallery-page .gallery-category-picker label{font-size:11px}
+  .photo-gallery-page .gallery-view-switch button{padding-inline:9px}
+}

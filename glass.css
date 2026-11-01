@@ -86,3 +86,22 @@ body{
   .home-work-card p{font-size:11px}
 }
 @media(prefers-reduced-transparency:reduce){.nav-glass,.home-page .nav-glass,.gear-page .nav-glass,.mobile-menu{background:var(--pane-solid);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* Copy moves as a complete thought. Photo reveals keep their own treatment. */
+.js-motion body [data-reveal]:not([data-scroll-scene]){
+  transform:translateY(10px);
+  transition:opacity .65s ease,transform .7s cubic-bezier(.2,.7,.2,1);
+}
+.js-motion body [data-reveal]:not([data-scroll-scene]).is-visible{transform:none}
+html body .portfolio-intro .ui-title-line{overflow:visible}
+html body .portfolio-intro .ui-title-line>span,
+html body .portfolio-intro .eyebrow,
+html body .portfolio-intro .portfolio-lead{
+  animation:none;
+  clip-path:none;
+  opacity:1;
+  transform:none;
+}
+@media(prefers-reduced-motion:reduce){
+  .js-motion body [data-reveal]{opacity:1;transform:none;transition:none}
+}

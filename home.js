@@ -21,9 +21,11 @@
     const collection = hero.querySelector('[data-showcase-collection]');
     const detail = hero.querySelector('[data-showcase-detail]');
     const ambient = hero.querySelector('[data-showcase-ambient]');
-    const interval = 6800;
+    const interval = 5600;
     const count = slides.length;
-    if (count < 2 || controls.length !== count) return;
+    if (count < 2 || !controls.length) return;
+    const categoryOf = index => slides[index].dataset.category;
+    const controlFor = index => controls.find(button => button.dataset.homeCategory === categoryOf(index));
 
     /* Clones are inert divs: no duplicate IDs or viewer data attributes. */
     const clone = (slide,index) => {
@@ -47,7 +49,7 @@
     slides.forEach(slide => { slide.querySelectorAll('img').forEach(image => image.draggable = false); });
     const clones = [...track.querySelectorAll('[data-home-clone]')];
 
-    let active = 0, physical = 1, elapsed = 0, lastTick = 0;
+    let active = 0, physical = 1, elapsed = 0, photoElapsed = 0, holdUntil = 0, lastTick = 0;
     let userPaused = false, focused = false, visible = true, windowActive = true;
     let introPending = !reduce.matches;
     let moving = false, pending = null, drag = null, suppressUntil = 0;
@@ -60,18 +62,24 @@
       }
       return null;
     };
-    const canPlay = () => unavailable.size < count-1 && !introPending && !userPaused && !focused && visible && windowActive && !moving && !drag && !document.hidden && !document.body.classList.contains('menu-open') && !reduce.matches && !document.querySelector('dialog[open]');
+    const canMovePhoto = () => !introPending && !userPaused && visible && windowActive && !moving && !drag && !document.hidden && !document.body.classList.contains('menu-open') && !reduce.matches && !document.querySelector('dialog[open]');
+    const canPlay = () => unavailable.size < count-1 && canMovePhoto() && !focused && performance.now() >= holdUntil;
     const paint = () => {
       const progress = Math.min(1,elapsed / interval);
       hero.style.setProperty('--home-slide-progress',String(progress));
-      const scale = `scale(${1.025 + progress * .025})`;
-      slides[active].querySelectorAll('img').forEach(image => image.style.transform = scale);
-      clones.forEach(element => { if (Number(element.dataset.homeClone) === active) element.querySelectorAll('img').forEach(image => image.style.transform = scale); });
+      // A separate, continuous photo clock also keeps manual selections alive.
+      const phase = (1-Math.cos(photoElapsed / 9000*Math.PI))/2;
+      const direction = active % 2 ? -1 : 1;
+      const amplitude = Number(slides[active].dataset.motion || .055);
+      const zoom = 1.025 + phase * amplitude;
+      const transform = `translate3d(${direction*(phase-.5)*1.2}%,${(phase-.5)*-.5}%,0) scale(${zoom})`;
+      slides[active].querySelectorAll('img').forEach(image => image.style.transform = transform);
+      clones.forEach(element => { if (Number(element.dataset.homeClone) === active) element.querySelectorAll('img').forEach(image => image.style.transform = transform); });
     };
     const stopClock = () => { cancelAnimationFrame(frame); frame = 0; lastTick = 0; };
     const sync = () => {
       stopClock();
-      const playing = canPlay();
+      const playing = canMovePhoto();
       hero.classList.toggle('is-paused',!playing);
       pause.hidden = reduce.matches;
       pause.textContent = userPaused ? 'Speel' : 'Pauze';
@@ -81,8 +89,12 @@
     };
     const tick = now => {
       frame = 0;
-      if (!canPlay()) { lastTick = 0; return; }
-      if (lastTick) elapsed += now - lastTick;
+      if (!canMovePhoto()) { lastTick = 0; return; }
+      if (lastTick) {
+        const delta = Math.min(now-lastTick,100);
+        photoElapsed += delta;
+        if (canPlay()) elapsed += delta;
+      }
       lastTick = now;
       paint();
       if (elapsed >= interval) { const next = nextAvailable(active); if (next !== null) go(next,false,1); else sync(); return; }
@@ -94,7 +106,8 @@
       if (immediate) { track.getBoundingClientRect(); track.classList.remove('is-resetting'); }
     };
     const revealControl = () => {
-      const button = controls[active];
+      const button = controlFor(active);
+      if (!button) return;
       const left = button.offsetLeft - (rail.clientWidth-button.offsetWidth)/2;
       rail.scrollTo({left:Math.max(0,left),behavior:reduce.matches?'auto':'smooth'});
     };
@@ -106,7 +119,7 @@
         slide.tabIndex = -1;
         slide.inert = !current;
       });
-      controls.forEach((button,index) => button.setAttribute('aria-pressed',String(index === active)));
+      controls.forEach(button => button.setAttribute('aria-pressed',String(button.dataset.homeCategory === categoryOf(active))));
       label.textContent = labels[active];
       collection.href = slides[active].dataset.route;
       collection.setAttribute('aria-label',`Bekijk de serie ${labels[active].toLowerCase()}`);
@@ -116,7 +129,7 @@
         nextImage.src = slides[upcoming].dataset.preview;
         nextImage.alt = `Voorbeeld uit de volgende serie: ${labels[upcoming].toLowerCase()}`;
         nextTitle.textContent = labels[upcoming];
-        nextButton.setAttribute('aria-label',`Bekijk de volgende serie: ${labels[upcoming].toLowerCase()}`);
+        nextButton.setAttribute('aria-label',`Bekijk de volgende foto: ${labels[upcoming].toLowerCase()}`);
         hero.querySelector('.showcase-next-counter').textContent = String(upcoming+1).padStart(2,'0');
       }
       const ambienceSource = slides[active].dataset.ambient;
@@ -134,7 +147,7 @@
       }
       if (!reduce.matches && nextImage.animate) {
         nextImage.animate([{opacity:.25,transform:'translateX(12px) scale(1.04)'},{opacity:1,transform:'translateX(0) scale(1)'}],{duration:650,easing:'cubic-bezier(.2,.75,.2,1)'});
-        label.parentElement.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:650,easing:'ease-out'});
+        label.parentElement.animate([{opacity:.3},{opacity:1}],{duration:500,easing:'ease-out'});
       }
       if (counter) counter.textContent = `${String(active+1).padStart(2,'0')} / ${String(count).padStart(2,'0')}`;
       if (manual) status.textContent = `${active+1} van ${count}. ${labels[active]}.`;
@@ -163,7 +176,7 @@
     };
     const go = (index,manual = false,direction = 0) => {
       if (index === null || index < 0 || index >= count || unavailable.has(index)) { sync(); return; }
-      if (manual) { userPaused = true; introPending = false; }
+      if (manual) { holdUntil = performance.now()+4500; introPending = false; }
       if (moving) { pending = {index,manual,direction}; sync(); return; }
       if (index === active) { position(); sync(); return; }
       const steps = direction < 0 ? (active-index+count)%count : (index-active+count)%count;
@@ -173,26 +186,38 @@
       if (active === 0 && index === count-1 && direction <= 0) nextPhysical = 0;
       active = index;
       physical = nextPhysical;
-      elapsed = 0;
+      elapsed = 0; photoElapsed = 0;
       mark(manual);
-      beginMove(skipBrokenFrames);
+      const jump = manual && direction === 0 && steps > 1;
+      beginMove(skipBrokenFrames || jump);
+      if (jump && !reduce.matches) track.animate([{opacity:.3},{opacity:1}],{duration:650,easing:'ease-out'});
     };
     hero.addEventListener('home:intro-complete',() => { introPending = false; sync(); });
     setTimeout(() => { if (introPending) { introPending = false; sync(); } },2200);
     track.addEventListener('transitionend',event => { if (event.target === track && event.propertyName === 'transform') finish(); });
 
+    const categorySlide = (category,after = active) => {
+      for (let step = 1; step <= count; step++) {
+        const index = (after+step)%count;
+        if (categoryOf(index) === category && !unavailable.has(index)) return index;
+      }
+      return null;
+    };
     controls.forEach((button,index) => {
-      button.addEventListener('click',() => go(index,true));
+      button.addEventListener('click',() => go(categorySlide(button.dataset.homeCategory),true));
       button.addEventListener('keydown',event => {
-        let next = index, direction = 0;
-        if (event.key === 'ArrowRight') { next = nextAvailable(index,1); direction = 1; }
-        else if (event.key === 'ArrowLeft') { next = nextAvailable(index,-1); direction = -1; }
-        else if (event.key === 'Home') next = nextAvailable(count-1,1);
-        else if (event.key === 'End') next = nextAvailable(0,-1);
+        const enabled = controls.map((control,i) => control.disabled ? -1 : i).filter(i => i >= 0);
+        if (!enabled.length) return;
+        const current = enabled.indexOf(index);
+        let next = index;
+        if (event.key === 'ArrowRight') next = enabled[(current+1)%enabled.length];
+        else if (event.key === 'ArrowLeft') next = enabled[(current-1+enabled.length)%enabled.length];
+        else if (event.key === 'Home') next = enabled[0];
+        else if (event.key === 'End') next = enabled[enabled.length-1];
         else return;
         event.preventDefault(); event.stopPropagation();
-        go(next,true,direction);
-        if (next !== null) controls[next].focus({preventScroll:true});
+        go(categorySlide(controls[next].dataset.homeCategory),true);
+        controls[next].focus({preventScroll:true});
       });
     });
     hero.addEventListener('keydown',event => {
@@ -201,13 +226,13 @@
       event.preventDefault();
       const direction = event.key === 'ArrowRight' ? 1 : -1;
       go(nextAvailable(active,direction),true,direction);
-      controls[active].focus({preventScroll:true});
+      controlFor(active)?.focus({preventScroll:true});
     });
     nextButton.addEventListener('click',() => go(nextAvailable(active),true,1));
     pause.addEventListener('click',() => { userPaused = !userPaused; if (!userPaused) focused = false; sync(); });
-    slides.forEach(slide => slide.addEventListener('click',() => { userPaused = true; sync(); }));
-    hero.addEventListener('focusin',() => { focused = true; sync(); });
-    hero.addEventListener('focusout',() => requestAnimationFrame(() => { focused = hero.contains(document.activeElement); sync(); }));
+    hero.addEventListener('focusin',event => { focused = event.target.matches(':focus-visible'); sync(); });
+    hero.addEventListener('focusout',() => requestAnimationFrame(() => { focused = hero.contains(document.activeElement) && document.activeElement.matches(':focus-visible'); sync(); }));
+    hero.addEventListener('pointerdown',() => { if (focused) { focused = false; sync(); } },{passive:true});
 
     /* A tap opens the photograph; a horizontal gesture slides the track. */
     viewport.addEventListener('pointerdown',event => {
@@ -241,7 +266,7 @@
       if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
       if (!gesture.locked) { sync(); return; }
       suppressUntil = performance.now()+550;
-      userPaused = true;
+      holdUntil = performance.now()+4500;
       const speed = Math.abs(gesture.dx)/Math.max(1,performance.now()-gesture.started);
       const advance = !cancelled && (Math.abs(gesture.dx)>viewport.clientWidth*.15 || (Math.abs(gesture.dx)>35 && speed>.45));
       if (advance) {
@@ -277,9 +302,13 @@
     const retried = new WeakSet();
     const markUnavailable = index => {
       unavailable.add(index);
-      controls[index].disabled = true;
-      controls[index].setAttribute('aria-disabled','true');
-      controls[index].title = 'Foto momenteel niet beschikbaar';
+      const button = controlFor(index);
+      const missingCategory = slides.every((slide,i) => slide.dataset.category !== categoryOf(index) || unavailable.has(i));
+      if (button && missingCategory) {
+        button.disabled = true;
+        button.setAttribute('aria-disabled','true');
+        button.title = 'Foto’s momenteel niet beschikbaar';
+      }
       if (active === index) {
         const next = nextAvailable(index);
         if (next !== null) {

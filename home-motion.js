@@ -21,14 +21,14 @@
       scenes.push(element);
     };
 
-    /* Replace whole-panel reveals with a short sequence of their text elements. */
+    /* Related text arrives together, so a heading is immediately readable. */
     document.querySelectorAll('.home-heading,.home-group-title,.home-drone-copy,.home-about-copy,.home-contact-inner').forEach(group => {
       group.setAttribute('data-scene-shell','');
-      [...group.children].forEach((child,index) => addScene(child,Math.min(index*75,225)));
+      addScene(group);
     });
     document.querySelectorAll('.home-work>.home-kicker,.home-film>.home-kicker,.home-film-caption,.home-film-small>div,.home-drone-caption').forEach(item => addScene(item));
     document.querySelectorAll('.home-work-grid').forEach(group => {
-      [...group.querySelectorAll('.home-work-card')].forEach((card,index) => addScene(card,index*90,true));
+      [...group.querySelectorAll('.home-work-card')].forEach((card,index) => addScene(card,Math.min(index*45,90),true));
     });
     document.querySelectorAll('.home-film-button,.home-about-photo').forEach(frame => {
       frame.setAttribute('data-scene-photo','');

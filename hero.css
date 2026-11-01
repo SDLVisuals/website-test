@@ -11,16 +11,16 @@ html[data-theme="light"] .showcase-ambience>div{background:linear-gradient(110de
 .home-page .site-top{transition:top .4s,width .4s,max-width .4s}
 .showcase-layout{position:absolute;inset:100px 24px 106px;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.38fr);gap:20px}
 .showcase-editorial{display:flex;flex-direction:column;justify-content:center;gap:18px;min-width:0}
-.showcase-copy{position:relative;padding:32px 30px;border-radius:28px;background:linear-gradient(140deg,#ffffff16,#ffffff03),#1d1d1d9c;border:1px solid #ffffff36;box-shadow:inset 0 1px 0 #ffffff30,0 20px 60px #00000010;backdrop-filter:blur(28px) saturate(125%);-webkit-backdrop-filter:blur(28px) saturate(125%);color:#f5f5f5;animation:showcase-glass-in 1.2s cubic-bezier(.2,.75,.2,1) .15s both}
+.showcase-copy{position:relative;padding:32px 30px;border-radius:28px;background:linear-gradient(140deg,#ffffff16,#ffffff03),#1d1d1d9c;border:1px solid #ffffff36;box-shadow:inset 0 1px 0 #ffffff30,0 20px 60px #00000010;backdrop-filter:blur(28px) saturate(125%);-webkit-backdrop-filter:blur(28px) saturate(125%);color:#f5f5f5;animation:showcase-glass-in .8s cubic-bezier(.2,.75,.2,1) .12s both}
 html[data-theme="light"] .showcase-copy{background:linear-gradient(140deg,#ffffffe0,#ffffff80);border-color:#ffffffbb;color:#202020;box-shadow:inset 0 1px 0 #fff,0 20px 60px #0000000c}
 .showcase-eyebrow{display:flex;gap:9px;align-items:center;font-size:10px;letter-spacing:.12em;line-height:1.5;text-transform:uppercase;font-weight:600}
 .showcase-eyebrow>span{width:6px;height:6px;border-radius:50%;background:#d14450;box-shadow:0 0 0 4px #d1445015;flex:none}
 .showcase-hero h1{font:500 clamp(44px,4.9vw,78px)/1.06 Manrope,Arial,sans-serif;letter-spacing:-.06em;margin:23px 0 21px}
-.showcase-hero h1>span{display:block;overflow:hidden;padding-block:2px}
-.showcase-hero h1>span>span{display:block;animation:home-line-enter 1.15s cubic-bezier(.18,.75,.2,1) .25s both}
-.showcase-hero h1>span+span>span{animation-delay:.39s}
-.showcase-intro{font-size:13px;line-height:1.85;opacity:.75;animation:home-fade-enter .9s .55s both}
-.showcase-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;margin-top:24px;animation:home-fade-enter 1s .65s both}
+.showcase-hero h1>span{display:block;padding-block:2px}
+.showcase-hero h1>span>span{display:block;animation:none}
+.showcase-hero h1>span+span>span{animation:none}
+.showcase-intro{font-size:13px;line-height:1.85;opacity:.75;animation:none}
+.showcase-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;margin-top:24px;animation:none}
 .showcase-primary{min-height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:14px 22px;font-size:12px;font-weight:600;background:#f5f5f5;color:#191919;transition:background .3s,color .3s,box-shadow .3s}
 html[data-theme="light"] .showcase-primary{background:#202020;color:white}
 .showcase-primary:hover,.showcase-primary:focus-visible,html[data-theme="light"] .showcase-primary:hover{background:#b92f40;color:white;box-shadow:0 8px 28px #b92f4033}
@@ -79,7 +79,7 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
 .showcase-pause[hidden]{display:none}
 .showcase-hero button:focus-visible,.showcase-hero a:focus-visible{outline:2px solid #e65361;outline-offset:4px}
 @keyframes showcase-photo-in{from{opacity:.3;clip-path:inset(6% 4% round 40px)}to{opacity:1;clip-path:inset(0 round 28px)}}
-@keyframes showcase-glass-in{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:none}}
+@keyframes showcase-glass-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(min-width:1600px){.showcase-layout{inset:115px 38px 114px;grid-template-columns:minmax(0,.7fr) minmax(0,1.4fr);gap:32px}.showcase-copy{padding:45px}.showcase-next{gap:25px}.showcase-next-image{width:115px;height:140px}.showcase-next-copy strong{font-size:30px}.showcase-intro{font-size:15px}.showcase-footer{inset:auto 38px 28px}}
 @media(max-width:1100px) and (min-width:761px){.showcase-copy{padding:27px 23px}.showcase-hero h1{font-size:5vw}.showcase-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:15px}.showcase-intro{font-size:12px}.showcase-actions{gap:10px 15px}.showcase-signature{display:none}.showcase-next-image{width:76px;height:98px}.showcase-next{gap:15px}.showcase-tabs button{min-width:75px;padding-inline:13px;gap:9px}.showcase-footer{gap:15px;padding-left:17px}}
 @media(max-width:760px){
@@ -91,7 +91,7 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
  .showcase-layout{display:block;inset:85px 12px 84px}
  .showcase-frame{position:absolute;inset:0 0 150px;border-radius:24px}
  .showcase-hero .showcase-mobile-photo{display:block}.showcase-hero .showcase-desktop-photo{display:none}
- .showcase-photo img{object-position:50% 28%!important}
+ .showcase-photo img{object-position:var(--mobile-position,50% 28%)!important}
  .showcase-slide-product img{object-fit:contain}
  .showcase-frame::after{background:linear-gradient(0deg,#0005,transparent 26%,transparent 80%,#0002)}
  .showcase-frame-top{inset:13px 13px auto}.showcase-number{font-size:9px;padding:7px 10px}.showcase-swipe-hint{font-size:9px}
@@ -126,9 +126,9 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
 @media(max-width:350px){.showcase-tabs button{min-width:52px}.showcase-frame-bottom{bottom:78px}}
 .showcase-ambience>img{position:absolute;inset:0}
 @media(min-width:761px) and (max-width:1100px){.showcase-hero .showcase-mobile-photo{display:block}.showcase-hero .showcase-desktop-photo{display:none}.showcase-frame-bottom{flex-wrap:wrap;gap:14px}}
-.showcase-hero .showcase-slide-product{display:grid;grid-template-columns:1fr 1fr;gap:9px;background:#d5d4d0}
+.showcase-hero .showcase-product-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px;background:#d5d4d0}
 .showcase-slide-product .showcase-companion img{object-fit:cover;object-position:50% 50%}
-@media(max-width:1100px){.showcase-hero .showcase-slide-product{display:block}.showcase-slide-product .showcase-companion{display:none}}
+@media(max-width:1100px){.showcase-hero .showcase-product-pair{display:block}.showcase-slide-product .showcase-companion{display:none}}
 /* Immersive opening: one continuous photographic stage, glass over the image. */
 @media(min-width:761px){
  .showcase-layout{inset:0;display:block}
@@ -163,12 +163,16 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
  .showcase-frame-top{top:98px;left:22px;right:22px}
  .showcase-frame-bottom{bottom:408px;left:22px;right:22px}
  .showcase-next{color:#fff}
- .showcase-slide-portrait .showcase-photo img{object-position:57% 19%!important}
- .showcase-slide-wedding .showcase-photo img{object-position:58% 24%!important}
- .showcase-slide-couple .showcase-photo img{object-position:50% 22%!important}
- .showcase-slide-product .showcase-photo img{object-fit:cover;object-position:50% 30%!important}
+ .showcase-slide-product .showcase-photo img{object-fit:cover;object-position:var(--mobile-position,50% 30%)!important}
  .showcase-footer{z-index:5;background:linear-gradient(120deg,#ffffff1b,#ffffff05),#16161688}
 }
 @media(max-width:380px){.showcase-frame-bottom{bottom:370px}.showcase-editorial{bottom:80px}}
 @keyframes showcase-immersive-in{from{opacity:.4;clip-path:inset(3% 2% round 35px)}to{opacity:1;clip-path:inset(0 round 0)}}
 @media(prefers-reduced-motion:reduce){.showcase-frame{animation:none!important}}
+
+/* Six compact collection controls; the photo itself supplies the movement. */
+.showcase-tabs{min-width:0}.showcase-tabs button{min-width:80px;padding-inline:14px;gap:8px}.showcase-next-copy strong{font-size:19px}.showcase-next-copy{min-width:0}
+@media(max-width:1100px){.showcase-tab-number{display:none}.showcase-footer-caption{max-width:90px}.showcase-tabs button{min-width:65px;padding-inline:12px}}
+@media(max-width:760px){.showcase-tabs{flex:1}.showcase-tabs button{min-width:52px;font-size:10.5px;padding-inline:10px}.showcase-next-copy strong{font-size:12px}.showcase-next-copy .showcase-small{font-size:7px}}
+
+@media(max-width:760px){.showcase-tabs{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent);mask-image:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent)}}

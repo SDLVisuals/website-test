@@ -4,14 +4,24 @@
 
 .home-scenes-enabled .home-page [data-scroll-scene="copy"]{
   opacity:0;
-  transform:translateY(20px);
-  transition:opacity .75s ease,transform 1.05s cubic-bezier(.2,.75,.2,1);
+  transform:translateY(10px);
+  transition:opacity .65s ease,transform .7s cubic-bezier(.2,.7,.2,1);
   transition-delay:var(--scene-delay,0ms);
 }
 .home-scenes-enabled .home-page [data-scroll-scene="copy"].is-scene-visible{
   opacity:1;
   transform:none;
 }
+.home-scenes-enabled .home-page .home-contact-inner[data-scroll-scene="copy"]{
+  opacity:1;
+  transform:none;
+  transition:none;
+}
+.home-scenes-enabled .home-contact-inner[data-scroll-scene="copy"]>*{
+  opacity:0;
+  transition:opacity .65s ease;
+}
+.home-scenes-enabled .home-contact-inner[data-scroll-scene="copy"].is-scene-visible>*{opacity:1}
 
 /* Cards never translate or tilt. Only their image and caption become visible. */
 .home-scenes-enabled .home-work-card[data-scroll-scene]>.home-work-image img,
@@ -22,17 +32,15 @@
 }
 .home-scenes-enabled .home-work-card.is-scene-visible>.home-work-image img,
 .home-scenes-enabled [data-scene-photo].is-scene-visible img{opacity:1}
-.home-scenes-enabled .home-work-card[data-scroll-scene]>h4,
+.home-scenes-enabled .home-work-card[data-scroll-scene]>h3,
 .home-scenes-enabled .home-work-card[data-scroll-scene]>p,
 .home-scenes-enabled .home-work-card[data-scroll-scene]>.home-work-open{
   opacity:0;
-  transform:translateY(14px);
-  transition:opacity .7s ease,transform .9s cubic-bezier(.2,.75,.2,1);
-  transition-delay:calc(var(--scene-delay,0ms) + 100ms);
+  transform:translateY(8px);
+  transition:opacity .65s ease,transform .7s cubic-bezier(.2,.7,.2,1);
+  transition-delay:var(--scene-delay,0ms);
 }
-.home-scenes-enabled .home-work-card[data-scroll-scene]>p{transition-delay:calc(var(--scene-delay,0ms) + 160ms)}
-.home-scenes-enabled .home-work-card[data-scroll-scene]>.home-work-open{transition-delay:calc(var(--scene-delay,0ms) + 220ms)}
-.home-scenes-enabled .home-work-card.is-scene-visible>h4,
+.home-scenes-enabled .home-work-card.is-scene-visible>h3,
 .home-scenes-enabled .home-work-card.is-scene-visible>p,
 .home-scenes-enabled .home-work-card.is-scene-visible>.home-work-open{opacity:1;transform:none}
 
@@ -43,10 +51,6 @@
 }
 .home-motion-enhanced .home-page [data-home-media].is-media-near img{will-change:transform,clip-path}
 
-@media(max-width:760px){
-  .home-scenes-enabled .home-page [data-scroll-scene="copy"]{transform:translateY(15px)}
-  .home-scenes-enabled .home-page [data-scroll-scene="copy"].is-scene-visible{transform:none}
-}
 @media(prefers-reduced-motion:reduce){
   .home-page [data-scroll-scene],
   .home-page [data-scroll-scene]>*{

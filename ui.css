@@ -136,3 +136,7 @@ body{--ui-radius:24px}
 }
 @media(max-width:360px){.wrap{padding-inline:17px}.portfolio-categories{margin-inline:-17px;padding-inline:17px}.gallery-toolbar{margin-inline:0;padding:9px;gap:7px}.gallery-toolbar>p{font-size:11px}.gallery-view-switch button{font-size:10px;padding-inline:10px}.portfolio-intro h1{font-size:11.6vw}.portfolio-intro-actions{gap:15px}.contact-panel{padding-inline:20px}}
 @media(prefers-reduced-motion:reduce){.ui-title-line>span,.portfolio-intro .eyebrow,.portfolio-lead,.mobile-menu:not([hidden]){animation:none}.js-motion .portfolio-gallery figure[data-reveal],.js-motion .portfolio-gallery figure[data-reveal] .portfolio-image img{transform:none;clip-path:none;transition:none}}
+
+/* Prevent accidental double-tap zoom; keep deliberate pinch zoom available. */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}a,button,input,select,textarea,label{touch-action:manipulation}
+@media(max-width:760px){input,select,textarea{font-size:16px}}

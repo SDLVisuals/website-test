@@ -54,12 +54,18 @@
       applyTheme(userTheme || (prefersDark.matches ? 'dark' : 'light'));
     });
 
+    /* Headings enter as complete, readable blocks instead of separate clipped lines. */
+    document.querySelectorAll('.portfolio-intro').forEach(intro => intro.setAttribute('data-reveal',''));
+
     /* Each item reveals once. Content stays visible if JS or the observer is unavailable. */
     const revealItems = [...document.querySelectorAll('[data-reveal]')];
     document.querySelectorAll('[data-stagger]').forEach(group => {
       [...group.querySelectorAll('[data-reveal]')]
         .filter(item => item.closest('[data-stagger]') === group)
-        .forEach((item, index) => item.style.setProperty('--reveal-delay', `${Math.min(index * 75, 375)}ms`));
+        .forEach((item, index) => {
+          const hasPhoto = !!item.querySelector('img,video');
+          item.style.setProperty('--reveal-delay', `${hasPhoto ? Math.min(index * 45, 90) : 0}ms`);
+        });
     });
     let revealObserver;
     const showAll = () => {
@@ -82,6 +88,13 @@
     } else {
       showAll();
     }
+    document.addEventListener('focusin', event => {
+      const item = event.target.closest?.('[data-reveal]');
+      if (!item) return;
+      item.style.setProperty('--reveal-delay','0ms');
+      item.classList.add('is-visible');
+      revealObserver?.unobserve(item);
+    });
 
     /* State only: the stylesheet owns the glass header's visual treatment. */
     const header = document.getElementById('site-header');
