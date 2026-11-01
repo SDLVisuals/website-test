@@ -163,3 +163,29 @@ html[data-theme=light] .gallery-collection-option:hover{background:#fff;border-c
  .photo-gallery-page .gallery-category-current strong{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.photo-gallery-page .collection-explore{transition:none}}
+
+/* Finishing details: compact desktop controls and comfortable short-screen navigation. */
+@media(min-width:1101px){
+ .photo-gallery-page .gallery-toolbar{flex-wrap:nowrap;gap:15px;padding:10px 12px;border-radius:22px}
+ .photo-gallery-page .gallery-toolbar .portfolio-categories{order:0;flex:1 1 auto;min-width:0;gap:5px;margin:0;padding:0;border:0;scroll-padding-inline:8px}
+ .photo-gallery-page .gallery-toolbar .portfolio-category{padding:10px 13px;font-size:11px}
+ .photo-gallery-page .gallery-toolbar .gallery-collection-title{flex:0 0 auto;padding-inline:3px}
+ .photo-gallery-page .gallery-toolbar .gallery-collection-title h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ .photo-gallery-page .gallery-toolbar .gallery-collection-title p{font-size:11px}
+ .photo-gallery-page .gallery-toolbar .gallery-view-switch{flex:0 0 auto;margin:0}
+ .photo-gallery-page .gallery-toolbar .gallery-view-switch button{font-size:11px;padding-inline:13px}
+}
+.photo-gallery-page .gallery-collections-dialog[open]{align-items:safe flex-end}
+.photo-gallery-page .gallery-collections-panel{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.photo-gallery-page .portfolio-gallery .portfolio-image{scroll-margin-block:190px 28px}
+@media(max-width:1100px) and (min-width:601px){.photo-gallery-page .portfolio-gallery .portfolio-image{scroll-margin-top:260px}}
+@media(max-width:600px){.photo-gallery-page .portfolio-gallery .portfolio-image{scroll-margin-top:178px}}
+@media(max-height:540px){
+ .photo-gallery-page .gallery-collections-dialog{padding:10px}
+ .photo-gallery-page .gallery-collections-panel{max-height:calc(100dvh - 20px);padding:17px;border-radius:24px}
+ .photo-gallery-page .gallery-collections-heading{margin-bottom:15px}
+ .photo-gallery-page .gallery-collections-heading h2{font-size:22px}
+ .photo-gallery-page .gallery-collection-grid{gap:7px}
+ .photo-gallery-page .gallery-collection-option{min-height:65px;padding:5px 7px}
+ .photo-gallery-page .gallery-collection-option img{height:53px;width:37px}
+}

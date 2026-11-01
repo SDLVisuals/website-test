@@ -14,6 +14,48 @@
     let introTimer = 0;
     let observer;
 
+    /* Native horizontal browsing on phones; the full grid remains on desktop. */
+    const collectionRail = document.querySelector('.home-work-ordered');
+    if (collectionRail) {
+      const cards = [...collectionRail.querySelectorAll('.home-work-card')];
+      const controls = document.querySelector('.home-collection-controls');
+      const count = controls?.querySelector('[data-collection-current]');
+      const previous = controls?.querySelector('[data-collection-prev]');
+      const next = controls?.querySelector('[data-collection-next]');
+      const mobile = matchMedia('(max-width:760px)');
+      let selected = 0;
+      let railFrame = 0;
+      const syncRail = () => {
+        railFrame = 0;
+        const max = collectionRail.scrollWidth - collectionRail.clientWidth;
+        const progress = max > 0 ? clamp(collectionRail.scrollLeft / max, 0, 1) : 0;
+        const left = collectionRail.getBoundingClientRect().left + parseFloat(getComputedStyle(collectionRail).paddingLeft);
+        let distance = Infinity;
+        cards.forEach((card, index) => {
+          const delta = Math.abs(card.getBoundingClientRect().left - left);
+          if (delta < distance) { distance = delta; selected = index; }
+        });
+        if (progress > .99 && max > 0) selected = cards.length - 1;
+        if (count) count.textContent = String(selected + 1).padStart(2,'0');
+        controls?.style.setProperty('--collection-progress',progress.toFixed(4));
+        if (previous) previous.disabled = selected === 0;
+        if (next) next.disabled = selected === cards.length - 1;
+      };
+      const queueRail = () => { if (!railFrame) railFrame = requestAnimationFrame(syncRail); };
+      const navigateRail = direction => {
+        if (!mobile.matches) return;
+        const target = cards[clamp(selected + direction,0,cards.length - 1)];
+        const padding = parseFloat(getComputedStyle(collectionRail).paddingLeft);
+        const left = target.getBoundingClientRect().left - collectionRail.getBoundingClientRect().left + collectionRail.scrollLeft - padding;
+        collectionRail.scrollTo({left,behavior:reduced.matches ? 'instant' : 'smooth'});
+      };
+      previous?.addEventListener('click',() => navigateRail(-1));
+      next?.addEventListener('click',() => navigateRail(1));
+      collectionRail.addEventListener('scroll',queueRail,{passive:true});
+      addEventListener('resize',queueRail,{passive:true});
+      syncRail();
+    }
+
     const addScene = (element, delay = 0, card = false) => {
       if (element.hasAttribute('data-scroll-scene')) return;
       element.setAttribute('data-scroll-scene',card ? 'card' : 'copy');

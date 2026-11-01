@@ -254,6 +254,7 @@
         collection = selectedCollection;
         media = collections[collection];
         dialog.dataset.mediaType = collection;
+        dialog.classList.toggle('is-single-item', media.length === 1);
         strip.setAttribute('aria-label', collection === 'photo' ? 'Fotogalerij' : 'Filmselectie');
         buildThumbnails();
       }

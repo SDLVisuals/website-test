@@ -1,0 +1,38 @@
+/* Drone work is presented in its original film format, alongside a clear service story. */
+.drone-page .portfolio-intro .eyebrow{color:var(--accent)}
+.drone-sections{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 25px;border-bottom:1px solid var(--line)}
+.drone-sections a{display:inline-flex;align-items:center;min-height:44px;padding:10px 17px;border:1px solid var(--line);border-radius:999px;background:var(--glass);font-size:12px;line-height:1.4;transition:background .25s,border-color .25s}
+.drone-sections a:hover{background:var(--soft);border-color:var(--muted)}
+.drone-film-section{padding-block:65px 90px}
+.drone-film-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:13%;align-items:center;max-width:1150px;margin:auto}
+.drone-film-copy>.eyebrow{color:var(--accent);margin-bottom:22px}
+.drone-film-copy h2{font:500 clamp(40px,4.8vw,68px)/1.12 Manrope,Arial,sans-serif;letter-spacing:-.055em;margin-bottom:25px}
+.drone-film-copy>p:not(.eyebrow){font-size:15px;line-height:1.85;color:var(--muted);max-width:440px}
+.drone-services{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:38px;padding-top:25px;border-top:1px solid var(--line)}
+.drone-services>div>span{display:block;font-size:10px;color:var(--accent);margin-bottom:16px}
+.drone-services h3{font:500 18px/1.4 Manrope,Arial,sans-serif;letter-spacing:-.35px;margin-bottom:12px}
+.drone-services p{font-size:13px;line-height:1.8;color:var(--muted)}
+.drone-film-card{width:100%;max-width:360px;margin:0 auto}
+.drone-film-button{display:block;position:relative;width:100%;padding:0;border:1px solid var(--pane-rim,var(--line));border-radius:29px;background:#17272b;overflow:hidden;box-shadow:0 20px 60px #00000016;transition:box-shadow .35s,border-color .35s}
+.drone-film-button>img{display:block;width:100%;height:auto;aspect-ratio:9/16;object-fit:contain}
+.drone-film-button:hover,.drone-film-button:focus-visible{border-color:var(--muted);box-shadow:0 22px 65px #00000024}
+.drone-film-badge{position:absolute;top:17px;left:17px;border:1px solid #ffffff60;border-radius:999px;padding:8px 12px;background:#14191b65;color:#fff;font-size:10px;letter-spacing:.06em;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.drone-film-launch{position:absolute;left:17px;right:17px;bottom:47px;display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:12px 17px;border:1px solid #ffffff80;border-radius:999px;background:#14191b88;color:#fff;font-size:13px;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 #ffffff20;transition:background .25s}
+.drone-film-launch svg{width:17px;height:17px;fill:currentColor}
+.drone-film-button:hover .drone-film-launch{background:#14191bbb}
+.drone-film-card figcaption{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:15px;font-size:11px;line-height:1.5;color:var(--muted)}
+.drone-film-card figcaption strong{font-size:13px;font-weight:500;color:var(--ink)}
+.drone-equipment-section{padding-bottom:90px}
+.drone-equipment{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:7%;padding:clamp(28px,4.5vw,65px);border:1px solid var(--pane-rim,var(--line));border-radius:32px;background:var(--veil);box-shadow:inset 0 1px 0 var(--pane-highlight,#ffffff20)}
+.drone-equipment .eyebrow{color:var(--accent);margin-bottom:20px}
+.drone-equipment h2{font:500 clamp(32px,3.6vw,52px)/1.14 Manrope,Arial,sans-serif;letter-spacing:-.05em;margin-bottom:22px}
+.drone-equipment-copy>p:not(.eyebrow){font-size:14px;line-height:1.85;color:var(--muted);max-width:410px;margin-bottom:24px}
+.drone-equipment figure{margin:0;min-width:0}
+.drone-equipment img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 16px 16px #00000012)}
+.drone-equipment figcaption{text-align:center;font-size:11px;line-height:1.6;color:var(--muted)}
+.drone-page .portfolio-process{padding-top:0}
+@media(max-width:1050px){.drone-film-layout{gap:7%;grid-template-columns:1fr .8fr}.drone-services{gap:20px}.drone-services h3{font-size:16px}.drone-equipment{gap:4%}}
+@media(max-width:760px){.drone-film-section{padding-block:42px 65px}.drone-film-layout{gap:30px;grid-template-columns:1fr 1fr;align-items:start}.drone-film-copy h2{font-size:37px}.drone-film-copy>p:not(.eyebrow){font-size:14px}.drone-services{grid-template-columns:1fr;gap:23px;margin-top:25px;padding-top:22px}.drone-services>div>span{margin-bottom:9px}.drone-services h3{font-size:18px;margin-bottom:8px}.drone-film-card figcaption{display:block}.drone-film-card figcaption span{display:block;margin-top:3px}.drone-equipment-section{padding-bottom:65px}.drone-equipment{padding:30px;gap:25px;grid-template-columns:1fr 1fr}.drone-equipment h2{font-size:33px}.drone-equipment-copy>p:not(.eyebrow){font-size:14px}}
+@media(max-width:580px){.drone-sections{display:none}.drone-film-section{padding-top:10px}.drone-film-card{order:-1}.drone-page .portfolio-intro{padding-bottom:25px}.drone-sections{gap:7px;padding-bottom:23px}.drone-sections a{font-size:11px;padding-inline:14px}.drone-film-layout{display:flex;flex-direction:column;gap:31px}.drone-film-copy h2{font-size:41px;margin-bottom:20px}.drone-film-copy>.eyebrow{margin-bottom:18px}.drone-film-copy>p:not(.eyebrow){max-width:100%}.drone-services{grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}.drone-services h3{font-size:16px}.drone-services p{font-size:13px}.drone-film-card{max-width:330px}.drone-film-button{border-radius:26px}.drone-film-card figcaption{display:flex}.drone-film-card figcaption span{margin:0}.drone-film-launch{bottom:44px}.drone-equipment{display:flex;flex-direction:column;align-items:stretch;padding:28px 24px;border-radius:27px;gap:10px}.drone-equipment h2{font-size:36px}.drone-equipment figure{width:100%;max-width:330px;margin:auto}.drone-equipment img{aspect-ratio:1.15}}
+@media(max-width:360px){.drone-film-copy h2{font-size:37px}.drone-services{grid-template-columns:1fr;gap:21px}.drone-film-card figcaption{display:block}.drone-film-card figcaption span{margin-top:3px}.drone-equipment h2{font-size:32px}}
+@media(prefers-reduced-motion:reduce){.drone-sections a,.drone-film-button,.drone-film-launch{transition:none}}
