@@ -1,7 +1,4 @@
 /* Video collections have the same clear place as photography on the homepage. */
-.home-page .home-video-gallery-first .home-heading{margin-bottom:38px}
-.home-page .home-video-gallery-first .home-film-intro{max-width:410px}
-.home-page .home-video-gallery-first .home-film-intro .clarity-action{margin-top:8px}
 .home-page .home-video-collections{padding-top:0;margin-top:0;border-top:0}
 .home-page .home-video-collections .album-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
 .home-page .home-video-collections .album-card{padding:10px;border:1px solid var(--line);border-radius:32px;background:var(--glass);box-shadow:inset 0 1px 0 var(--border-lit);transition:border-color .3s,box-shadow .3s}
@@ -26,7 +23,6 @@
 @media(hover:hover) and (prefers-reduced-motion:no-preference){.home-page .home-video-collections .album-card:hover{border-color:color-mix(in srgb,var(--accent) 35%,var(--line));box-shadow:inset 0 1px 0 var(--border-lit),0 12px 35px #0000000b}}
 @media(max-width:1050px){.home-page .home-video-collections .album-grid{gap:24px}.home-page .home-video-collections .album-card-copy{padding:20px 13px 15px}.home-page .home-video-collections .album-card-copy h3{font-size:28px}.home-page .home-video-featured{grid-template-columns:minmax(180px,.4fr) minmax(0,1fr);gap:28px}.home-video-featured-heading h3{font-size:31px}}
 @media(max-width:760px){
- .home-page .home-video-gallery-first .home-heading{margin-bottom:30px}
  .home-page .home-video-collections{--video-rail-inset:5.4vw;padding:0;margin:0;border:0}
  .home-page .home-video-collections .album-grid{display:flex;gap:16px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--video-rail-inset);margin-inline:calc(-1 * var(--video-rail-inset));padding:4px var(--video-rail-inset) 17px;scrollbar-width:none}
  .home-page .home-video-collections .album-grid::-webkit-scrollbar{display:none}
@@ -52,8 +48,7 @@
 @media(prefers-reduced-motion:reduce){.home-page .home-video-collections .album-card{transition:none}.home-page .home-video-collections .album-grid{scroll-behavior:auto}}
 
 /* One quiet visual language for every mobile gallery rail. */
-.home-page .home-drone-collections{grid-column:1 / -1;min-width:0;width:100%;margin-top:12px}
-.home-drone-collections .album-section-heading h3{font:500 clamp(25px,3vw,34px)/1.2 Manrope,Arial,sans-serif;letter-spacing:-.045em;margin:12px 0 0}
+.home-page .home-drone-collections{min-width:0;width:100%;margin-top:0}
 .home-page .home-drone-collections .album-grid:has(>.album-card:only-child){grid-template-columns:minmax(0,1fr);max-width:650px}
 @media(max-width:760px){
  html body.home-page .home-video-collections .album-card{padding:0;border:0;background:transparent;box-shadow:none;border-radius:0}
@@ -62,6 +57,39 @@
  .home-page .home-video-collections.has-integrated-controls .album-card-image{margin-bottom:calc(var(--collection-controls-height) + 20px)}
  .home-page .home-video-collections.has-integrated-controls .album-card-copy{padding-top:0}
  .home-page .home-video-collections .album-card-action{border-radius:999px}
- .home-page .home-drone-collections{margin-top:18px}
  .home-page .home-drone-collections .album-card:only-child{flex-basis:100%}
 }
+
+/* Shared portfolio rhythm for photography, videography and drone. */
+.home-page .home-drone{display:block}
+.home-page .home-collection-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px 32px;margin-top:32px;padding-top:26px;border-top:1px solid var(--line)}
+.home-page .home-collection-footer .home-drone-gear{margin:0;padding:0;border:0;max-width:345px}
+.home-page .home-collection-footer .home-drone-gear p{margin:0}
+.home-page .home-collection-footer>.clarity-action{flex-shrink:0}
+html body.home-page .clarity-action,
+html body.home-page .home-about-copy>.home-link{min-height:50px;padding:13px 21px;border-radius:999px;font:600 14px/1.4 'DM Sans',Arial,sans-serif}
+html body.home-page .home-work-ordered .home-work-card h3,
+html body.home-page .home-video-collections .album-card-copy h3{font:500 clamp(25px,2.4vw,34px)/1.2 Manrope,Arial,sans-serif;letter-spacing:-.045em;margin-bottom:9px}
+html body.home-page .home-work-ordered .home-work-card>p,
+html body.home-page .home-video-collections .album-card-copy>p{font-size:13px;line-height:1.75;color:var(--muted);min-height:23px}
+html body.home-page .home-work-ordered .home-work-image,
+html body.home-page .home-video-collections .album-card-image{border-radius:28px}
+html body.home-page .home-work-ordered .home-work-open,
+html body.home-page .home-video-collections .album-card-action{display:inline-flex;align-items:center;justify-content:center;width:fit-content;max-width:100%;min-height:50px;margin-top:17px;padding:13px 21px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--bg);font:600 14px/1.4 'DM Sans',Arial,sans-serif;box-shadow:0 5px 18px #00000008;transition:background .25s,border-color .25s,color .25s,box-shadow .25s}
+@media(hover:hover) and (pointer:fine){
+ html.refinement-ready body.home-page .home-work-card:hover .home-work-open,
+ html.refinement-ready body.home-page .home-work-card:focus-visible .home-work-open,
+ html.refinement-ready body.home-page .album-card:hover .album-card-action,
+ html.refinement-ready body.home-page .album-card:focus-visible .album-card-action{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 5px 22px var(--glow)}
+}
+@media(max-width:760px){
+ .home-page .home-collection-footer{align-items:flex-start;flex-direction:column;gap:24px;margin-top:20px;padding-top:24px}
+ html body.home-page .home-work-ordered .home-work-card h3,
+ html body.home-page .home-video-collections .album-card-copy h3{font-size:27px}
+}
+@media(prefers-reduced-motion:reduce){
+ html body.home-page .home-work-ordered .home-work-open,
+ html body.home-page .home-video-collections .album-card-action{transition:none}
+}
+
+.home-page [data-collection-count][hidden]{display:none!important}

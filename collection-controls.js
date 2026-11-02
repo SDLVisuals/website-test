@@ -6,6 +6,11 @@
     if (!controls || !rail || controls.dataset.collectionReady === 'true') return;
     const cardSelector = '.home-work-card, .album-card';
     let cards = [...rail.querySelectorAll(cardSelector)];
+    const counter = rail.closest('section')?.querySelector('[data-collection-count]');
+    const updateCount = () => {
+      if (counter) { counter.textContent = `${cards.length} ${cards.length === 1 ? 'serie' : 'series'} om te ontdekken`; counter.hidden = !cards.length; }
+    };
+    updateCount();
     const choices = controls.querySelector('[data-collection-choices]');
     const name = controls.querySelector('[data-collection-name]');
     const position = controls.querySelector('[data-collection-position]');
@@ -129,6 +134,7 @@
     document.addEventListener('sdl:content-updated',() => {
       layoutDirty = true;
       cards = [...rail.querySelectorAll(cardSelector)];
+      updateCount();
       if (!cards.length) { controls.hidden = true; choices.replaceChildren(); selected = -1; requested = null; placeControls(false); return; }
       names = cards.map((card,index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
       buttons = createChoices(); choices.replaceChildren(...buttons);
