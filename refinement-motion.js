@@ -7,8 +7,8 @@
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
     const cards = '.home-work-card,.home-film-main,.home-film-small,.home-drone-media,.home-about-photo,.coming-soon-card,.album-card,.album-video-card,.portfolio-gallery>figure,.portfolio-video,.film-featured,.film-project,.film-service,.gear-opening-photo,.gear-detail-photo,.gear-camera,.gear-tool,.gear-drone,.drone-film-card,.drone-equipment,.ig-card,.service-directory nav>a';
-    const blocks = '.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.coming-soon-heading,.album-section-heading,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading,.home-film-foot,.collection-browser';
-    const liftTargets = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media,.clarity-action,.home-work-open';
+    const blocks = '.home-video-featured-heading,.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.coming-soon-heading,.album-section-heading,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading,.home-film-foot,.collection-browser';
+    const liftTargets = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media,.album-card-image,.album-video-play,.clarity-action,.button,.home-btn,.coming-soon-action,.service-directory nav>a';
     // Home photo movement and full-photo viewers already have dedicated controllers.
     const mediaTargets = '.collection-hero-media,.film-project--portrait .film-project-play,.portfolio-feature:not([data-photo])';
     const registered = new Set();
@@ -16,6 +16,7 @@
     const nearbyMedia = new Set();
     const animations = new Map();
     let revealObserver, mediaObserver, frame = 0, hovered = null, pressed = null;
+    let observerGeneration = 0;
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
     const listen = (query, callback) => {
       if (query.addEventListener) query.addEventListener('change', callback);
@@ -33,20 +34,22 @@
     const reveal = element => {
       if (element.dataset.refineSeen === 'true') return;
       element.dataset.refineSeen = 'true';
+      element.classList.add('is-refine-seen');
       revealObserver?.unobserve(element);
       if (!element.isConnected || !element.parentElement) return;
       if (reduced.matches || document.hidden || typeof element.animate !== 'function' || element.contains(document.activeElement)) return;
       const card = element.dataset.refineReveal === 'card';
       const siblings = [...element.parentElement.children].filter(sibling => sibling.hasAttribute('data-refine-reveal'));
-      const delay = card ? Math.min(Math.max(0, siblings.indexOf(element)) % 3 * 85, 170) : 0;
-      const offset = innerWidth <= 760 ? 12 : 20;
+      const columns = innerWidth <= 760 ? 1 : innerWidth <= 1050 ? 2 : 3;
+      const delay = card ? Math.max(0, siblings.indexOf(element)) % columns * 70 : 0;
+      const offset = innerWidth <= 760 ? 18 : 28;
       // Text fades as one intact block. Only complete cards settle into position.
       const keyframes = card
-        ? [{ opacity: .22, translate: `0 ${offset}px` }, { opacity: 1, translate: '0 0' }]
-        : [{ opacity: .3 }, { opacity: 1 }];
+        ? [{ opacity: .18, translate: `0 ${offset}px`, scale: '.985' }, { opacity: 1, translate: '0 0', scale: '1' }]
+        : [{ opacity: .35, translate: '0 6px' }, { opacity: 1, translate: '0 0' }];
       element.classList.add('is-refine-entering');
       const animation = element.animate(keyframes, {
-        duration: card ? 980 : 700, delay, easing: 'cubic-bezier(.19,.75,.24,1)', fill: 'none'
+        duration: card ? 860 : 620, delay, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards'
       });
       animations.set(element, animation);
       const finish = () => {
@@ -76,12 +79,16 @@
     };
     const observeElement = element => {
       if (element.dataset.refineSeen === 'true') return;
-      if (reduced.matches || !revealObserver) { element.dataset.refineSeen = 'true'; return; }
+      if (reduced.matches || !revealObserver) { element.dataset.refineSeen = 'true'; element.classList.add('is-refine-seen'); return; }
       revealObserver.observe(element);
     };
     const register = scope => {
       select(scope, `${cards},${blocks}`).forEach(element => {
         if (registered.has(element) || element.closest('.home-hero,dialog')) return;
+        // A single owner per visual block avoids compounded parent/child entrances.
+        // Keep the legacy scene visible; the shared controller handles this block.
+        element.classList.add('is-visible', 'is-scene-visible');
+        if (element.parentElement?.closest('[data-refine-reveal]')) return;
         registered.add(element);
         element.dataset.refineReveal = element.matches(cards) ? 'card' : 'block';
         observeElement(element);
@@ -99,12 +106,13 @@
       });
     };
     const setupObservers = () => {
+      const generation = ++observerGeneration;
       revealObserver?.disconnect(); mediaObserver?.disconnect();
       nearbyMedia.forEach(wrapper => wrapper.classList.remove('is-refine-media-near'));
       nearbyMedia.clear();
       if (frame) cancelAnimationFrame(frame); frame = 0;
       if (reduced.matches || !('IntersectionObserver' in window)) {
-        registered.forEach(element => { element.dataset.refineSeen = 'true'; cancelEntry(element); });
+        registered.forEach(element => { element.dataset.refineSeen = 'true'; element.classList.add('is-refine-seen'); cancelEntry(element); });
         media.forEach((_, wrapper) => {
           wrapper.style.removeProperty('--refine-photo-shift');
           wrapper.style.removeProperty('--refine-photo-scale');
@@ -112,10 +120,13 @@
         return;
       }
       revealObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => { if (entry.isIntersecting) reveal(entry.target); });
+        if (generation !== observerGeneration) return;
+        entries.forEach(entry => { if (entry.isIntersecting && entry.target.isConnected) reveal(entry.target); });
       }, { threshold: .06, rootMargin: '0px 0px -24px 0px' });
       mediaObserver = new IntersectionObserver(entries => {
+        if (generation !== observerGeneration) return;
         entries.forEach(entry => {
+          if (!entry.target.isConnected) return;
           entry.target.classList.toggle('is-refine-media-near', entry.isIntersecting);
           if (entry.isIntersecting) nearbyMedia.add(entry.target);
           else nearbyMedia.delete(entry.target);
@@ -153,7 +164,16 @@
     addEventListener('blur', () => { clearPress(); clearHover(); });
     addEventListener('scroll', () => { clearPress(); schedule(); }, { passive: true });
     addEventListener('resize', schedule, { passive: true });
-    addEventListener('pageshow', schedule);
+    addEventListener('pageshow', event => {
+      // Back/forward restores the exact view, never a half-complete entrance.
+      if (event.persisted) animations.forEach((_, element) => cancelEntry(element));
+      schedule();
+    });
+    addEventListener('pagehide', () => {
+      if (frame) cancelAnimationFrame(frame); frame = 0;
+      animations.forEach((_, element) => cancelEntry(element));
+      clearHover(); clearPress();
+    });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         if (frame) cancelAnimationFrame(frame); frame = 0;
@@ -164,7 +184,7 @@
     document.addEventListener('focusin', event => {
       let target = event.target.closest?.('[data-refine-reveal]');
       while (target) {
-        target.dataset.refineSeen = 'true'; revealObserver?.unobserve(target); cancelEntry(target);
+        target.dataset.refineSeen = 'true'; target.classList.add('is-refine-seen'); revealObserver?.unobserve(target); cancelEntry(target);
         target = target.parentElement?.closest('[data-refine-reveal]');
       }
     });
@@ -172,7 +192,7 @@
     listen(finePointer, clearHover);
     // The content editor may replace a series after the initial page load.
     document.addEventListener('sdl:content-updated', () => {
-      registered.forEach(element => { if (!element.isConnected) { cancelEntry(element); registered.delete(element); } });
+      registered.forEach(element => { if (!element.isConnected) { revealObserver?.unobserve(element); cancelEntry(element); registered.delete(element); } });
       media.forEach((_, wrapper) => { if (!wrapper.isConnected) { mediaObserver?.unobserve(wrapper); nearbyMedia.delete(wrapper); media.delete(wrapper); } });
       register(document); schedule();
     });

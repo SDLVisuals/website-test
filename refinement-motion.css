@@ -80,3 +80,56 @@ html.refinement-ready .gallery-collections-dialog[open]:not(.is-closing) .galler
  html.refinement-ready .home-play::after{display:none;animation:none}
  .is-refine-entering{will-change:auto}
 }
+
+/* One composed entrance per block, including galleries inserted from beheer. */
+html.refinement-ready body [data-refine-reveal] [data-reveal],
+html.refinement-ready body [data-refine-reveal] [data-scroll-scene]{opacity:1;transform:none;transition:none}
+html.refinement-ready body [data-refine-reveal].refine-lift{
+ transition:translate .45s cubic-bezier(.16,1,.3,1),scale .2s ease,background-color .25s,border-color .3s,box-shadow .35s,color .25s;
+}
+.is-refine-entering{will-change:opacity,translate,scale}
+html.refinement-ready .home-heading,
+html.refinement-ready .album-section-heading,
+html.refinement-ready .film-section-heading,
+html.refinement-ready .gear-section-heading{position:relative}
+html.refinement-ready .home-heading::after,
+html.refinement-ready .album-section-heading::after,
+html.refinement-ready .film-section-heading::after,
+html.refinement-ready .gear-section-heading::after{
+ content:'';position:absolute;bottom:-15px;left:0;width:56px;height:2px;border-radius:2px;
+ background:linear-gradient(90deg,var(--accent),transparent);transform-origin:left;pointer-events:none;
+}
+html.refinement-ready :is(.home-heading,.album-section-heading,.film-section-heading,.gear-section-heading).is-refine-seen::after{
+ animation:refine-section-line .9s .15s cubic-bezier(.16,1,.3,1) backwards;
+}
+@keyframes refine-section-line{from{opacity:0;transform:scaleX(.15)}to{opacity:1;transform:scaleX(1)}}
+
+/* Keep each entire photograph framed. Only the surrounding frame rises on hover. */
+@media(hover:hover) and (pointer:fine){
+ html.refinement-ready .refine-lift.is-refine-hover{translate:0 -3px}
+ html.refinement-ready .album-card:hover .album-card-action,
+ html.refinement-ready .album-card:focus-visible .album-card-action{box-shadow:0 5px 22px var(--glow)}
+ html.refinement-ready .home-work-card:hover .home-work-open,
+ html.refinement-ready .home-work-card:focus-visible .home-work-open{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+}
+html.refinement-ready .refine-lift.is-refine-pressed{translate:0 1px;scale:.985}
+html.refinement-ready .clarity-action.refine-lift.is-refine-pressed,
+html.refinement-ready .button.refine-lift.is-refine-pressed,
+html.refinement-ready .home-btn.refine-lift.is-refine-pressed{scale:.97}
+@media(prefers-reduced-motion:reduce){
+ html.refinement-ready :is(.home-heading,.album-section-heading,.film-section-heading,.gear-section-heading).is-refine-seen::after{animation:none}
+ html.refinement-ready body [data-refine-reveal].refine-lift,
+ html.refinement-ready .refine-lift.is-refine-pressed,
+ html.refinement-ready .clarity-action.refine-lift.is-refine-pressed,
+ html.refinement-ready .button.refine-lift.is-refine-pressed,
+ html.refinement-ready .home-btn.refine-lift.is-refine-pressed{translate:none;scale:none;transition:none}
+}
+/* Legacy scene selectors include both card and scene attributes. Match their
+   specificity explicitly, including CMS clones that retained an old scene flag. */
+html.refinement-ready.home-scenes-enabled body .home-work-card[data-refine-reveal]>.home-work-image img,
+html.refinement-ready.home-scenes-enabled body [data-refine-reveal][data-scene-photo] img,
+html.refinement-ready.home-scenes-enabled body [data-refine-reveal] [data-scene-photo] img{opacity:1}
+html.refinement-ready body .home-work-card[data-refine-reveal]>.home-work-open{
+ transition:background-color .25s,color .25s,border-color .25s,box-shadow .3s;
+}
+@media(prefers-reduced-motion:reduce){html.refinement-ready body .home-work-card[data-refine-reveal]>.home-work-open{transition:none}}

@@ -22,6 +22,7 @@
     const detail = hero.querySelector('[data-showcase-detail]');
     const ambient = hero.querySelector('[data-showcase-ambient]');
     const interval = 4800;
+    const imageTimeout = 10000;
     const count = slides.length;
     if (count < 2 || !controls.length) return;
     const categoryOf = index => slides[index].dataset.category;
@@ -66,16 +67,35 @@
       const source = sourceOf(image);
       const cached = decoded.get(image);
       if (cached?.source === source && cached.pending) return cached.pending;
-      const record = {source,ready:false,pending:null};
-      record.pending = Promise.resolve().then(() => image.decode ? image.decode() : undefined).then(() => {
-        record.source = sourceOf(image);
-        record.ready = image.complete && image.naturalWidth > 0;
-        return record.ready;
-      },() => false).finally(() => { record.pending = null; });
+      const record = {source,ready:false,pending:null,timedOut:false};
+      record.pending = new Promise(resolve => {
+        let settled = false;
+        const finish = ready => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeout);
+          record.pending = null;
+          resolve(ready);
+        };
+        // A stalled network/decode request must not lock the whole carousel.
+        const timeout = setTimeout(() => { record.timedOut = true; finish(false); },imageTimeout);
+        Promise.resolve().then(() => image.decode ? image.decode() : undefined).then(() => {
+          record.source = sourceOf(image);
+          record.ready = image.complete && image.naturalWidth > 0;
+          if (record.ready && record.timedOut) { record.timedOut = false; restoreImage(image); }
+          finish(record.ready);
+        },() => finish(false));
+      });
       decoded.set(image,record);
       return record.pending;
     };
-    const prepareSlide = index => Promise.all(visibleImages(index).map(decodeImage)).then(results => results.every(Boolean));
+    const prepareSlide = index => {
+      const images = visibleImages(index);
+      return Promise.all(images.map(decodeImage)).then(results => {
+        if (images.some(image => decoded.get(image)?.timedOut)) markUnavailable(index);
+        return results.every(Boolean);
+      });
+    };
     const slideReady = index => visibleImages(index).every(imageReady);
     // Decode the neighbours while the current photograph is being viewed.
     const warmNeighbours = () => [active,nextAvailable(active),nextAvailable(active,-1)].forEach(index => {
@@ -427,6 +447,17 @@
         }
       } else sync();
     };
+    function restoreImage(image) {
+      const slide = image.closest('[data-home-slide],[data-home-clone]');
+      if (!slide) return;
+      const index = Number(slide.dataset.homeSlide ?? slide.dataset.homeClone);
+      if (!unavailable.delete(index)) return;
+      decoded.delete(image);
+      const button = controlFor(index);
+      if (button) { button.disabled = false; button.removeAttribute('aria-disabled'); button.removeAttribute('title'); }
+      // A late load/decode after connectivity returns becomes selectable again.
+      sync();
+    }
     [...track.querySelectorAll('img'),...rail.querySelectorAll('img')].forEach(image => {
       const failed = () => {
         if (retried.has(image) && !image.complete) return;
@@ -444,6 +475,7 @@
         if (slide) markUnavailable(Number(slide.dataset.homeSlide ?? slide.dataset.homeClone));
         else image.style.opacity = '0';
       };
+      image.addEventListener('load',() => restoreImage(image));
       image.addEventListener('error',failed);
       if (image.complete && image.naturalWidth === 0) setTimeout(() => {
         if (image.complete && image.naturalWidth === 0 && !retried.has(image)) failed();

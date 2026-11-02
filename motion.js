@@ -18,7 +18,7 @@
     document.querySelectorAll('.portfolio-intro').forEach(intro => intro.setAttribute('data-reveal',''));
 
     /* Each item reveals once. Content stays visible if JS or the observer is unavailable. */
-    const revealItems = [...document.querySelectorAll('[data-reveal]')];
+    const revealItems = new Set(document.querySelectorAll('[data-reveal]')); 
     document.querySelectorAll('[data-stagger]').forEach(group => {
       [...group.querySelectorAll('[data-reveal]')]
         .filter(item => item.closest('[data-stagger]') === group)
@@ -48,6 +48,19 @@
     } else {
       showAll();
     }
+    document.addEventListener('sdl:content-updated', () => {
+      // CMS replaces gallery nodes in place. Release old observer targets and
+      // immediately hand refined cards to the shared animation controller.
+      revealItems.forEach(item => {
+        if (!item.isConnected) { revealObserver?.unobserve(item); revealItems.delete(item); }
+      });
+      document.querySelectorAll('[data-reveal]').forEach(item => {
+        if (revealItems.has(item)) return;
+        revealItems.add(item);
+        if (item.closest('[data-refine-reveal]') || reducedMotion.matches || !revealObserver) item.classList.add('is-visible');
+        else revealObserver.observe(item);
+      });
+    });
     document.addEventListener('focusin', event => {
       const item = event.target.closest?.('[data-reveal]');
       if (!item) return;
