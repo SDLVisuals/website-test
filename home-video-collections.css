@@ -50,3 +50,18 @@
 @media(max-width:480px){.home-page .home-video-collections{--video-rail-inset:6vw}}
 @media(max-width:360px){.home-page .home-video-collections .album-card-copy h3{font-size:25px}.home-page .home-video-collections .album-card-copy{padding-inline:10px}.home-video-featured-heading h3{font-size:28px}}
 @media(prefers-reduced-motion:reduce){.home-page .home-video-collections .album-card{transition:none}.home-page .home-video-collections .album-grid{scroll-behavior:auto}}
+
+/* One quiet visual language for every mobile gallery rail. */
+.home-page .home-drone-collections{grid-column:1 / -1;min-width:0;width:100%;margin-top:12px}
+.home-drone-collections .album-section-heading h3{font:500 clamp(25px,3vw,34px)/1.2 Manrope,Arial,sans-serif;letter-spacing:-.045em;margin:12px 0 0}
+.home-page .home-drone-collections .album-grid:has(>.album-card:only-child){grid-template-columns:minmax(0,1fr);max-width:650px}
+@media(max-width:760px){
+ html body.home-page .home-video-collections .album-card{padding:0;border:0;background:transparent;box-shadow:none;border-radius:0}
+ .home-page .home-video-collections .album-card-image{border-radius:26px}
+ .home-page .home-video-collections .album-card-copy{padding:20px 0 0}
+ .home-page .home-video-collections.has-integrated-controls .album-card-image{margin-bottom:calc(var(--collection-controls-height) + 20px)}
+ .home-page .home-video-collections.has-integrated-controls .album-card-copy{padding-top:0}
+ .home-page .home-video-collections .album-card-action{border-radius:999px}
+ .home-page .home-drone-collections{margin-top:18px}
+ .home-page .home-drone-collections .album-card:only-child{flex-basis:100%}
+}

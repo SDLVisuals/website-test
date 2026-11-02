@@ -1,20 +1,20 @@
-/* One clear controller for the native mobile photography rail. */
+/* Independent, native swipe controls for photo, video and drone galleries. */
 (() => {
   'use strict';
-  const start = () => {
-    const controls = document.querySelector('[data-collection-browser]');
-    const rail = document.querySelector('.home-work-ordered');
+  const setup = controls => {
+    const rail = document.getElementById(controls.dataset.collectionBrowser || 'photo-collections');
     if (!controls || !rail || controls.dataset.collectionReady === 'true') return;
-    let cards = [...rail.querySelectorAll('.home-work-card')];
+    const cardSelector = '.home-work-card, .album-card';
+    let cards = [...rail.querySelectorAll(cardSelector)];
     const choices = controls.querySelector('[data-collection-choices]');
     const name = controls.querySelector('[data-collection-name]');
     const position = controls.querySelector('[data-collection-position]');
     const previous = controls.querySelector('[data-collection-prev]');
     const next = controls.querySelector('[data-collection-next]');
-    if (!cards.length || !choices || !name || !position || !previous || !next) return;
+    if (!choices || !name || !position || !previous || !next) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     let names = cards.map((card, index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
-    const section = rail.closest('.home-work');
+    const section = rail.parentElement;
     let selected = -1, requested = null, frame = 0, settleTimer = 0, layoutDirty = true, lastScrolling;
     const clamp = index => Math.max(0, Math.min(cards.length - 1, index));
     const createChoices = () => cards.map((card, index) => {
@@ -31,13 +31,14 @@
     });
     let buttons = createChoices();
     choices.replaceChildren(...buttons);
+    controls.style.setProperty('--collection-slots', Math.min(6, Math.max(1, cards.length)));
     const edges = () => {
       const current = requested ?? Math.max(0, selected);
       previous.disabled = current === 0;
       next.disabled = current === cards.length - 1;
     };
     const placeControls = scrolling => {
-      const image = cards[0]?.querySelector('.home-work-image');
+      const image = cards[0]?.querySelector('.home-work-image, .album-card-image');
       const integrated = scrolling && innerWidth <= 760 && !!section && !!image;
       controls.classList.toggle('is-integrated', integrated);
       section?.classList.toggle('has-integrated-controls', integrated);
@@ -64,7 +65,7 @@
     const sync = () => {
       frame = 0;
       const maximum = Math.max(0, rail.scrollWidth - rail.clientWidth);
-      const scrolling = maximum > 3 && /auto|scroll/.test(getComputedStyle(rail).overflowX);
+      const scrolling = cards.length > 1 && maximum > 3 && /auto|scroll/.test(getComputedStyle(rail).overflowX);
       if (controls.hidden === scrolling) controls.hidden = !scrolling;
       if (scrolling !== lastScrolling) { layoutDirty = true; lastScrolling = scrolling; }
       if (!scrolling) { requested = null; if (layoutDirty) placeControls(false); layoutDirty = false; return; }
@@ -127,10 +128,11 @@
     window.visualViewport?.addEventListener('resize',scheduleLayout,{passive:true});
     document.addEventListener('sdl:content-updated',() => {
       layoutDirty = true;
-      cards = [...rail.querySelectorAll('.home-work-card')];
-      if (!cards.length) { controls.hidden = true; placeControls(false); return; }
+      cards = [...rail.querySelectorAll(cardSelector)];
+      if (!cards.length) { controls.hidden = true; choices.replaceChildren(); selected = -1; requested = null; placeControls(false); return; }
       names = cards.map((card,index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
       buttons = createChoices(); choices.replaceChildren(...buttons);
+      controls.style.setProperty('--collection-slots', Math.min(6, Math.max(1, cards.length)));
       selected = -1; requested = null; schedule();
     });
     addEventListener('pageshow', scheduleLayout);
@@ -143,6 +145,7 @@
     controls.dataset.collectionReady = 'true';
     sync();
   };
+  const start = () => document.querySelectorAll('[data-collection-browser]').forEach(setup);
   const startAfterCMS = () => {
     const ready = window.SDLCMSReady;
     if (ready && typeof ready.then === 'function') ready.then(start, start);
