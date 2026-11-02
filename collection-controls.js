@@ -14,10 +14,7 @@
     if (!cards.length || !choices || !name || !position || !previous || !next) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     let names = cards.map((card, index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
-    const anchor = document.createElement('div');
-    anchor.className = 'collection-browser-anchor';
-    anchor.setAttribute('aria-hidden','true');
-    controls.before(anchor);
+    const section = rail.closest('.home-work');
     let selected = -1, requested = null, frame = 0, settleTimer = 0;
     const clamp = index => Math.max(0, Math.min(cards.length - 1, index));
     const createChoices = () => cards.map((card, index) => {
@@ -39,34 +36,37 @@
       previous.disabled = current === 0;
       next.disabled = current === cards.length - 1;
     };
-    const dock = scrolling => {
-      const bounds = rail.getBoundingClientRect();
-      const height = window.visualViewport?.height || innerHeight;
-      const floating = controls.classList.contains('is-floating');
-      const original = (floating ? anchor : controls).getBoundingClientRect();
-      const blocked = document.body.classList.contains('menu-open') || !!document.querySelector('dialog[open]');
-      // Keep the controls beside the visible photographs, not a whole card below.
-      // A spacer keeps the document still when the dock attaches to the viewport.
-      // Position changes keep the same buttons in the DOM, so a selected/focused
-      // button can safely travel with the dock while the visitor scrolls back.
-      const shouldFloat = scrolling && innerWidth <= 760 && !blocked &&
-        bounds.top < height * .62 && bounds.bottom > 140 && original.top > height - 132;
-      if (shouldFloat === floating) return;
-      if (shouldFloat) {
-        anchor.style.height = `${controls.offsetHeight + 5}px`;
-        anchor.classList.add('is-reserved');
-      } else {
-        anchor.classList.remove('is-reserved');
-        anchor.style.height = '';
+    const placeControls = scrolling => {
+      const image = cards[0]?.querySelector('.home-work-image');
+      const integrated = scrolling && innerWidth <= 760 && !!section && !!image;
+      controls.classList.toggle('is-integrated', integrated);
+      section?.classList.toggle('has-integrated-controls', integrated);
+      if (!integrated) {
+        controls.style.top = '';
+        section?.style.removeProperty('--collection-controls-height');
+        return;
       }
-      controls.classList.toggle('is-floating',shouldFloat);
+      // Reserve a real row between every image and its title. The controls are
+      // outside the horizontal rail so they stay still when the photos swipe.
+      const height = `${Math.ceil(controls.offsetHeight)}px`;
+      if (section.style.getPropertyValue('--collection-controls-height') !== height) {
+        section.style.setProperty('--collection-controls-height', height);
+      }
+      // Offset geometry ignores reveal transforms and page scrolling. The
+      // section is the positioned ancestor, including after CMS gallery edits.
+      let imageTop = 0, element = image;
+      while (element && element !== section) {
+        imageTop += element.offsetTop;
+        element = element.offsetParent;
+      }
+      controls.style.top = `${Math.round(imageTop + image.offsetHeight + 12)}px`;
     };
     const sync = () => {
       frame = 0;
       const maximum = Math.max(0, rail.scrollWidth - rail.clientWidth);
       const scrolling = maximum > 3 && /auto|scroll/.test(getComputedStyle(rail).overflowX);
       controls.hidden = !scrolling;
-      if (!scrolling) { requested = null; dock(false); return; }
+      if (!scrolling) { requested = null; placeControls(false); return; }
       const padding = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
       const start = rail.getBoundingClientRect().left + padding;
       let closest = 0, distance = Infinity;
@@ -84,7 +84,7 @@
         choices.scrollTo?.({left:Math.max(0,button.offsetLeft - (choices.clientWidth-button.offsetWidth)/2),behavior:reduced.matches?'auto':'smooth'});
       }
       edges();
-      dock(true);
+      placeControls(true);
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(sync); };
     const release = () => { clearTimeout(settleTimer); requested = null; schedule(); };
@@ -122,22 +122,21 @@
     rail.addEventListener('pointerdown', release, { passive: true });
     rail.addEventListener('wheel', release, { passive: true });
     addEventListener('resize', release, { passive: true });
-    addEventListener('scroll', schedule, { passive: true });
     window.visualViewport?.addEventListener('resize',schedule,{passive:true});
-    document.addEventListener('focusin',schedule);
-    if ('MutationObserver' in window) {
-      new MutationObserver(schedule).observe(document.body,{attributes:true,attributeFilter:['class']});
-      new MutationObserver(records => { if (records.some(record => record.type === 'attributes' || [...record.addedNodes,...record.removedNodes].some(node => node.nodeType === 1 && (node.matches('dialog') || node.querySelector('dialog'))))) schedule(); }).observe(document.body,{attributes:true,attributeFilter:['open'],subtree:true,childList:true});
-    }
     document.addEventListener('sdl:content-updated',() => {
       cards = [...rail.querySelectorAll('.home-work-card')];
-      if (!cards.length) { controls.hidden = true; dock(false); return; }
+      if (!cards.length) { controls.hidden = true; placeControls(false); return; }
       names = cards.map((card,index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
       buttons = createChoices(); choices.replaceChildren(...buttons);
       selected = -1; requested = null; schedule();
     });
     addEventListener('pageshow', schedule);
-    if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(rail);
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(schedule);
+      observer.observe(rail); observer.observe(controls);
+      if (section) observer.observe(section);
+    }
+    document.fonts?.ready.then(schedule);
     controls.dataset.collectionReady = 'true';
     sync();
   };
