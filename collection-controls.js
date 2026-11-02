@@ -97,6 +97,11 @@
     controls.dataset.collectionReady = 'true';
     sync();
   };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
-  else start();
+  const startAfterCMS = () => {
+    const ready = window.SDLCMSReady;
+    if (ready && typeof ready.then === 'function') ready.then(start, start);
+    else start();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startAfterCMS, { once: true });
+  else startAfterCMS();
 })();

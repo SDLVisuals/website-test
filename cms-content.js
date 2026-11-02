@@ -13,6 +13,8 @@
     couple: 'koppelshoot.html', auto: 'auto.html', product: 'product.html'
   });
   const GALLERIES = Object.values(ROUTES).map(path => path.slice(0, -5));
+  const COMING_SOON_GRADIENTS = ['ruby', 'violet', 'midnight', 'silver'];
+  const COMING_SOON_DEFAULT = [{ id: 'communiefotografie', title: 'Communiefotografie', description: 'Communiefotografie komt binnenkort bij SDL Visuals. Meer informatie volgt.', visible: true, gradient: 'ruby' }];
   const MAX_BYTES = 2 * 1024 * 1024;
   const fail = () => { throw new Error('Ongeldige gepubliceerde fotocollectie.'); };
   const plain = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -239,25 +241,39 @@
   function normalizePayload(payload) {
     if (!plain(payload) || payload.version !== 1 || !Number.isInteger(payload.revision) || payload.revision < 0) return fail();
     const content = payload.content;
-    if (!plain(content) || content.version !== 1 || !Array.isArray(content.galleries) || content.galleries.length !== 6
-      || !Array.isArray(content.hero) || content.hero.length !== 12) return fail();
+    if (!plain(content) || content.version !== 1 || !Array.isArray(content.galleries) || content.galleries.length < 6 || content.galleries.length > 30
+      || !Array.isArray(content.hero) || content.hero.length < 1 || content.hero.length > 24) return fail();
     const galleries = content.galleries.map(value => {
-      if (!plain(value) || !GALLERIES.includes(value.key) || value.path !== `${value.key}.html`
+      if (!plain(value) || typeof value.key !== 'string' || !/^[a-z][a-z0-9-]{1,47}$/.test(value.key)
+        || value.path !== (GALLERIES.includes(value.key) ? `${value.key}.html` : `galerij.html?serie=${value.key}`)
         || !Array.isArray(value.photos) || value.photos.length > 500) return fail();
       const photos = value.photos.map(photo);
       if (new Set(photos.map(item => item.id)).size !== photos.length) return fail();
-      return { key: value.key, title: text(value.title, 120), path: value.path, cover: photo(value.cover), photos };
+      const title = text(value.title, 80);
+      if (!title.trim()) return fail();
+      return { key: value.key, title, path: value.path, description: value.description === undefined ? undefined : text(value.description, 600), cover: photo(value.cover), photos };
     });
-    if (new Set(galleries.map(item => item.key)).size !== 6) return fail();
+    if (new Set(galleries.map(item => item.key)).size !== galleries.length || !GALLERIES.every(key => galleries.some(item => item.key === key))
+      || galleries.reduce((total, item) => total + item.photos.length, 0) > 2500) return fail();
     const hero = content.hero.map(value => {
       if (!plain(value) || !Object.hasOwn(ROUTES, value.category) || value.route !== ROUTES[value.category]) return fail();
       return {
         id: text(value.id, 120), category: value.category, label: text(value.label, 120), route: value.route,
-        detail: text(value.detail, 1000), desktop: photo(value.desktop), mobile: photo(value.mobile)
+        detail: text(value.detail, 1000), desktop: photo(value.desktop), mobile: photo(value.mobile),
+        motion: value.motion === undefined ? undefined : Number(value.motion)
       };
     });
-    if (new Set(hero.map(item => item.id)).size !== 12 || !Object.keys(ROUTES).every(key => hero.some(item => item.category === key))) return fail();
-    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleries, hero, videos: normalizeVideos(content.videos) } };
+    if (new Set(hero.map(item => item.id)).size !== hero.length || hero.some(item => !item.id || item.motion !== undefined && (!Number.isFinite(item.motion) || item.motion < 0 || item.motion > .08))) return fail();
+    const announcements = content.comingSoon === undefined ? COMING_SOON_DEFAULT : content.comingSoon;
+    if (!Array.isArray(announcements) || announcements.length > 20) return fail();
+    const comingSoon = announcements.map(value => {
+      if (!plain(value) || typeof value.visible !== 'boolean' || !COMING_SOON_GRADIENTS.includes(value.gradient || 'ruby')) return fail();
+      const item = { id: text(value.id, 120), title: text(value.title, 100), description: text(value.description, 600), planning: text(value.planning, 80), visible: value.visible, gradient: value.gradient || 'ruby' };
+      if (!/^[A-Za-z0-9_-]+$/.test(item.id) || !item.title.trim()) return fail();
+      return item;
+    });
+    if (new Set(comingSoon.map(item => item.id)).size !== comingSoon.length) return fail();
+    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleries, hero, videos: normalizeVideos(content.videos), comingSoon } };
   }
   const viewerSource = photo => photo.srcset?.length ? photo.srcset[photo.srcset.length - 1].src : photo.src;
   function setImage(image, item, sizes) {
@@ -334,7 +350,7 @@
       slide.className = `home-slide showcase-slide showcase-slide-${item.category}${index === 0 ? ' is-active' : ''}`;
       slide.id = `home-slide-${index + 1}`;
       Object.assign(slide.dataset, {
-        homeSlide: String(index), category: item.category, motion: original?.dataset.motion || '0.035',
+        homeSlide: String(index), category: item.category, motion: String(item.motion ?? original?.dataset.motion ?? '0.035'),
         label: item.label, route: item.route, detail: item.detail, preview: item.mobile.src, ambient: item.desktop.src
       });
       slide.setAttribute('aria-hidden', String(index !== 0));
@@ -354,11 +370,114 @@
     });
     return fragment;
   }
+  function applyGalleryNavigation(galleries, doc, currentPath) {
+    const visible = galleries.filter(item => item.photos.length || item.path === currentPath);
+    const categories = doc.querySelector('.portfolio-categories');
+    const sheet = doc.querySelector('.gallery-collection-grid');
+    [categories, sheet].filter(Boolean).forEach(nav => {
+      const detailed = nav === sheet;
+      const retained = [...nav.children].filter(link => ['Video.html', 'drone.html'].includes(link.getAttribute('href')));
+      const links = visible.map(item => {
+        const link = doc.createElement('a');
+        link.className = detailed ? 'gallery-collection-option' : 'portfolio-category';
+        link.href = item.path;
+        if (item.path === currentPath) link.setAttribute('aria-current', 'page');
+        if (detailed) {
+          const image = doc.createElement('img'); image.loading = 'lazy';
+          setImage(image, item.cover, '64px'); image.alt = '';
+          const label = doc.createElement('span'); label.textContent = item.title;
+          if (item.path === currentPath) { const current = doc.createElement('small'); current.textContent = 'Nu bekeken'; label.append(current); }
+          link.append(image, label);
+        } else link.textContent = item.title;
+        return link;
+      });
+      nav.replaceChildren(...links, ...retained);
+    });
+  }
+  function applyHomeGalleries(galleries, doc) {
+    const rail = doc.querySelector('.home-work-ordered');
+    if (!rail) return;
+    const originals = new Map([...rail.querySelectorAll('.home-work-card')].map(card => [card.getAttribute('href'), card]));
+    const visible = galleries.filter(item => item.photos.length);
+    const cards = visible.map(item => {
+      const original = originals.get(item.path);
+      const card = original ? original.cloneNode(true) : doc.createElement('a');
+      card.className = 'home-work-card'; card.href = item.path;
+      if (!original) {
+        const frame = doc.createElement('span'); frame.className = 'home-work-image';
+        const image = doc.createElement('img'); image.loading = 'lazy'; frame.append(image);
+        const title = doc.createElement('h3');
+        const description = doc.createElement('p');
+        const action = doc.createElement('span'); action.className = 'home-work-open'; action.textContent = 'Bekijk de fotoserie';
+        card.append(frame, title, description, action);
+      }
+      write(card.querySelector('h3'), item.title);
+      if (item.description !== undefined || !original) write(card.querySelector('p'), item.description || 'Een selectie uit mijn werk.');
+      const image = card.querySelector('.home-work-image img');
+      if (image) setImage(image, item.cover, '(max-width:760px) 86vw, 40vw');
+      return card;
+    });
+    rail.replaceChildren(...cards);
+    if (!cards.length) {
+      const empty = doc.createElement('p'); empty.className = 'portfolio-empty';
+      empty.textContent = 'Nieuwe fotoseries verschijnen binnenkort. Vertel me gerust wat je in gedachten hebt.'; rail.append(empty);
+    }
+    write(doc.querySelector('#fotografie .service-meta'), `${visible.length} ${visible.length === 1 ? 'serie' : 'series'} om te ontdekken`);
+  }
+  function applyComingSoon(items, doc) {
+    const section = doc.querySelector('[data-coming-soon]');
+    const grid = section?.querySelector('[data-coming-soon-grid]');
+    if (!section || !grid) return;
+    const visible = items.filter(item => item.visible);
+    section.hidden = !visible.length;
+    grid.replaceChildren(...visible.map(item => {
+      const card = doc.createElement('article'); card.className = `coming-soon-card coming-soon-${item.gradient}`;
+      card.dataset.comingSoonId = item.id;
+      const label = doc.createElement('p'); label.className = 'coming-soon-label'; label.textContent = 'Binnenkort bij SDL Visuals';
+      const copy = doc.createElement('div'); copy.className = 'coming-soon-copy';
+      const title = doc.createElement('h3'); title.textContent = item.title;
+      const description = doc.createElement('p'); description.textContent = item.description;
+      copy.append(title, description);
+      const foot = doc.createElement('div'); foot.className = 'coming-soon-foot';
+      const planning = doc.createElement('span'); planning.textContent = item.planning || 'Meer informatie volgt';
+      const action = doc.createElement('a'); action.className = 'coming-soon-action'; action.href = 'contact.html';
+      action.textContent = 'Ik heb interesse'; action.setAttribute('aria-label', `Meer informatie over ${item.title.toLowerCase()}`);
+      foot.append(planning, action); card.append(label, copy, foot); return card;
+    }));
+  }
+  function applyCustomGallery(gallery, doc) {
+    if (!doc.body.hasAttribute('data-custom-gallery')) return;
+    const empty = doc.querySelector('[data-custom-gallery-empty]');
+    const contents = doc.querySelector('[data-custom-gallery-content]');
+    if (empty) empty.hidden = !!gallery;
+    if (contents) contents.hidden = !gallery;
+    if (!gallery) return;
+    const description = gallery.description || `Ontdek ${gallery.title.toLowerCase()} in een fotoreportage van SDL Visuals.`;
+    const title = `${gallery.title} | Fotografie door SDL Visuals`;
+    const canonical = `https://sdlvisuals.be/${gallery.path}`;
+    doc.title = title;
+    const meta = (selector, value) => doc.querySelector(selector)?.setAttribute('content', value);
+    meta('meta[name="description"]', description);
+    meta('meta[name="robots"]', 'index, follow, max-image-preview:large');
+    meta('meta[property="og:title"]', title); meta('meta[property="og:description"]', description);
+    meta('meta[property="og:url"]', canonical); meta('meta[property="og:image"]', gallery.cover.src);
+    meta('meta[property="og:image:alt"]', gallery.cover.alt);
+    meta('meta[name="twitter:title"]', title); meta('meta[name="twitter:description"]', description);
+    meta('meta[name="twitter:image"]', gallery.cover.src);
+    doc.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical);
+    write(doc.querySelector('#collection-title'), gallery.title);
+    write(doc.querySelector('.collection-hero-lead'), description);
+    write(doc.querySelector('.collection-breadcrumb [aria-current="page"]'), gallery.title);
+    const schema = doc.querySelector('[data-custom-gallery-schema]');
+    if (schema) schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description, url: canonical, inLanguage: 'nl-BE', isPartOf: { '@id': 'https://sdlvisuals.be/#website' }, primaryImageOfPage: { '@type': 'ImageObject', contentUrl: gallery.cover.src, caption: gallery.cover.alt } });
+  }
   function applyContent(payload, doc, location) {
     const { content } = payload;
     const filename = location.pathname.split('/').pop() || 'index.html';
     const isHome = filename === 'index.html' || filename === 'glass.html';
-    const gallery = content.galleries.find(item => item.path === filename);
+    const requested = filename === 'galerij.html' ? new URLSearchParams(location.search || '').get('serie') : null;
+    const currentPath = requested ? `galerij.html?serie=${requested}` : filename;
+    const gallery = content.galleries.find(item => item.path === currentPath);
     const galleryElement = gallery && doc.querySelector('[data-gallery]');
     const track = isHome && doc.querySelector('.home-slide-track');
     // Build replacements while detached: malformed data cannot leave half of a gallery on screen.
@@ -372,11 +491,26 @@
       if (explore) explore.textContent = `Bekijk de ${count}`;
       const cover = doc.querySelector('.collection-hero-media img');
       if (cover) setImage(cover, gallery.cover, '(max-width:760px) 100vw, 75vw');
+      write(doc.querySelector('.gallery-category-current>strong'), gallery.title);
     }
+    applyCustomGallery(gallery?.photos.length ? gallery : null, doc);
+    applyGalleryNavigation(content.galleries, doc, currentPath);
     if (track) {
       track.replaceChildren(heroFragment);
       const first = content.hero[0];
-      const next = content.hero[1];
+      const next = content.hero[1] || first;
+      const hero = doc.querySelector('.home-hero');
+      if (hero) hero.dataset.presentedCategory = first.category;
+      const tabs = doc.querySelector('.showcase-tabs');
+      if (tabs) {
+        const buttons = [...tabs.querySelectorAll('[data-home-select]')];
+        const categories = [...new Set(content.hero.map(item => item.category))];
+        tabs.replaceChildren(...categories.map((category, index) => {
+          const button = buttons.find(item => item.dataset.homeCategory === category);
+          if (button) { write(button.querySelector('.showcase-tab-number'), String(index + 1).padStart(2, '0')); button.dataset.homeSelect = String(index); }
+          return button;
+        }).filter(Boolean));
+      }
       doc.querySelectorAll('[data-home-select]').forEach(control => {
         const matches = content.hero.map((item, index) => ({ item, index })).filter(row => row.item.category === control.dataset.homeCategory);
         control.setAttribute('aria-controls', matches.map(row => `home-slide-${row.index + 1}`).join(' '));
@@ -398,11 +532,8 @@
       if (nextTitle) nextTitle.textContent = next.label;
       const nextButton = doc.querySelector('[data-showcase-next]');
       if (nextButton) nextButton.setAttribute('aria-label', `Bekijk de volgende foto: ${next.label.toLowerCase()}`);
-      content.galleries.forEach(item => {
-        const image = [...doc.querySelectorAll('.home-work-card')].find(card => card.getAttribute('href') === item.path)?.querySelector('.home-work-image img');
-        if (image) setImage(image, item.cover, '(max-width:760px) 86vw, 40vw');
-      });
     }
+    if (isHome) { applyHomeGalleries(content.galleries, doc); applyComingSoon(content.comingSoon || COMING_SOON_DEFAULT, doc); }
     applyVideos(content.videos, doc, filename);
     doc.documentElement.dataset.cmsRevision = String(payload.revision);
   }
@@ -451,5 +582,5 @@
       return { applied: false, reason: 'fallback' };
     } finally { scope.clearTimeout(timer); }
   }
-  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, readJSON, run, ENDPOINT, CMS_ORIGIN };
+  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, applyComingSoon, readJSON, run, ENDPOINT, CMS_ORIGIN };
 });
