@@ -59,6 +59,183 @@
     }
     return item;
   }
+  const VIDEO_CATEGORIES = Object.freeze({ wedding: 'Trouwfilm', business: 'Bedrijfsfilm', product: 'Productfilm', events: 'Eventfilm', auto: 'Automotive', drone: 'Dronefilm', other: 'Film' });
+  function videoSource(provider, source) {
+    if (typeof source !== 'string' || source.length > 2048 || /[\\\u0000-\u0020]/.test(source)) return fail();
+    const patterns = { gumlet: /^[a-f0-9]{24}$/, vimeo: /^\d{6,15}$/, youtube: /^[A-Za-z0-9_-]{11}$/ };
+    if (patterns[provider]) return patterns[provider].test(source) ? source : fail();
+    if (provider !== 'file') return fail();
+    let url;
+    try { url = new URL(source); } catch (_) { return fail(); }
+    const host = url.hostname.toLowerCase();
+    const deniedHost = !host.includes('.') || /(?:^|\.)(?:localhost|local|internal|test|invalid)$/.test(host)
+      || /^\[/.test(host) || /^\d+(?:\.\d+){0,3}$/.test(host);
+    if (url.protocol !== 'https:' || url.username || url.password || url.hash || deniedHost || !/\.(mp4|webm)$/i.test(url.pathname)) return fail();
+    if (url.origin === CMS_ORIGIN && (!/^\/media\/[a-f0-9-]{36}\.(mp4|webm)$/.test(url.pathname) || url.search)) return fail();
+    return url.href;
+  }
+  function normalizeVideos(values) {
+    if (values === undefined) return undefined; // Older publications retain the existing film section.
+    if (!Array.isArray(values) || values.length > 100) return fail();
+    const videos = values.map(value => {
+      if (!plain(value) || !Object.hasOwn(VIDEO_CATEGORIES, value.category)
+        || !['gumlet', 'vimeo', 'youtube', 'file'].includes(value.provider)
+        || !['landscape', 'portrait'].includes(value.format)
+        || typeof value.featured !== 'boolean' || typeof value.showOnHome !== 'boolean') return fail();
+      const item = {
+        id: text(value.id, 120), title: text(value.title, 160), category: value.category,
+        description: text(value.description, 800), duration: text(value.duration, 50), format: value.format,
+        provider: value.provider, source: videoSource(value.provider, value.source), poster: photo(value.poster),
+        featured: value.featured, showOnHome: value.showOnHome
+      };
+      if (!/^[A-Za-z0-9_-]+$/.test(item.id) || !item.title.trim()) return fail();
+      return item;
+    });
+    if (new Set(videos.map(item => item.id)).size !== videos.length || videos.filter(item => item.featured).length > 1
+      || videos.filter(item => item.showOnHome && (item.category !== 'drone' || item.featured)).length > 4) return fail();
+    return videos;
+  }
+  function write(node, value) { if (node) node.textContent = value; }
+  function videoVisibility(node, visible) {
+    node.hidden = !visible;
+    if (visible) node.style.removeProperty('display');
+    else {
+      node.style.setProperty('display', 'none');
+      node.querySelectorAll('button[data-video],button[data-video-src]').forEach(button => {
+        button.removeAttribute('data-video'); button.removeAttribute('data-video-src');
+        button.removeAttribute('data-video-provider'); button.removeAttribute('data-video-id');
+      });
+    }
+  }
+  function patchVideo(button, item) {
+    button.removeAttribute('data-video');
+    button.removeAttribute('data-video-src');
+    button.removeAttribute('data-video-provider');
+    button.dataset.videoId = item.id;
+    button.dataset.videoProvider = item.provider;
+    if (item.provider === 'file') button.dataset.videoSrc = item.source;
+    else button.dataset.video = item.source;
+    button.dataset.title = `${item.title} · ${VIDEO_CATEGORIES[item.category]}`;
+    button.dataset.poster = item.poster.src;
+    button.dataset.format = item.format;
+    button.setAttribute('aria-label', `Bekijk de film: ${item.title}`);
+    const image = button.querySelector('img');
+    if (image) setImage(image, item.poster, '(max-width:760px) 92vw, 65vw');
+  }
+  function makeProject(template, item) {
+    const article = template.cloneNode(true);
+    article.removeAttribute('id');
+    article.classList.toggle('film-project--portrait', item.format === 'portrait');
+    article.classList.toggle('film-project--landscape', item.format === 'landscape');
+    patchVideo(article.querySelector('button'), item);
+    write(article.querySelector('h3'), item.title);
+    const caption = article.querySelector('.film-project-caption p');
+    if (caption) {
+      caption.textContent = VIDEO_CATEGORIES[item.category];
+      if (item.duration) { const duration = caption.ownerDocument.createElement('span'); duration.className = 'film-caption-duration'; duration.textContent = item.duration; caption.append(duration); }
+    }
+    return article;
+  }
+  function makeHomeMain(template, item) {
+    const article = template.cloneNode(true);
+    patchVideo(article.querySelector('button'), item);
+    write(article.querySelector('.home-featured-label'), item.category === 'wedding' ? 'Uitgelichte trouwfilm' : 'Uitgelichte film');
+    write(article.querySelector('.home-film-watch small'), item.title);
+    write(article.querySelector('.home-film-caption h3'), item.title);
+    write(article.querySelector('.home-film-caption p'), item.description);
+    const meta = article.querySelector('.home-film-meta');
+    if (meta) {
+      meta.textContent = VIDEO_CATEGORIES[item.category];
+      if (item.duration) meta.append(meta.ownerDocument.createElement('br'), meta.ownerDocument.createTextNode(item.duration));
+    }
+    return article;
+  }
+  function makeHomeSmall(template, item) {
+    const article = template.cloneNode(true);
+    patchVideo(article.querySelector('button'), item);
+    write(article.querySelector('.home-film-type'), VIDEO_CATEGORIES[item.category]);
+    write(article.querySelector('h3'), item.title);
+    write(article.querySelector('p'), item.description);
+    return article;
+  }
+  function applyVideos(videos, doc, filename) {
+    if (!videos) return;
+    const featured = videos.find(item => item.featured) || videos[0];
+    if (filename === 'Video.html') {
+      const feature = doc.querySelector('.film-featured');
+      const projects = doc.querySelector('.film-projects');
+      const template = projects?.querySelector('.film-project');
+      if (feature) {
+        videoVisibility(feature, !!featured);
+        if (featured) {
+          patchVideo(feature.querySelector('button'), featured);
+          write(feature.querySelector('.film-featured-kicker'), featured.category === 'wedding' ? 'Uitgelichte trouwfilm' : 'Uitgelichte film');
+          write(feature.querySelector('.film-featured-watch>span'), featured.category === 'wedding' ? 'Bekijk de trouwfilm' : 'Bekijk de film');
+          write(feature.querySelector('h2'), featured.title);
+          const caption = feature.querySelector('.film-featured-caption p');
+          if (caption) {
+            caption.textContent = VIDEO_CATEGORIES[featured.category];
+            if (featured.duration) { const duration = doc.createElement('span'); duration.className = 'film-caption-duration'; duration.textContent = featured.duration; caption.append(duration); }
+          }
+        }
+      }
+      if (projects && template) {
+        projects.replaceChildren(...videos.filter(item => item !== featured).map(item => makeProject(template, item)));
+        if (!videos.length) { const empty = doc.createElement('p'); empty.textContent = 'Nieuwe films verschijnen binnenkort. Bespreek intussen gerust jouw filmidee.'; projects.append(empty); }
+      }
+    }
+    if (filename === 'index.html' || filename === 'glass.html') {
+      const layout = doc.querySelector('.home-film-layout');
+      const mainTemplate = layout?.querySelector('.home-film-main');
+      const sideTemplate = layout?.querySelector('.home-film-small');
+      const main = videos.find(item => item.featured && item.showOnHome) || videos.find(item => item.showOnHome && item.category !== 'drone');
+      if (layout && mainTemplate && sideTemplate) {
+        const rows = [];
+        if (main) {
+          rows.push(makeHomeMain(mainTemplate, main));
+          const side = doc.createElement('div'); side.className = 'home-film-side';
+          side.append(...videos.filter(item => item.showOnHome && item.category !== 'drone' && item !== main).slice(0, 3).map(item => makeHomeSmall(sideTemplate, item)));
+          rows.push(side);
+        } else { const empty = doc.createElement('p'); empty.textContent = 'Ontdek mijn videowerk of bespreek jouw filmidee.'; rows.push(empty); }
+        layout.replaceChildren(...rows);
+      }
+      const drone = videos.find(item => item.category === 'drone' && item.showOnHome);
+      const figure = doc.querySelector('.home-drone-media');
+      if (figure) {
+        videoVisibility(figure, !!drone);
+        if (drone) { patchVideo(figure.querySelector('button'), drone); write(figure.querySelector('figcaption>span'), drone.title); }
+      }
+    }
+    if (filename === 'drone.html') {
+      const figure = doc.querySelector('.drone-film-card');
+      const drone = videos.find(item => item.category === 'drone');
+      if (figure) {
+        videoVisibility(figure, !!drone);
+        if (drone) {
+          patchVideo(figure.querySelector('button'), drone);
+          write(figure.querySelector('figcaption strong'), drone.title);
+          write(figure.querySelector('figcaption>span'), drone.description);
+        }
+      }
+    }
+    const galleryCategories = { 'trouw.html': ['wedding'], 'evenementen.html': ['business', 'events'], 'auto.html': ['auto'], 'product.html': ['product'] };
+    if (galleryCategories[filename]) {
+      const grid = doc.querySelector('.portfolio-video-grid');
+      const template = grid?.querySelector('.portfolio-video');
+      if (grid && template) {
+        const wedding = videos.filter(item => galleryCategories[filename].includes(item.category)).sort((a, b) => Number(b.featured) - Number(a.featured));
+        videoVisibility(grid.closest('section'), !!wedding.length);
+        grid.replaceChildren(...wedding.map((item, index) => {
+          const article = template.cloneNode(true);
+          patchVideo(article.querySelector('button'), item);
+          write(article.querySelector('h3'), item.title);
+          write(article.querySelector('.portfolio-video-caption p'), item.category === 'wedding' ? 'Trouwfilm / Aparte reportage' : VIDEO_CATEGORIES[item.category]);
+          write(article.querySelector('.portfolio-video-caption>span'), item.duration || `FILM / ${String(index + 1).padStart(2, '0')}`);
+          return article;
+        }));
+      }
+    }
+  }
   function normalizePayload(payload) {
     if (!plain(payload) || payload.version !== 1 || !Number.isInteger(payload.revision) || payload.revision < 0) return fail();
     const content = payload.content;
@@ -80,7 +257,7 @@
       };
     });
     if (new Set(hero.map(item => item.id)).size !== 12 || !Object.keys(ROUTES).every(key => hero.some(item => item.category === key))) return fail();
-    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleries, hero } };
+    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleries, hero, videos: normalizeVideos(content.videos) } };
   }
   const viewerSource = photo => photo.srcset?.length ? photo.srcset[photo.srcset.length - 1].src : photo.src;
   function setImage(image, item, sizes) {
@@ -226,6 +403,7 @@
         if (image) setImage(image, item.cover, '(max-width:760px) 86vw, 40vw');
       });
     }
+    applyVideos(content.videos, doc, filename);
     doc.documentElement.dataset.cmsRevision = String(payload.revision);
   }
   async function readJSON(response) {
@@ -273,5 +451,5 @@
       return { applied: false, reason: 'fallback' };
     } finally { scope.clearTimeout(timer); }
   }
-  return { imageURL, photo, normalizePayload, applyContent, readJSON, run, ENDPOINT, CMS_ORIGIN };
+  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, readJSON, run, ENDPOINT, CMS_ORIGIN };
 });

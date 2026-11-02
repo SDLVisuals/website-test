@@ -1,6 +1,12 @@
 /* Shared photo and film viewer. No dependencies, no synthetic playback controls. */
 (() => {
   'use strict';
+  const filmURL = (provider, source, autoplay = false) => {
+    if (provider === 'gumlet' && /^[a-f0-9]{24}$/.test(source || '')) return `https://play.gumlet.io/embed/${source}${autoplay ? '?autoplay=true&muted=false' : ''}`;
+    if (provider === 'vimeo' && /^\d{6,15}$/.test(source || '')) return `https://player.vimeo.com/video/${source}${autoplay ? '?autoplay=1&dnt=1' : '?dnt=1'}`;
+    if (provider === 'youtube' && /^[A-Za-z0-9_-]{11}$/.test(source || '')) return `https://www.youtube-nocookie.com/embed/${source}${autoplay ? '?autoplay=1&rel=0' : '?rel=0'}`;
+    return '';
+  };
   const start = () => {
     const triggers = [...document.querySelectorAll('button[data-photo],button[data-video],button[data-video-src]')];
     if (!triggers.length || document.getElementById('work-viewer')) return;
@@ -11,10 +17,11 @@
       const photo = button.dataset.photo;
       const video = button.dataset.video;
       const native = button.dataset.videoSrc;
-      if (!photo && !native && !/^[a-f0-9]{24}$/.test(video || '')) return;
+      const provider = button.dataset.videoProvider || 'gumlet';
+      if (!photo && !native && !filmURL(provider, video)) return;
       const type = photo ? 'photo' : native ? 'native' : 'film';
       const src = photo || native || video;
-      const key = `${type}:${src}`;
+      const key = `${type}:${provider}:${src}`;
       let index = lookup.get(key);
       if (index === undefined) {
         const image = button.querySelector('img');
@@ -22,7 +29,7 @@
         const title = button.dataset.caption || button.dataset.title || image?.alt || (photo ? 'Fotografie · SDL Visuals' : 'Een film van SDL Visuals');
         index = library.length;
         lookup.set(key, index);
-        library.push({ type, src, poster: type === 'photo' ? src : poster, title, alt: image?.alt || title, format: button.dataset.format || 'portrait' });
+        library.push({ type, src, provider, poster: type === 'photo' ? src : poster, title, alt: image?.alt || title, format: button.dataset.format || 'portrait' });
       }
       triggerIndexes.set(button, index);
     });
@@ -164,7 +171,7 @@
       message.className = 'work-viewer-error';
       message.textContent = item.type === 'photo' ? 'Deze foto kon niet worden geladen.' : 'Deze film kon niet worden geladen.';
       const link = document.createElement('a');
-      link.href = item.type === 'film' ? `https://play.gumlet.io/embed/${item.src}` : item.src;
+      link.href = item.type === 'film' ? filmURL(item.provider, item.src) : item.src;
       link.target = '_blank';
       link.rel = 'noopener';
       link.textContent = item.type === 'photo' ? 'Foto apart openen' : 'Film apart openen';
@@ -225,8 +232,9 @@
           video.play().catch(() => {});
         } else {
           const frame = document.createElement('iframe');
-          frame.src = `https://play.gumlet.io/embed/${item.src}?autoplay=true&muted=false`;
+          frame.src = filmURL(item.provider, item.src, true);
           frame.title = item.title;
+          frame.referrerPolicy = 'strict-origin-when-cross-origin';
           frame.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
           frame.allowFullscreen = true;
           videoWrapper.append(frame);
