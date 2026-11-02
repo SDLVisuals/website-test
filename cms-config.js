@@ -2,5 +2,5 @@
 window.SDLCMSConfig = Object.freeze({
   enabled: true,
   endpoint: 'https://sdl-visuals-beheer.sunny-mesa-3330.chatgpt.site/api/public/content',
-  timeoutMs: 2200
+  timeoutMs: 8000
 });

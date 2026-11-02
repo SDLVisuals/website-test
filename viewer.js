@@ -331,7 +331,9 @@
       startThumbnailLoading();
     };
 
-    triggerIndexes.forEach((index, button) => button.addEventListener('click', () => {
+    const open = button => {
+      const index = triggerIndexes.get(button);
+      if (index === undefined) return;
       opener = button;
       const item = library[index];
       const selectedCollection = item.type === 'photo' ? 'photo' : 'film';
@@ -356,7 +358,8 @@
       if (!dialog.open) dialog.showModal();
       show(media.indexOf(item));
       close.focus({ preventScroll: true });
-    }));
+    };
+    triggerIndexes.forEach((_, button) => button.addEventListener('click', () => open(button)));
     close.addEventListener('click', () => dialog.close());
     previous.addEventListener('click', () => show(active - 1));
     next.addEventListener('click', () => show(active + 1));
@@ -456,6 +459,14 @@
     window.visualViewport?.addEventListener('resize', scheduleFit, { passive: true });
     if ('ResizeObserver' in window) new ResizeObserver(scheduleFit).observe(stage);
     strip.addEventListener('scroll', () => { if (!('IntersectionObserver' in window)) startThumbnailLoading(); }, { passive: true });
+    // Open only the requested, published film after the CMS and viewer are ready.
+    if (/\/Video\.html$/i.test(window.location?.pathname || '')) {
+      const requestedFilm = new URLSearchParams(window.location.search).get('film');
+      if (requestedFilm) {
+        const button = triggers.find(trigger => trigger.dataset.videoId === requestedFilm && triggerIndexes.has(trigger) && library[triggerIndexes.get(trigger)].type !== 'photo');
+        if (button) open(button);
+      }
+    }
   };
   // Wait for published photos before capturing slide and viewer elements.
   const startAfterCMS = () => {

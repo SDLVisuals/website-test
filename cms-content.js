@@ -14,7 +14,7 @@
   });
   const GALLERIES = Object.values(ROUTES).map(path => path.slice(0, -5));
   const COMING_SOON_GRADIENTS = ['ruby', 'violet', 'midnight', 'silver'];
-  const COMING_SOON_DEFAULT = [{ id: 'communiefotografie', title: 'Communiefotografie', description: 'Communiefotografie komt binnenkort bij SDL Visuals. Meer informatie volgt.', visible: true, gradient: 'ruby' }];
+  const COMING_SOON_DEFAULT = [{ id: 'communiefotografie', title: 'Communiefotografie', description: 'Communiefotografie komt binnenkort bij SDL Visuals. Meer informatie volgt.', visible: true, gradient: 'ruby', destination: { type: 'contact' } }];
   const MAX_BYTES = 2 * 1024 * 1024;
   const fail = () => { throw new Error('Ongeldige gepubliceerde fotocollectie.'); };
   const plain = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -270,6 +270,16 @@
       if (!plain(value) || typeof value.visible !== 'boolean' || !COMING_SOON_GRADIENTS.includes(value.gradient || 'ruby')) return fail();
       const item = { id: text(value.id, 120), title: text(value.title, 100), description: text(value.description, 600), planning: text(value.planning, 80), visible: value.visible, gradient: value.gradient || 'ruby' };
       if (!/^[A-Za-z0-9_-]+$/.test(item.id) || !item.title.trim()) return fail();
+      if (value.destination !== undefined) {
+        const destination = value.destination;
+        if (!plain(destination) || !['contact', 'gallery', 'video'].includes(destination.type)) return fail();
+        item.destination = { type: destination.type };
+        if (destination.type !== 'contact') {
+          const target = text(destination.target, destination.type === 'gallery' ? 48 : 120);
+          if (!(destination.type === 'gallery' ? /^[a-z][a-z0-9-]{1,47}$/ : /^[A-Za-z0-9_-]+$/).test(target)) return fail();
+          item.destination.target = target;
+        }
+      }
       return item;
     });
     if (new Set(comingSoon.map(item => item.id)).size !== comingSoon.length) return fail();
@@ -424,7 +434,20 @@
     }
     write(doc.querySelector('#fotografie .service-meta'), `${visible.length} ${visible.length === 1 ? 'serie' : 'series'} om te ontdekken`);
   }
-  function applyComingSoon(items, doc) {
+  function comingSoonDestination(item, content = {}) {
+    const fallback = { href: 'contact.html', label: 'Ik heb interesse', kind: 'contact', targetTitle: item.title };
+    const destination = item.destination;
+    if (destination?.type === 'gallery') {
+      const gallery = content.galleries?.find(gallery => gallery.key === destination.target && gallery.photos.length);
+      if (gallery) return { href: gallery.path, label: 'Bekijk de galerij', kind: 'gallery', targetTitle: gallery.title };
+    }
+    if (destination?.type === 'video') {
+      const video = content.videos?.find(video => video.id === destination.target);
+      if (video) return { href: `Video.html?film=${encodeURIComponent(video.id)}`, label: 'Bekijk de film', kind: 'video', targetTitle: video.title };
+    }
+    return fallback;
+  }
+  function applyComingSoon(items, doc, content) {
     const section = doc.querySelector('[data-coming-soon]');
     const grid = section?.querySelector('[data-coming-soon-grid]');
     if (!section || !grid) return;
@@ -433,16 +456,25 @@
     grid.replaceChildren(...visible.map(item => {
       const card = doc.createElement('article'); card.className = `coming-soon-card coming-soon-${item.gradient}`;
       card.dataset.comingSoonId = item.id;
+      const destination = comingSoonDestination(item, content);
+      card.dataset.destinationType = destination.kind;
+      const top = doc.createElement('div'); top.className = 'coming-soon-card-top';
       const label = doc.createElement('p'); label.className = 'coming-soon-label'; label.textContent = 'Binnenkort bij SDL Visuals';
+      top.append(label);
+      if (destination.kind !== 'contact') {
+        const badge = doc.createElement('span'); badge.className = 'coming-soon-badge';
+        badge.textContent = destination.kind === 'gallery' ? 'Fotogalerij' : 'Film'; top.append(badge);
+      }
       const copy = doc.createElement('div'); copy.className = 'coming-soon-copy';
       const title = doc.createElement('h3'); title.textContent = item.title;
       const description = doc.createElement('p'); description.textContent = item.description;
       copy.append(title, description);
       const foot = doc.createElement('div'); foot.className = 'coming-soon-foot';
       const planning = doc.createElement('span'); planning.textContent = item.planning || 'Meer informatie volgt';
-      const action = doc.createElement('a'); action.className = 'coming-soon-action'; action.href = 'contact.html';
-      action.textContent = 'Ik heb interesse'; action.setAttribute('aria-label', `Meer informatie over ${item.title.toLowerCase()}`);
-      foot.append(planning, action); card.append(label, copy, foot); return card;
+      const action = doc.createElement('a'); action.className = 'coming-soon-action'; action.href = destination.href;
+      action.textContent = destination.label;
+      action.setAttribute('aria-label', destination.kind === 'contact' ? `Meer informatie over ${item.title.toLowerCase()}` : `${destination.label}: ${destination.targetTitle}`);
+      foot.append(planning, action); card.append(top, copy, foot); return card;
     }));
   }
   function applyCustomGallery(gallery, doc) {
@@ -533,7 +565,7 @@
       const nextButton = doc.querySelector('[data-showcase-next]');
       if (nextButton) nextButton.setAttribute('aria-label', `Bekijk de volgende foto: ${next.label.toLowerCase()}`);
     }
-    if (isHome) { applyHomeGalleries(content.galleries, doc); applyComingSoon(content.comingSoon || COMING_SOON_DEFAULT, doc); }
+    if (isHome) { applyHomeGalleries(content.galleries, doc); applyComingSoon(content.comingSoon || COMING_SOON_DEFAULT, doc, content); }
     applyVideos(content.videos, doc, filename);
     doc.documentElement.dataset.cmsRevision = String(payload.revision);
   }
@@ -565,7 +597,7 @@
     if (!config?.enabled) return { applied: false, reason: 'disabled' };
     if (config.endpoint !== ENDPOINT) return { applied: false, reason: 'configuration' };
     const controller = new scope.AbortController();
-    const timeoutMs = Math.max(250, Math.min(2500, Number(config.timeoutMs) || 2200));
+    const timeoutMs = Math.max(250, Math.min(10000, Number(config.timeoutMs) || 8000));
     let timer;
     try {
       const deadline = new Promise((_, reject) => {
@@ -582,5 +614,5 @@
       return { applied: false, reason: 'fallback' };
     } finally { scope.clearTimeout(timer); }
   }
-  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, applyComingSoon, readJSON, run, ENDPOINT, CMS_ORIGIN };
+  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, applyComingSoon, comingSoonDestination, readJSON, run, ENDPOINT, CMS_ORIGIN };
 });
