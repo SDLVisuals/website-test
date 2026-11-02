@@ -18,6 +18,22 @@ html.refinement-ready .refine-media{overflow:hidden}
 html.refinement-ready .refine-media>img{transform:translate3d(0,var(--refine-photo-shift,0%),0) scale(var(--refine-photo-scale,1.032));transition:none}
 html.refinement-ready .refine-media.is-refine-media-near>img{will-change:transform}
 
+/* Ease photograph motion inside its stationary frame; hero images keep their own controller. */
+html.refinement-ready.home-motion-enhanced .home-page [data-home-media] img{
+ transform:translate3d(0,var(--home-media-shift,0%),0) scale(var(--home-media-scale,1.038));
+ transition:none;
+}
+/* A short sheen makes the primary action respond without adding icons or moving its text. */
+html.refinement-ready .clarity-action{position:relative;isolation:isolate;overflow:hidden}
+html.refinement-ready .clarity-action::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 20%,#ffffff30 48%,transparent 76%);transform:translateX(-125%);transition:transform .75s cubic-bezier(.2,.7,.2,1)}
+html.refinement-ready .home-play{position:relative}
+html.refinement-ready .home-play::after{content:'';position:absolute;inset:-7px;border:1px solid #ffffff80;border-radius:inherit;opacity:0;pointer-events:none}
+@media(hover:hover) and (pointer:fine){
+ html.refinement-ready .clarity-action:hover::before,html.refinement-ready .clarity-action:focus-visible::before{transform:translateX(125%)}
+ html.refinement-ready .home-film-button:hover .home-play::after,html.refinement-ready .home-film-button:focus-visible .home-play::after{animation:refine-play-ring .9s ease-out both}
+}
+@keyframes refine-play-ring{from{opacity:.65;transform:scale(.88)}to{opacity:0;transform:scale(1.18)}}
+
 /* A frame responds to an actual pointer, without changing its layout or moving its caption. */
 html.refinement-ready .refine-lift{translate:0 0;scale:1;transition:translate .45s cubic-bezier(.2,.7,.2,1),scale .2s ease,box-shadow .35s,border-color .3s}
 @media(hover:hover) and (pointer:fine){
@@ -59,5 +75,8 @@ html.refinement-ready .gallery-collections-dialog[open]:not(.is-closing) .galler
  html.refinement-ready .work-viewer[open]::backdrop,
  html.refinement-ready .ig-viewer[open]::backdrop,
  html.refinement-ready .gallery-collections-dialog[open]:not(.is-closing) .gallery-collections-panel{animation:none}
+ html.refinement-ready.home-motion-enhanced .home-page [data-home-media] img{transform:none!important;clip-path:none!important;will-change:auto}
+ html.refinement-ready .clarity-action::before{display:none;transition:none}
+ html.refinement-ready .home-play::after{display:none;animation:none}
  .is-refine-entering{will-change:auto}
 }

@@ -6,9 +6,9 @@
     if (root.classList.contains('refinement-ready')) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-    const cards = '.home-work-card,.home-film-main,.home-film-small,.home-drone-media,.home-about-photo,.portfolio-gallery>figure,.portfolio-video,.film-featured,.film-project,.film-service,.gear-opening-photo,.gear-detail-photo,.gear-camera,.gear-tool,.gear-drone,.drone-film-card,.drone-equipment,.ig-card';
-    const blocks = '.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading';
-    const liftTargets = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media';
+    const cards = '.home-work-card,.home-film-main,.home-film-small,.home-drone-media,.home-about-photo,.portfolio-gallery>figure,.portfolio-video,.film-featured,.film-project,.film-service,.gear-opening-photo,.gear-detail-photo,.gear-camera,.gear-tool,.gear-drone,.drone-film-card,.drone-equipment,.ig-card,.service-directory nav>a';
+    const blocks = '.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading,.home-film-foot,.collection-browser';
+    const liftTargets = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media,.clarity-action,.home-work-open';
     // Home photo movement and full-photo viewers already have dedicated controllers.
     const mediaTargets = '.collection-hero-media,.film-project--portrait .film-project-play,.portfolio-feature:not([data-photo])';
     const registered = new Set();
@@ -38,7 +38,7 @@
       if (reduced.matches || document.hidden || typeof element.animate !== 'function' || element.contains(document.activeElement)) return;
       const card = element.dataset.refineReveal === 'card';
       const siblings = [...element.parentElement.children].filter(sibling => sibling.hasAttribute('data-refine-reveal'));
-      const delay = card ? Math.min(Math.max(0, siblings.indexOf(element)) % 3 * 55, 110) : 0;
+      const delay = card ? Math.min(Math.max(0, siblings.indexOf(element)) % 3 * 85, 170) : 0;
       const offset = innerWidth <= 760 ? 12 : 20;
       // Text fades as one intact block. Only complete cards settle into position.
       const keyframes = card
@@ -46,7 +46,7 @@
         : [{ opacity: .3 }, { opacity: 1 }];
       element.classList.add('is-refine-entering');
       const animation = element.animate(keyframes, {
-        duration: card ? 850 : 650, delay, easing: 'cubic-bezier(.19,.75,.24,1)', fill: 'none'
+        duration: card ? 980 : 700, delay, easing: 'cubic-bezier(.19,.75,.24,1)', fill: 'none'
       });
       animations.set(element, animation);
       const finish = () => {
@@ -170,6 +170,12 @@
     });
     listen(reduced, () => { clearHover(); clearPress(); setupObservers(); });
     listen(finePointer, clearHover);
+    // The content editor may replace a series after the initial page load.
+    document.addEventListener('sdl:content-updated', () => {
+      registered.forEach(element => { if (!element.isConnected) { cancelEntry(element); registered.delete(element); } });
+      media.forEach((_, wrapper) => { if (!wrapper.isConnected) { mediaObserver?.unobserve(wrapper); nearbyMedia.delete(wrapper); media.delete(wrapper); } });
+      register(document); schedule();
+    });
     // The optional feed arrives after page load. Observe only that small subtree.
     const instagram = document.querySelector('#instagram');
     if (instagram && 'MutationObserver' in window) {

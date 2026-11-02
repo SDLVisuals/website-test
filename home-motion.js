@@ -7,12 +7,15 @@
     if (!body.classList.contains('home-page')) return;
     const hero = document.querySelector('.showcase-hero,.home-hero');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const frames = [...document.querySelectorAll('.home-work-image,.home-film-button,.home-about-photo')];
+    const photoSelector = '.home-work-image,.home-film-button,.home-about-photo';
+    const frames = [...document.querySelectorAll(photoSelector)];
+    const photoStates = new Map();
     const scenes = [];
     const clamp = (value,min,max) => Math.min(max,Math.max(min,value));
     let tick = 0;
     let introTimer = 0;
     let observer;
+    let targetsDirty = true, lastPaint = 0;
 
     /* Native horizontal browsing on phones; the full grid remains on desktop. */
     const collectionRail = document.querySelector('.home-work-ordered');
@@ -81,27 +84,59 @@
       body.classList.remove('home-intro-running');
       hero?.dispatchEvent(new Event('home:intro-complete'));
     };
-    const paint = () => {
-      tick = 0;
-      if (reduced.matches) return;
-      const height = innerHeight;
-      frames.forEach(frame => {
-        const bounds = frame.getBoundingClientRect();
-        const near = bounds.bottom > -100 && bounds.top < height+100;
+    const measure = () => {
+      targetsDirty = false;
+      const height = innerHeight, mobile = innerWidth <= 760;
+      // Read the whole scene before changing styles; horizontal cards outside the viewport can rest.
+      const measurements = frames.map(frame => ({frame,bounds:frame.getBoundingClientRect()}));
+      measurements.forEach(({frame,bounds}) => {
+        const near = bounds.bottom > -100 && bounds.top < height+100 && bounds.right > -80 && bounds.left < innerWidth+80;
         frame.classList.toggle('is-media-near',near);
+        let state = photoStates.get(frame);
+        if (!state) { state = {ready:false}; photoStates.set(frame,state); }
+        state.near = near;
         if (!near) return;
-        /* The mask opens as a photo enters; its gentle zoom settles as it passes. */
         const reveal = clamp((height*.95-bounds.top)/(height*.62),0,1);
         const passage = clamp((height-bounds.top)/(height+bounds.height),0,1);
-        frame.style.setProperty('--home-media-scale',(1.085-passage*.085).toFixed(4));
-        frame.style.setProperty('--home-media-inset',`${((1-reveal)*11).toFixed(2)}%`);
+        state.targetScale = (mobile ? 1.038 : 1.065)-passage*(mobile ? .012 : .025);
+        state.targetShift = (passage-.5)*(mobile ? 1.1 : 2.6);
+        state.targetInset = (1-reveal)*(mobile ? 5 : 8);
+        if (!state.ready) {
+          state.scale = state.targetScale; state.shift = state.targetShift; state.inset = state.targetInset;
+          state.ready = true;
+        }
       });
       if (hero) {
         const bounds = hero.getBoundingClientRect();
         hero.style.setProperty('--showcase-scroll',clamp(-bounds.top/Math.max(bounds.height,1),0,1).toFixed(4));
       }
     };
+    const paint = now => {
+      tick = 0;
+      if (reduced.matches || document.hidden) { lastPaint = 0; return; }
+      if (targetsDirty) measure();
+      const time = Number.isFinite(now) ? now : performance.now();
+      const delta = lastPaint ? Math.min(64,time-lastPaint) : 16;
+      lastPaint = time;
+      const ease = 1-Math.exp(-delta/85);
+      let settling = false;
+      photoStates.forEach((state,frame) => {
+        if (!state.near) return;
+        state.scale += (state.targetScale-state.scale)*ease;
+        state.shift += (state.targetShift-state.shift)*ease;
+        state.inset += (state.targetInset-state.inset)*ease;
+        const moving = Math.abs(state.targetScale-state.scale)>.0002 || Math.abs(state.targetShift-state.shift)>.008 || Math.abs(state.targetInset-state.inset)>.015;
+        if (!moving) { state.scale=state.targetScale; state.shift=state.targetShift; state.inset=state.targetInset; }
+        settling ||= moving;
+        frame.style.setProperty('--home-media-scale',state.scale.toFixed(4));
+        frame.style.setProperty('--home-media-shift',`${state.shift.toFixed(3)}%`);
+        frame.style.setProperty('--home-media-inset',`${state.inset.toFixed(2)}%`);
+      });
+      if (settling) tick = requestAnimationFrame(paint);
+      else lastPaint = 0;
+    };
     const schedule = () => {
+      targetsDirty = true;
       if (!tick && !document.hidden && !reduced.matches) tick = requestAnimationFrame(paint);
     };
     const show = element => {
@@ -117,6 +152,7 @@
         if (reduced.matches) {
           frame.style.removeProperty('--home-media-scale');
           frame.style.removeProperty('--home-media-inset');
+          frame.style.removeProperty('--home-media-shift');
           frame.classList.remove('is-media-near');
         }
       });
@@ -132,11 +168,11 @@
       }
       if (reduced.matches) {
         if (tick) cancelAnimationFrame(tick);
-        tick = 0;
+        tick = 0; lastPaint = 0; photoStates.clear();
         hero?.style.removeProperty('--showcase-scroll');
         clearTimeout(introTimer);
         completeIntro();
-      } else paint();
+      } else { targetsDirty = true; paint(); }
     };
 
     applyPreference();
@@ -146,8 +182,21 @@
     } else completeIntro();
     addEventListener('scroll',schedule,{passive:true});
     addEventListener('resize',schedule,{passive:true});
+    collectionRail?.addEventListener('scroll',schedule,{passive:true});
     addEventListener('pageshow',schedule);
     document.addEventListener('visibilitychange',schedule);
+    document.addEventListener('sdl:content-updated',() => {
+      for (let index=frames.length-1;index>=0;index--) {
+        if (!frames[index].isConnected) { photoStates.delete(frames[index]); frames.splice(index,1); }
+      }
+      document.querySelectorAll(photoSelector).forEach(frame => {
+        if (!frames.includes(frame)) {
+          frames.push(frame); frame.toggleAttribute('data-home-media',!reduced.matches);
+          frame.querySelector('img')?.addEventListener('load',schedule,{once:true});
+        }
+      });
+      schedule();
+    });
     /* Keyboard navigation must never land on an unrevealed link. */
     document.addEventListener('focusin',event => {
       const scene = event.target.closest?.('[data-scroll-scene]');
