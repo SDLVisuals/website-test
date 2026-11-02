@@ -106,6 +106,7 @@
     let focused = false, visible = true, keyboardNavigation = false;
     let introPending = !reduce.matches;
     let moving = false, pending = null, preparing = null, drag = null, suppressUntil = 0;
+    let fadeLayer = null, fadeAnimation = null;
     let presented = -1, presentationManual = false;
     let frame = 0, fallback = 0, autoTimer = 0, deadline = 0, remaining = interval;
     const unavailable = new Set();
@@ -243,9 +244,17 @@
       if (counter) counter.textContent = `${String(active+1).padStart(2,'0')} / ${String(count).padStart(2,'0')}`;
       if (manual) status.textContent = `${active+1} van ${count}. ${labels[active]}.`;
     };
+    const clearFade = () => {
+      const animation = fadeAnimation;
+      fadeAnimation = null;
+      if (animation) { animation.onfinish = null; animation.cancel(); }
+      fadeLayer?.remove(); fadeLayer = null;
+      hero.classList.remove('is-photo-dissolving');
+    };
     const finish = () => {
       clearTimeout(fallback);
       if (!moving) return;
+      clearFade();
       if (physical === 0) { physical = count; position(true); }
       else if (physical === count+1) { physical = 1; position(true); }
       moving = false;
@@ -256,7 +265,26 @@
       if (next) go(next.index,next.manual,next.direction);
       else sync();
     };
-    const beginMove = (immediate = false) => {
+    const beginMove = (immediate = false, outgoing = null) => {
+      clearFade();
+      // Automatic mobile changes dissolve only photographs, not text or controls.
+      // The old decoded frame stays above the new one until the fade is complete.
+      const dissolve = mobilePhoto.matches && !reduce.matches && !immediate && outgoing !== null && typeof slides[outgoing].animate === 'function';
+      if (dissolve) {
+        fadeLayer = clone(slides[outgoing],outgoing);
+        fadeLayer.removeAttribute('data-home-clone');
+        fadeLayer.classList.remove('home-slide-clone');
+        fadeLayer.classList.add('home-slide-transition');
+        fadeLayer.querySelectorAll('img').forEach(image => { image.loading = 'eager'; });
+        viewport.append(fadeLayer);
+        hero.classList.add('is-photo-dissolving');
+        moving = true; track.classList.remove('is-moving');
+        position(true); sync();
+        fadeAnimation = fadeLayer.animate([{opacity:1},{opacity:0}],{duration:1050,easing:'cubic-bezier(.3,0,.2,1)',fill:'forwards'});
+        fadeAnimation.onfinish = finish;
+        fallback = setTimeout(finish,1200);
+        return;
+      }
       moving = !reduce.matches && !immediate;
       track.classList.toggle('is-moving',moving);
       position(reduce.matches || immediate);
@@ -292,14 +320,16 @@
       let nextPhysical = index+1;
       if (active === count-1 && index === 0 && direction >= 0) nextPhysical = count+1;
       if (active === 0 && index === count-1 && direction <= 0) nextPhysical = 0;
+      const outgoing = active;
       active = index;
       physical = nextPhysical;
       elapsed = 0; photoElapsed = photoClocks[index];
       presentationManual = manual;
       mark();
       const jump = manual && direction === 0 && steps > 1;
-      beginMove(skipBrokenFrames || jump);
-      if (jump && !reduce.matches) track.animate([{opacity:.3},{opacity:1}],{duration:650,easing:'ease-out'});
+      const dissolve = mobilePhoto.matches && (!manual || direction === 0);
+      beginMove(skipBrokenFrames || (jump && !dissolve),dissolve ? outgoing : null);
+      if (jump && !dissolve && !reduce.matches) track.animate([{opacity:.3},{opacity:1}],{duration:650,easing:'ease-out'});
     };
     hero.addEventListener('home:intro-complete',() => { introPending = false; sync(); });
     setTimeout(() => { if (introPending) { introPending = false; sync(); } },2200);
@@ -388,10 +418,11 @@
     window.addEventListener('pointerup',event => endDrag(event));
     window.addEventListener('pointercancel',event => endDrag(event,true));
     hero.addEventListener('click',event => {
-      if (viewport.contains(event.target) && performance.now()<suppressUntil) { event.preventDefault(); event.stopImmediatePropagation(); }
+      if (viewport.contains(event.target) && (fadeLayer || performance.now()<suppressUntil)) { event.preventDefault(); event.stopImmediatePropagation(); }
     },true);
     const recover = () => {
       drag = null; pending = null; preparing = null; moving = false;
+      clearFade();
       clearTimeout(fallback);
       physical = active+1;
       track.classList.remove('is-dragging','is-moving');
@@ -407,7 +438,7 @@
     new MutationObserver(records => {
       if (records.some(record => record.type === 'attributes' || [...record.addedNodes,...record.removedNodes].some(node => node.nodeType === 1 && (node.matches('dialog') || node.querySelector('dialog'))))) sync();
     }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['open']});
-    window.addEventListener('pagehide',() => { stopAuto(); stopClock(); });
+    window.addEventListener('pagehide',() => { stopAuto(); stopClock(); clearFade(); });
     window.addEventListener('pageshow',() => { introPending = false; recover(); });
     window.addEventListener('focus',() => { if (drag) recover(); else sync(); });
     reduce.addEventListener('change',() => { if (moving) finish(); sync(); });
@@ -416,7 +447,7 @@
       const width = viewport.clientWidth;
       if (Math.abs(width-measuredWidth) < 1) return;
       measuredWidth = width;
-      clearTimeout(fallback); moving = false; pending = null; preparing = null; drag = null;
+      clearTimeout(fallback); clearFade(); moving = false; pending = null; preparing = null; drag = null;
       physical = active+1;
       track.classList.remove('is-dragging','is-moving'); hero.classList.remove('is-hero-dragging');
       position(true); present(presentationManual); revealControl(); warmNeighbours(); sync();
@@ -438,7 +469,7 @@
       if (active === index) {
         const next = nextAvailable(index);
         if (next !== null) {
-          clearTimeout(fallback); moving = false; pending = null;
+          clearTimeout(fallback); clearFade(); moving = false; pending = null;
           track.classList.remove('is-moving');
           go(next,false,1);
         } else {

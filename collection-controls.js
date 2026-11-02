@@ -5,7 +5,7 @@
     const controls = document.querySelector('[data-collection-browser]');
     const rail = document.querySelector('.home-work-ordered');
     if (!controls || !rail || controls.dataset.collectionReady === 'true') return;
-    const cards = [...rail.querySelectorAll('.home-work-card')];
+    let cards = [...rail.querySelectorAll('.home-work-card')];
     const choices = controls.querySelector('[data-collection-choices]');
     const name = controls.querySelector('[data-collection-name]');
     const position = controls.querySelector('[data-collection-position]');
@@ -13,10 +13,14 @@
     const next = controls.querySelector('[data-collection-next]');
     if (!cards.length || !choices || !name || !position || !previous || !next) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const names = cards.map((card, index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
+    let names = cards.map((card, index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
+    const anchor = document.createElement('div');
+    anchor.className = 'collection-browser-anchor';
+    anchor.setAttribute('aria-hidden','true');
+    controls.before(anchor);
     let selected = -1, requested = null, frame = 0, settleTimer = 0;
     const clamp = index => Math.max(0, Math.min(cards.length - 1, index));
-    const buttons = cards.map((card, index) => {
+    const createChoices = () => cards.map((card, index) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'collection-choice';
@@ -28,18 +32,41 @@
       button.title = names[index];
       return button;
     });
+    let buttons = createChoices();
     choices.replaceChildren(...buttons);
     const edges = () => {
       const current = requested ?? Math.max(0, selected);
       previous.disabled = current === 0;
       next.disabled = current === cards.length - 1;
     };
+    const dock = scrolling => {
+      const bounds = rail.getBoundingClientRect();
+      const height = window.visualViewport?.height || innerHeight;
+      const floating = controls.classList.contains('is-floating');
+      const original = (floating ? anchor : controls).getBoundingClientRect();
+      const blocked = document.body.classList.contains('menu-open') || !!document.querySelector('dialog[open]');
+      // Keep the controls beside the visible photographs, not a whole card below.
+      // A spacer keeps the document still when the dock attaches to the viewport.
+      // Position changes keep the same buttons in the DOM, so a selected/focused
+      // button can safely travel with the dock while the visitor scrolls back.
+      const shouldFloat = scrolling && innerWidth <= 760 && !blocked &&
+        bounds.top < height * .62 && bounds.bottom > 140 && original.top > height - 132;
+      if (shouldFloat === floating) return;
+      if (shouldFloat) {
+        anchor.style.height = `${controls.offsetHeight + 5}px`;
+        anchor.classList.add('is-reserved');
+      } else {
+        anchor.classList.remove('is-reserved');
+        anchor.style.height = '';
+      }
+      controls.classList.toggle('is-floating',shouldFloat);
+    };
     const sync = () => {
       frame = 0;
       const maximum = Math.max(0, rail.scrollWidth - rail.clientWidth);
       const scrolling = maximum > 3 && /auto|scroll/.test(getComputedStyle(rail).overflowX);
       controls.hidden = !scrolling;
-      if (!scrolling) { requested = null; return; }
+      if (!scrolling) { requested = null; dock(false); return; }
       const padding = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
       const start = rail.getBoundingClientRect().left + padding;
       let closest = 0, distance = Infinity;
@@ -53,8 +80,11 @@
         name.textContent = names[selected];
         position.textContent = `Serie ${selected + 1} van ${cards.length}`;
         buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === selected)));
+        const button = buttons[selected];
+        choices.scrollTo?.({left:Math.max(0,button.offsetLeft - (choices.clientWidth-button.offsetWidth)/2),behavior:reduced.matches?'auto':'smooth'});
       }
       edges();
+      dock(true);
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(sync); };
     const release = () => { clearTimeout(settleTimer); requested = null; schedule(); };
@@ -92,6 +122,20 @@
     rail.addEventListener('pointerdown', release, { passive: true });
     rail.addEventListener('wheel', release, { passive: true });
     addEventListener('resize', release, { passive: true });
+    addEventListener('scroll', schedule, { passive: true });
+    window.visualViewport?.addEventListener('resize',schedule,{passive:true});
+    document.addEventListener('focusin',schedule);
+    if ('MutationObserver' in window) {
+      new MutationObserver(schedule).observe(document.body,{attributes:true,attributeFilter:['class']});
+      new MutationObserver(records => { if (records.some(record => record.type === 'attributes' || [...record.addedNodes,...record.removedNodes].some(node => node.nodeType === 1 && (node.matches('dialog') || node.querySelector('dialog'))))) schedule(); }).observe(document.body,{attributes:true,attributeFilter:['open'],subtree:true,childList:true});
+    }
+    document.addEventListener('sdl:content-updated',() => {
+      cards = [...rail.querySelectorAll('.home-work-card')];
+      if (!cards.length) { controls.hidden = true; dock(false); return; }
+      names = cards.map((card,index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
+      buttons = createChoices(); choices.replaceChildren(...buttons);
+      selected = -1; requested = null; schedule();
+    });
     addEventListener('pageshow', schedule);
     if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(rail);
     controls.dataset.collectionReady = 'true';

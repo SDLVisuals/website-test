@@ -98,6 +98,15 @@
       || videos.filter(item => item.showOnHome && (item.category !== 'drone' || item.featured)).length > 4) return fail();
     return videos;
   }
+  function normalizeAbout(value) {
+    // Older publications keep the complete authored fallback on the homepage.
+    if (value === undefined) return undefined;
+    if (!plain(value) || !Array.isArray(value.photos) || value.photos.length > 8
+      || typeof value.title !== 'string' || typeof value.eyebrow !== 'string' || typeof value.body !== 'string') return fail();
+    const result = { eyebrow: text(value.eyebrow, 100), title: text(value.title, 120), body: text(value.body, 2500), photos: value.photos.map(photo) };
+    if (!result.title.trim() || new Set(result.photos.map(item => item.id)).size !== result.photos.length) return fail();
+    return result;
+  }
   function write(node, value) { if (node) node.textContent = value; }
   function videoVisibility(node, visible) {
     node.hidden = !visible;
@@ -311,7 +320,8 @@
     // A v2 publication exposes films only when an actual published album references them.
     const publicVideoIds = new Set(galleries.filter(item => item.stage === 'published').flatMap(item => item.videoIds));
     const publicVideos = unified && videos ? videos.filter(item => publicVideoIds.has(item.id)) : videos;
-    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleryModel: unified ? 2 : undefined, galleries, hero, videos: publicVideos, comingSoon } };
+    const about = normalizeAbout(content.about);
+    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleryModel: unified ? 2 : undefined, galleries, hero, videos: publicVideos, comingSoon, ...(about === undefined ? {} : { about }) } };
   }
   const viewerSource = photo => photo.srcset?.length ? photo.srcset[photo.srcset.length - 1].src : photo.src;
   function setImage(image, item, sizes) {
@@ -329,6 +339,43 @@
       image.removeAttribute('srcset');
       image.removeAttribute('sizes');
     }
+  }
+  function makeAboutPhotos(doc, photos) {
+    const fragment = doc.createDocumentFragment();
+    photos.forEach((item, index) => {
+      const figure = doc.createElement('figure');
+      figure.className = 'about-story-frame';
+      const button = doc.createElement('button');
+      button.type = 'button'; button.className = 'about-story-photo';
+      button.dataset.photo = viewerSource(item);
+      button.dataset.photoCollection = 'about';
+      button.dataset.caption = item.caption || item.alt;
+      button.setAttribute('aria-label', `Vergroot foto over mij: ${item.caption || item.alt || index + 1}`);
+      const image = doc.createElement('img'); image.loading = 'lazy';
+      setImage(image, item, '(max-width:760px) 88vw, 40vw');
+      const hint = doc.createElement('span'); hint.className = 'about-story-photo-hint'; hint.textContent = 'Bekijk foto'; hint.setAttribute('aria-hidden', 'true');
+      button.append(image, hint);
+      const caption = doc.createElement('figcaption'); caption.textContent = item.caption;
+      caption.hidden = !item.caption;
+      figure.append(button, caption); fragment.append(figure);
+    });
+    return fragment;
+  }
+  function applyAbout(about, doc) {
+    const section = doc.querySelector('[data-about-story]');
+    if (!about || !section) return;
+    const track = section.querySelector('[data-about-photos]');
+    const fragment = track ? makeAboutPhotos(doc, about.photos) : null;
+    write(section.querySelector('[data-about-eyebrow]'), about.eyebrow);
+    write(section.querySelector('[data-about-title]'), about.title);
+    write(section.querySelector('[data-about-body]'), about.body);
+    if (track) track.replaceChildren(fragment);
+    section.classList.toggle('about-story-text-only', !about.photos.length);
+    const visual = section.querySelector('[data-about-visual]');
+    if (visual) visual.hidden = !about.photos.length;
+    const controls = section.querySelector('[data-about-controls]');
+    if (controls) controls.hidden = about.photos.length < 2;
+    write(section.querySelector('[data-about-count]'), `${about.photos.length ? '01' : '00'} / ${String(about.photos.length).padStart(2, '0')}`);
   }
   function makeGallery(doc, gallery) {
     const fragment = doc.createDocumentFragment();
@@ -717,6 +764,7 @@
     }
     if (isHome) {
       applyHomeGalleries(content.galleries, doc);
+      applyAbout(content.about, doc);
       if (content.galleryModel === 2) applyUpcomingGalleries(content, doc);
       else applyComingSoon(content.comingSoon || COMING_SOON_DEFAULT, doc, content);
     }
@@ -789,5 +837,5 @@
       return { applied: false, reason: 'fallback' };
     } finally { scope.clearTimeout(timer); }
   }
-  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, applyComingSoon, comingSoonDestination, navigationData, readJSON, run, ENDPOINT, CMS_ORIGIN };
+  return { imageURL, photo, videoSource, normalizeVideos, normalizeAbout, normalizePayload, applyContent, applyAbout, applyVideos, applyComingSoon, comingSoonDestination, navigationData, readJSON, run, ENDPOINT, CMS_ORIGIN };
 });

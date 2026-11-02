@@ -35,7 +35,8 @@
       const type = photo ? 'photo' : native ? 'native' : 'film';
       const src = photo || native || video;
       const homeSlide = photo && button.closest('[data-home-slide]');
-      const key = homeSlide ? `home-photo:${homeSlide.dataset.homeSlide}` : `${type}:${provider}:${src}`;
+      const photoCollection = photo && button.dataset.photoCollection === 'about' ? 'about' : '';
+      const key = homeSlide ? `home-photo:${homeSlide.dataset.homeSlide}` : `${type}:${photoCollection}:${provider}:${src}`;
       let index = lookup.get(key);
       if (index === undefined) {
         const image = button.querySelector('img');
@@ -43,7 +44,7 @@
         const title = button.dataset.caption || button.dataset.title || image?.alt || (photo ? 'Fotografie · SDL Visuals' : 'Een film van SDL Visuals');
         index = library.length;
         lookup.set(key, index);
-        library.push({ type, src, provider, poster, thumbnail: thumbnailSource(image, poster || src), title, alt: image?.alt || title, format: button.dataset.format || 'portrait', variants: homeSlide ? [] : null });
+        library.push({ type, src, provider, poster, photoCollection, thumbnail: thumbnailSource(image, poster || src), title, alt: image?.alt || title, format: button.dataset.format || 'portrait', variants: homeSlide ? [] : null });
       }
       if (homeSlide) library[index].variants.push(photoVariant(button));
       triggerIndexes.set(button, index);
@@ -51,7 +52,8 @@
     if (!library.length) return;
     // Keep browsing inside the kind of work the visitor opened.
     const collections = {
-      photo: library.filter(item => item.type === 'photo'),
+      photo: library.filter(item => item.type === 'photo' && item.photoCollection !== 'about'),
+      about: library.filter(item => item.type === 'photo' && item.photoCollection === 'about'),
       film: library.filter(item => item.type !== 'photo')
     };
     let media = [];
@@ -336,8 +338,8 @@
       if (index === undefined) return;
       opener = button;
       const item = library[index];
-      const selectedCollection = item.type === 'photo' ? 'photo' : 'film';
-      if (selectedCollection === 'photo') {
+      const selectedCollection = item.type === 'photo' ? item.photoCollection || 'photo' : 'film';
+      if (item.type === 'photo') {
         clearWarmPhotos();
         collections.photo.forEach(photo => {
           if (!photo.variants) return;
@@ -347,12 +349,12 @@
           Object.assign(photo, { src: variant.src, thumbnail: variant.thumbnail, poster: variant.thumbnail, title: variant.title, alt: variant.alt, format: variant.format });
         });
       } else clearWarmPhotos();
-      if (collection !== selectedCollection || selectedCollection === 'photo') {
+      if (collection !== selectedCollection || item.type === 'photo') {
         collection = selectedCollection;
         media = collections[collection];
-        dialog.dataset.mediaType = collection;
+        dialog.dataset.mediaType = item.type === 'photo' ? 'photo' : 'film';
         dialog.classList.toggle('is-single-item', media.length === 1);
-        strip.setAttribute('aria-label', collection === 'photo' ? 'Fotogalerij' : 'Filmselectie');
+        strip.setAttribute('aria-label', collection === 'about' ? 'Foto’s over mij' : collection === 'photo' ? 'Fotogalerij' : 'Filmselectie');
         buildThumbnails();
       }
       if (!dialog.open) dialog.showModal();

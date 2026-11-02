@@ -1,0 +1,37 @@
+/* A personal story, edited in Studio. Photographs stay in a native swipe rail. */
+.home-page .home-about.about-story{grid-template-columns:minmax(0,.92fr) minmax(0,1fr);gap:clamp(34px,6vw,88px);align-items:center}
+.about-story [hidden]{display:none!important}
+.about-story-visual{min-width:0;position:relative}
+.about-story-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;scroll-padding:0;isolation:isolate}
+.about-story-track::-webkit-scrollbar{display:none}
+.about-story-frame{flex:0 0 100%;min-width:0;margin:0;scroll-snap-align:start;scroll-snap-stop:normal}
+.about-story-photo{display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:32px;overflow:hidden;position:relative;aspect-ratio:4/5;background:var(--soft);cursor:zoom-in;isolation:isolate;touch-action:pan-x pan-y}
+.about-story-photo img{display:block;width:100%;height:100%;object-fit:cover;transform:none;opacity:1;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.about-story-photo::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 1px 0 #ffffff45,inset 0 0 0 1px #ffffff10;background:linear-gradient(180deg,transparent 70%,#00000025)}
+.about-story-photo-hint{position:absolute;right:19px;bottom:19px;z-index:1;padding:11px 16px;min-height:42px;display:flex;align-items:center;border:1px solid #ffffff59;border-radius:14px;color:white;font-size:11px;font-weight:500;background:#22222655;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 #ffffff38;pointer-events:none}
+.about-story-frame figcaption{padding:12px 4px 0;color:var(--muted);font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+.about-story-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:16px 0 0;padding:8px 9px 8px 18px;border:1px solid var(--line);border-radius:21px;background:var(--glass);box-shadow:inset 0 1px 0 var(--border-lit);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.about-story-count{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.about-story-navigation{display:flex;gap:3px}
+.about-story-navigation button{min-height:44px;min-width:61px;padding:9px 12px;border:0;border-radius:13px;background:transparent;color:var(--ink);font:500 11px 'DM Sans',sans-serif;cursor:pointer;transition:background-color .2s,opacity .2s}
+.about-story-navigation button:disabled{opacity:.3;cursor:default}
+.about-story-navigation button:not(:disabled):hover{background:var(--soft)}
+.about-story-photo:focus-visible,.about-story-navigation button:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+.home-page .about-story-copy{padding:clamp(26px,3.5vw,52px);border-radius:34px;border:1px solid var(--line);background:linear-gradient(135deg,var(--border-lit),transparent 60%),var(--glass);box-shadow:inset 0 1px 0 var(--border-lit),0 16px 45px #00000008;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);min-width:0}
+.home-page .about-story h2{white-space:pre-line;font-size:clamp(35px,3.8vw,56px);line-height:1.12;margin:22px 0;overflow-wrap:anywhere}
+.about-story-body{white-space:pre-line;font-size:15px;line-height:1.9;max-width:46ch;color:var(--muted);overflow-wrap:anywhere}
+.about-story-copy .clarity-action{margin-top:28px}
+.home-page .about-story-text-only{grid-template-columns:1fr}
+.about-story-text-only .about-story-copy{max-width:800px;margin-inline:auto;width:100%}
+@media(hover:hover) and (pointer:fine){.about-story-photo:hover img{transform:scale(1.025)}}
+@media(max-width:760px){
+ .home-page .home-about.about-story{grid-template-columns:1fr;gap:23px}
+ .home-page .about-story-copy{padding:28px 25px;border-radius:28px;order:-1}
+ .home-page .about-story h2{font-size:clamp(33px,8.7vw,43px);margin:18px 0}
+ .about-story-body{font-size:14px;line-height:1.85}
+ .about-story-copy .clarity-action{margin-top:24px}
+ .about-story-photo{border-radius:28px}
+ .about-story-photo{aspect-ratio:4/5}
+ .about-story-controls{margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){.about-story-photo img,.about-story-navigation button{transition:none}.about-story-photo:hover img{transform:none}.about-story-track{scroll-behavior:auto}}
