@@ -1,0 +1,52 @@
+/* Video collections have the same clear place as photography on the homepage. */
+.home-page .home-video-gallery-first .home-heading{margin-bottom:38px}
+.home-page .home-video-gallery-first .home-film-intro{max-width:410px}
+.home-page .home-video-gallery-first .home-film-intro .clarity-action{margin-top:8px}
+.home-page .home-video-collections{padding-top:0;margin-top:0;border-top:0}
+.home-page .home-video-collections .album-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.home-page .home-video-collections .album-card{padding:10px;border:1px solid var(--line);border-radius:32px;background:var(--glass);box-shadow:inset 0 1px 0 var(--border-lit);transition:border-color .3s,box-shadow .3s}
+.home-page .home-video-collections .album-card-image{aspect-ratio:1.55;border-radius:24px;border:0;outline:1px solid var(--line);outline-offset:-1px}
+.home-page .home-video-collections .album-card-type{font-size:10px;left:18px;top:18px}
+.home-page .home-video-collections .album-card-copy{position:relative;padding:23px 16px 18px}
+.home-page .home-video-collections .album-card-copy h3{font-size:clamp(25px,2.4vw,34px);font-weight:500;line-height:1.2;letter-spacing:-.045em;margin:0 0 9px}
+.home-page .home-video-collections .album-card-count{font-size:11px;margin:0 0 14px}
+.home-page .home-video-collections .album-card-copy>p{font-size:13px;line-height:1.75;max-width:43ch;min-height:23px}
+.home-page .home-video-collections .album-card-action{min-height:44px;margin-top:22px;padding:12px 18px;font-size:12px}
+.home-video-swipe-hint{display:none}
+.home-page .home-video-featured{display:grid;grid-template-columns:minmax(220px,.45fr) minmax(0,1fr);align-items:start;gap:clamp(30px,5vw,80px);padding-top:64px;margin-top:72px;border-top:1px solid var(--line)}
+.home-video-featured-heading{padding-top:12px;min-width:0}
+.home-video-featured-heading h3{font:500 clamp(29px,3vw,43px)/1.12 'Manrope',sans-serif;letter-spacing:-.055em;margin:18px 0 22px}
+.home-video-featured-heading>p:last-child{font-size:13px;line-height:1.8;color:var(--muted);max-width:28ch;margin:0}
+.home-page .home-video-featured .home-film-layout{display:block;min-width:0;width:100%}
+.home-page .home-video-featured .home-film-main .home-film-button{aspect-ratio:16/9;border-radius:30px}
+.home-page .home-video-featured .home-film-main .home-film-button img{object-fit:contain}
+.home-page .home-video-featured .home-film-caption{margin-top:19px}
+.home-page .home-video-featured .home-film-caption h3{font-size:23px}
+.home-page .home-video-gallery-first .home-film-foot{margin-top:52px}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){.home-page .home-video-collections .album-card:hover{border-color:color-mix(in srgb,var(--accent) 35%,var(--line));box-shadow:inset 0 1px 0 var(--border-lit),0 12px 35px #0000000b}}
+@media(max-width:1050px){.home-page .home-video-collections .album-grid{gap:24px}.home-page .home-video-collections .album-card-copy{padding:20px 13px 15px}.home-page .home-video-collections .album-card-copy h3{font-size:28px}.home-page .home-video-featured{grid-template-columns:minmax(180px,.4fr) minmax(0,1fr);gap:28px}.home-video-featured-heading h3{font-size:31px}}
+@media(max-width:760px){
+ .home-page .home-video-gallery-first .home-heading{margin-bottom:30px}
+ .home-page .home-video-collections{--video-rail-inset:5.4vw;padding:0;margin:0;border:0}
+ .home-page .home-video-collections .album-grid{display:flex;gap:16px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--video-rail-inset);margin-inline:calc(-1 * var(--video-rail-inset));padding:4px var(--video-rail-inset) 17px;scrollbar-width:none}
+ .home-page .home-video-collections .album-grid::-webkit-scrollbar{display:none}
+ .home-page .home-video-collections .album-card{flex:0 0 88%;min-width:0;padding:8px;border-radius:29px;scroll-snap-align:start;scroll-snap-stop:normal}
+ .home-page .home-video-collections .album-card-image{aspect-ratio:1.18;border-radius:22px}
+ .home-page .home-video-collections .album-card-type{left:15px;top:15px;font-size:9px}
+ .home-page .home-video-collections .album-card-copy{padding:22px 13px 16px}
+ .home-page .home-video-collections .album-card-copy h3{font-size:28px;margin-bottom:9px}
+ .home-page .home-video-collections .album-card-copy>p{font-size:12px;line-height:1.75}
+ .home-page .home-video-collections .album-card-action{font-size:11px;padding-inline:16px;margin-top:20px}
+ .home-video-swipe-hint{display:block;font-size:11px;line-height:1.6;color:var(--muted);margin:4px 0 0}
+ .home-page .home-video-featured{display:block;margin-top:48px;padding-top:36px}
+ .home-video-featured-heading{padding-top:0;margin-bottom:27px}
+ .home-video-featured-heading h3{font-size:31px;margin:13px 0 15px}
+ .home-video-featured-heading h3 br{display:none}
+ .home-video-featured-heading>p:last-child{font-size:12px;max-width:36ch}
+ .home-page .home-video-featured .home-film-main .home-film-button{border-radius:27px}
+ .home-page .home-video-featured .home-film-caption h3{font-size:22px}
+ .home-page .home-video-gallery-first .home-film-foot{margin-top:36px}
+}
+@media(max-width:480px){.home-page .home-video-collections{--video-rail-inset:6vw}}
+@media(max-width:360px){.home-page .home-video-collections .album-card-copy h3{font-size:25px}.home-page .home-video-collections .album-card-copy{padding-inline:10px}.home-video-featured-heading h3{font-size:28px}}
+@media(prefers-reduced-motion:reduce){.home-page .home-video-collections .album-card{transition:none}.home-page .home-video-collections .album-grid{scroll-behavior:auto}}

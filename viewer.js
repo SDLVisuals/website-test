@@ -471,7 +471,8 @@
   // Wait for published photos before capturing slide and viewer elements.
   const startAfterCMS = () => {
     const ready = window.SDLCMSReady;
-    if (ready && typeof ready.then === 'function') ready.then(start, start);
+    const staticEquipmentPage = window.location?.pathname?.split('/').pop() === 'gear.html';
+    if (!staticEquipmentPage && ready && typeof ready.then === 'function') ready.then(start, start);
     else start();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startAfterCMS, { once: true });

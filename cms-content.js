@@ -201,13 +201,17 @@
       const main = unified
         ? filmVideos.find(item => item.featured && item.showOnHome) || filmVideos.find(item => item.showOnHome)
         : videos.find(item => item.featured && item.showOnHome) || videos.find(item => item.showOnHome && item.category !== 'drone');
-      if (layout && mainTemplate && sideTemplate) {
+      const featureSection = doc.querySelector('.home-video-featured');
+      if (featureSection) videoVisibility(featureSection, !!main);
+      if (layout && mainTemplate) {
         const rows = [];
         if (main) {
           rows.push(makeHomeMain(mainTemplate, main));
-          const side = doc.createElement('div'); side.className = 'home-film-side';
-          side.append(...filmVideos.filter(item => item.showOnHome && (unified || item.category !== 'drone') && item !== main).slice(0, 3).map(item => makeHomeSmall(sideTemplate, item)));
-          rows.push(side);
+          if (sideTemplate) {
+            const side = doc.createElement('div'); side.className = 'home-film-side';
+            side.append(...filmVideos.filter(item => item.showOnHome && (unified || item.category !== 'drone') && item !== main).slice(0, 3).map(item => makeHomeSmall(sideTemplate, item)));
+            rows.push(side);
+          }
         } else { const empty = doc.createElement('p'); empty.textContent = 'Ontdek mijn videowerk of bespreek jouw filmidee.'; rows.push(empty); }
         layout.replaceChildren(...rows);
       }
@@ -371,8 +375,14 @@
     if (first) image.setAttribute('fetchpriority', 'high');
     const ratio = item.width / item.height;
     const mobileSizes = `(max-width:760px) max(calc(100vw - 18px), calc(${(ratio * 100).toFixed(3)}svh - ${(ratio * 260).toFixed(2)}px)), 100vw`;
+    const picture = doc.createElement('picture');
+    const inactive = doc.createElement('source');
+    inactive.setAttribute('media', mode === 'mobile' ? '(min-width:1101px)' : '(max-width:1100px)');
+    inactive.setAttribute('srcset', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+    picture.append(inactive, image);
+    button.append(picture);
+    // Set real image URLs only after the native media guard is in place.
     setImage(image, item, mode === 'mobile' ? mobileSizes : '100vw');
-    button.append(image);
     return button;
   }
   function makeHero(doc, rows, track) {
@@ -715,6 +725,18 @@
     applyAlbumLists(content, doc);
     doc.documentElement.dataset.cmsRevision = String(payload.revision);
   }
+  function navigationData(payload) {
+    const content = payload.content;
+    return {
+      revision: payload.revision,
+      galleries: content.galleries.filter(gallery => gallery.stage === 'upcoming' || galleryHasMedia(gallery, content)).map(gallery => ({
+        key: gallery.key, title: gallery.title, path: gallery.path,
+        kind: gallery.kind || 'photo', stage: gallery.stage || 'published',
+        photoCount: gallery.stage === 'upcoming' ? 0 : gallery.photos.length,
+        videoCount: gallery.stage === 'upcoming' ? 0 : galleryVideos(gallery, content).length
+      }))
+    };
+  }
   async function readJSON(response) {
     if (!response.ok || !/^application\/json\b/i.test(response.headers.get('content-type') || '')) throw new Error('Publicatie niet beschikbaar.');
     const length = Number(response.headers.get('content-length'));
@@ -742,23 +764,30 @@
   async function run(config, scope) {
     if (!config?.enabled) return { applied: false, reason: 'disabled' };
     if (config.endpoint !== ENDPOINT) return { applied: false, reason: 'configuration' };
-    const controller = new scope.AbortController();
+    const prefetched = scope.SDLCMSPrefetch;
+    const early = prefetched?.endpoint === ENDPOINT && !prefetched.used ? prefetched : null;
+    if (early) { early.used = true; early.release?.(); }
+    const controller = early?.controller || new scope.AbortController();
     const timeoutMs = Math.max(250, Math.min(10000, Number(config.timeoutMs) || 8000));
+    const elapsed = early ? Math.max(0, Date.now() - early.startedAt) : 0;
+    const remainingMs = Math.max(250, timeoutMs - elapsed);
     let timer;
     try {
       const deadline = new Promise((_, reject) => {
-        timer = scope.setTimeout(() => { controller.abort(); reject(new Error('Publicatie duurt te lang.')); }, timeoutMs);
+        timer = scope.setTimeout(() => { controller.abort(); reject(new Error('Publicatie duurt te lang.')); }, remainingMs);
       });
-      const request = scope.fetch(ENDPOINT, { credentials: 'omit', mode: 'cors', cache: 'no-cache', signal: controller.signal })
+      const request = (early?.response || scope.fetch(ENDPOINT, { credentials: 'omit', mode: 'cors', cache: 'no-cache', signal: controller.signal }))
         .then(readJSON).then(normalizePayload);
       const payload = await Promise.race([request, deadline]);
       applyContent(payload, scope.document, scope.location);
-      scope.document.dispatchEvent(new scope.CustomEvent('sdl:content-updated', { detail: { revision: payload.revision } }));
+      const navigation = navigationData(payload);
+      scope.SDLCMSNavigation = navigation;
+      scope.document.dispatchEvent(new scope.CustomEvent('sdl:content-updated', { detail: { revision: payload.revision, navigation } }));
       return { applied: true, revision: payload.revision };
     } catch (_) {
       // Never replace a finished page with an error screen or partial CMS data.
       return { applied: false, reason: 'fallback' };
     } finally { scope.clearTimeout(timer); }
   }
-  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, applyComingSoon, comingSoonDestination, readJSON, run, ENDPOINT, CMS_ORIGIN };
+  return { imageURL, photo, videoSource, normalizeVideos, normalizePayload, applyContent, applyVideos, applyComingSoon, comingSoonDestination, navigationData, readJSON, run, ENDPOINT, CMS_ORIGIN };
 });
