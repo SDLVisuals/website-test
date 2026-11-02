@@ -86,6 +86,7 @@
     let focused = false, visible = true, keyboardNavigation = false;
     let introPending = !reduce.matches;
     let moving = false, pending = null, preparing = null, drag = null, suppressUntil = 0;
+    let presented = -1, presentationManual = false;
     let frame = 0, fallback = 0, autoTimer = 0, deadline = 0, remaining = interval;
     const unavailable = new Set();
     const nextAvailable = (from,direction = 1) => {
@@ -172,7 +173,7 @@
       const left = button.offsetLeft - (rail.clientWidth-button.offsetWidth)/2;
       rail.scrollTo({left:Math.max(0,left),behavior:reduce.matches?'auto':'smooth'});
     };
-    const mark = manual => {
+    const mark = () => {
       slides.forEach((slide,index) => {
         const current = index === active;
         slide.classList.toggle('is-active',current);
@@ -181,6 +182,15 @@
         slide.inert = !current;
       });
       controls.forEach(button => button.setAttribute('aria-pressed',String(button.dataset.homeCategory === categoryOf(active))));
+      paint();
+      revealControl();
+      warmNeighbours();
+    };
+    // Keep the caption and destination with the displayed photograph until its move finishes.
+    const present = manual => {
+      if (presented === active) return;
+      presented = active;
+      hero.dataset.presentedCategory = categoryOf(active);
       label.textContent = labels[active];
       collection.href = slides[active].dataset.route;
       collection.setAttribute('aria-label',`Bekijk de serie ${labels[active].toLowerCase()}`);
@@ -212,9 +222,6 @@
       }
       if (counter) counter.textContent = `${String(active+1).padStart(2,'0')} / ${String(count).padStart(2,'0')}`;
       if (manual) status.textContent = `${active+1} van ${count}. ${labels[active]}.`;
-      paint();
-      revealControl();
-      warmNeighbours();
     };
     const finish = () => {
       clearTimeout(fallback);
@@ -223,6 +230,7 @@
       else if (physical === count+1) { physical = 1; position(true); }
       moving = false;
       track.classList.remove('is-moving');
+      present(presentationManual);
       const next = pending;
       pending = null;
       if (next) go(next.index,next.manual,next.direction);
@@ -267,7 +275,8 @@
       active = index;
       physical = nextPhysical;
       elapsed = 0; photoElapsed = photoClocks[index];
-      mark(manual);
+      presentationManual = manual;
+      mark();
       const jump = manual && direction === 0 && steps > 1;
       beginMove(skipBrokenFrames || jump);
       if (jump && !reduce.matches) track.animate([{opacity:.3},{opacity:1}],{duration:650,easing:'ease-out'});
@@ -367,7 +376,7 @@
       physical = active+1;
       track.classList.remove('is-dragging','is-moving');
       hero.classList.remove('is-hero-dragging');
-      position(true); warmNeighbours();
+      position(true); present(presentationManual); warmNeighbours();
       const bounds = hero.getBoundingClientRect();
       visible = bounds.bottom > 0 && bounds.top < innerHeight;
       sync();
@@ -390,7 +399,7 @@
       clearTimeout(fallback); moving = false; pending = null; preparing = null; drag = null;
       physical = active+1;
       track.classList.remove('is-dragging','is-moving'); hero.classList.remove('is-hero-dragging');
-      position(true); revealControl(); warmNeighbours(); sync();
+      position(true); present(presentationManual); revealControl(); warmNeighbours(); sync();
     },{passive:true});
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); },{threshold:.1}).observe(hero);
@@ -444,7 +453,7 @@
     if (copy && 'ResizeObserver' in window) {
       new ResizeObserver(() => hero.style.setProperty('--showcase-copy-height', `${copy.offsetHeight}px`)).observe(copy);
     }
-    mark(false); position(true); sync();
+    mark(); present(false); position(true); sync();
   };
   // Wait for published photos before capturing slide and viewer elements.
   const startAfterCMS = () => {

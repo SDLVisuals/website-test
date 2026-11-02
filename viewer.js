@@ -7,6 +7,19 @@
     if (provider === 'youtube' && /^[A-Za-z0-9_-]{11}$/.test(source || '')) return `https://www.youtube-nocookie.com/embed/${source}${autoplay ? '?autoplay=1&rel=0' : '?rel=0'}`;
     return '';
   };
+  const thumbnailSource = (image, fallback) => {
+    const candidates = (image?.getAttribute('srcset') || '').split(',').map(candidate => {
+      const match = candidate.trim().match(/^(.*?)\s+(\d+(?:\.\d+)?)w$/);
+      return match ? { src: match[1], width: Number(match[2]) } : null;
+    }).filter(Boolean).sort((a, b) => a.width - b.width);
+    return candidates[0]?.src || image?.currentSrc || image?.getAttribute('src') || fallback;
+  };
+  const photoVariant = button => {
+    const image = button.querySelector('img');
+    const src = button.dataset.photo;
+    const title = button.dataset.caption || button.dataset.title || image?.alt || 'Fotografie · SDL Visuals';
+    return { button, src, thumbnail: thumbnailSource(image, src), title, alt: image?.alt || title, format: button.dataset.format || 'portrait' };
+  };
   const start = () => {
     const triggers = [...document.querySelectorAll('button[data-photo],button[data-video],button[data-video-src]')];
     if (!triggers.length || document.getElementById('work-viewer')) return;
@@ -21,7 +34,8 @@
       if (!photo && !native && !filmURL(provider, video)) return;
       const type = photo ? 'photo' : native ? 'native' : 'film';
       const src = photo || native || video;
-      const key = `${type}:${provider}:${src}`;
+      const homeSlide = photo && button.closest('[data-home-slide]');
+      const key = homeSlide ? `home-photo:${homeSlide.dataset.homeSlide}` : `${type}:${provider}:${src}`;
       let index = lookup.get(key);
       if (index === undefined) {
         const image = button.querySelector('img');
@@ -29,8 +43,9 @@
         const title = button.dataset.caption || button.dataset.title || image?.alt || (photo ? 'Fotografie · SDL Visuals' : 'Een film van SDL Visuals');
         index = library.length;
         lookup.set(key, index);
-        library.push({ type, src, provider, poster: type === 'photo' ? src : poster, title, alt: image?.alt || title, format: button.dataset.format || 'portrait' });
+        library.push({ type, src, provider, poster, thumbnail: thumbnailSource(image, poster || src), title, alt: image?.alt || title, format: button.dataset.format || 'portrait', variants: homeSlide ? [] : null });
       }
+      if (homeSlide) library[index].variants.push(photoVariant(button));
       triggerIndexes.set(button, index);
     });
     if (!library.length) return;
@@ -75,7 +90,62 @@
     let swipe = null;
 
     let thumbnails = [];
+    let thumbnailObserver = null;
+    let thumbnailFrame = 0;
+    const pendingThumbnails = new Map();
+    const warmPhotos = new Map();
+    const clearWarmPhotos = () => {
+      warmPhotos.forEach(image => image.removeAttribute('src'));
+      warmPhotos.clear();
+    };
+    const preloadAdjacent = index => {
+      const neighbours = [media[index - 1], media[index + 1]].filter(item => item?.type === 'photo');
+      const keep = new Set(neighbours.map(item => item.src));
+      warmPhotos.forEach((image, src) => {
+        if (!keep.has(src)) { image.removeAttribute('src'); warmPhotos.delete(src); }
+      });
+      neighbours.forEach(item => {
+        if (warmPhotos.has(item.src)) return;
+        const image = document.createElement('img');
+        image.loading = 'eager'; image.decoding = 'async'; image.setAttribute('fetchpriority', 'low');
+        warmPhotos.set(item.src, image); image.src = item.src;
+      });
+    };
+    const loadThumbnail = button => {
+      const pending = pendingThumbnails.get(button);
+      if (!pending) return;
+      pending.image.src = pending.src;
+      pendingThumbnails.delete(button);
+      thumbnailObserver?.unobserve(button);
+    };
+    const loadVisibleThumbnails = () => {
+      thumbnailFrame = 0;
+      if (!dialog.open) return;
+      const bounds = strip.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      let remaining = Math.min(28, Math.ceil(bounds.width / 50) + 4);
+      for (const button of pendingThumbnails.keys()) {
+        const item = button.getBoundingClientRect();
+        if (item.right >= bounds.left - 80 && item.left <= bounds.right + 80 && item.bottom > bounds.top && item.top < bounds.bottom) {
+          loadThumbnail(button);
+          if (!--remaining) break;
+        }
+      }
+    };
+    const startThumbnailLoading = () => {
+      if (!dialog.open || !pendingThumbnails.size) return;
+      if ('IntersectionObserver' in window) {
+        if (!thumbnailObserver) thumbnailObserver = new IntersectionObserver(entries => {
+          if (!dialog.open) return;
+          entries.forEach(entry => { if (entry.isIntersecting) loadThumbnail(entry.target); });
+        }, { root: strip, rootMargin: '0px 80px', threshold: 0 });
+        pendingThumbnails.forEach((_, button) => thumbnailObserver.observe(button));
+      } else if (!thumbnailFrame) thumbnailFrame = requestAnimationFrame(loadVisibleThumbnails);
+    };
     const buildThumbnails = () => {
+      thumbnailObserver?.disconnect(); thumbnailObserver = null;
+      if (thumbnailFrame) cancelAnimationFrame(thumbnailFrame);
+      thumbnailFrame = 0; pendingThumbnails.clear();
       strip.replaceChildren();
       thumbnails = media.map((item, index) => {
       const button = document.createElement('button');
@@ -83,13 +153,14 @@
       button.className = 'work-viewer-thumb';
       button.setAttribute('aria-label', `${index + 1}. ${item.title}`);
       button.title = item.title;
-      if (item.poster) {
+      if (item.thumbnail || item.poster) {
         const image = document.createElement('img');
-        image.loading = 'lazy';
+        image.loading = 'eager';
         image.decoding = 'async';
-        image.src = item.poster;
+        image.setAttribute('fetchpriority', 'low');
         image.alt = '';
         button.append(image);
+        pendingThumbnails.set(button, { image, src: item.thumbnail || item.poster });
       } else {
         const fallback = document.createElement('span');
         fallback.className = 'work-viewer-thumb-fallback';
@@ -202,6 +273,9 @@
         canvas.className = 'work-viewer-canvas';
         photoImage = document.createElement('img');
         photoImage.className = 'work-viewer-image';
+        photoImage.loading = 'eager';
+        photoImage.decoding = 'async';
+        photoImage.setAttribute('fetchpriority', 'high');
         photoImage.alt = item.alt;
         photoImage.draggable = false;
         photoImage.addEventListener('load', () => {
@@ -210,6 +284,7 @@
           syncZoom();
           fit();
           if (direction && !reduced.matches) canvas.classList.add(direction > 0 ? 'is-swipe-next' : 'is-swipe-previous');
+          preloadAdjacent(index);
         });
         photoImage.addEventListener('error', () => showError(item, token));
         photoImage.src = item.src;
@@ -252,13 +327,25 @@
         strip.scrollTo({ left: strip.scrollLeft + thumbBounds.right - stripBounds.right + edge, behavior: reduced.matches ? 'instant' : 'smooth' });
       }
       status.textContent = `${index + 1} van ${media.length}. ${item.title}`;
+      // The selected photograph/player starts first. Only nearby small previews follow.
+      startThumbnailLoading();
     };
 
     triggerIndexes.forEach((index, button) => button.addEventListener('click', () => {
       opener = button;
       const item = library[index];
       const selectedCollection = item.type === 'photo' ? 'photo' : 'film';
-      if (collection !== selectedCollection) {
+      if (selectedCollection === 'photo') {
+        clearWarmPhotos();
+        collections.photo.forEach(photo => {
+          if (!photo.variants) return;
+          // Inactive slides still have layout; only CSS-hidden device variants are excluded.
+          const visible = photo.variants.filter(variant => variant.button.getClientRects().length > 0);
+          const variant = visible.find(variant => variant.button === button) || visible[0] || photo.variants[0];
+          Object.assign(photo, { src: variant.src, thumbnail: variant.thumbnail, poster: variant.thumbnail, title: variant.title, alt: variant.alt, format: variant.format });
+        });
+      } else clearWarmPhotos();
+      if (collection !== selectedCollection || selectedCollection === 'photo') {
         collection = selectedCollection;
         media = collections[collection];
         dialog.dataset.mediaType = collection;
@@ -329,7 +416,7 @@
     document.addEventListener('fullscreenchange', () => {
       fullscreen.textContent = document.fullscreenElement === dialog ? 'Venster herstellen' : 'Volledig scherm';
       fullscreen.setAttribute('aria-pressed', String(document.fullscreenElement === dialog));
-      requestAnimationFrame(fit);
+      scheduleFit();
     });
     dialog.addEventListener('keydown', event => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest?.('video,iframe,input,textarea,select')) return;
@@ -351,14 +438,24 @@
     });
     dialog.addEventListener('close', () => {
       cleanup();
+      clearWarmPhotos();
+      thumbnailObserver?.disconnect(); thumbnailObserver = null;
+      if (thumbnailFrame) cancelAnimationFrame(thumbnailFrame);
+      thumbnailFrame = 0;
+      if (resizeFrame) cancelAnimationFrame(resizeFrame);
+      resizeFrame = 0;
       if (document.fullscreenElement === dialog) document.exitFullscreen().catch(() => {});
       if (opener?.isConnected) opener.focus({ preventScroll: true });
       opener = null;
     });
-    window.addEventListener('resize', () => {
+    const scheduleFit = () => {
       if (!dialog.open || resizeFrame) return;
-      resizeFrame = requestAnimationFrame(() => { resizeFrame = 0; fit(); });
-    }, { passive: true });
+      resizeFrame = requestAnimationFrame(() => { resizeFrame = 0; fit(); if (!('IntersectionObserver' in window)) startThumbnailLoading(); });
+    };
+    window.addEventListener('resize', scheduleFit, { passive: true });
+    window.visualViewport?.addEventListener('resize', scheduleFit, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(scheduleFit).observe(stage);
+    strip.addEventListener('scroll', () => { if (!('IntersectionObserver' in window)) startThumbnailLoading(); }, { passive: true });
   };
   // Wait for published photos before capturing slide and viewer elements.
   const startAfterCMS = () => {

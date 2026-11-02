@@ -204,6 +204,12 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
 /* Keep both faces in view when this portrait-format couple photo spans a wide screen. */
 @media(min-width:1101px){.showcase-slide-couple .showcase-desktop-photo img{object-position:50% 20%!important}}
 
+/* Single photos use the same full-frame crop shown in the editor. */
+@media(min-width:1101px){
+ .showcase-slide-auto .showcase-desktop-photo img,
+ .showcase-slide-product:not(.showcase-product-pair) .showcase-desktop-photo img{object-fit:cover}
+}
+
 /* On a phone, frame the photograph above the copy instead of cropping it to the full screen height. */
 @media(max-width:760px){
  .showcase-frame,.showcase-hero .home-slide,.showcase-photo{background:transparent}
@@ -224,6 +230,6 @@ html[data-theme="light"] .showcase-pause{border-color:#ffffff90;background:#ffff
 }
 
 @media(max-width:760px){
- .showcase-frame:has(.showcase-slide-product.is-active) .showcase-series{color:#202020;text-shadow:0 1px 10px #ffffffb3}
- .showcase-frame:has(.showcase-slide-product.is-active) .showcase-collection{color:#202020;background:#ffffffad;border-color:#ffffffe0}
+ .showcase-hero[data-presented-category="product"] .showcase-frame .showcase-series{color:#202020;text-shadow:0 1px 10px #ffffffb3}
+ .showcase-hero[data-presented-category="product"] .showcase-frame .showcase-collection{color:#202020;background:#ffffffad;border-color:#ffffffe0}
 }
