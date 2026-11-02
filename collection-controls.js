@@ -15,7 +15,7 @@
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     let names = cards.map((card, index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
     const section = rail.closest('.home-work');
-    let selected = -1, requested = null, frame = 0, settleTimer = 0;
+    let selected = -1, requested = null, frame = 0, settleTimer = 0, layoutDirty = true, lastScrolling;
     const clamp = index => Math.max(0, Math.min(cards.length - 1, index));
     const createChoices = () => cards.map((card, index) => {
       const button = document.createElement('button');
@@ -59,14 +59,15 @@
         imageTop += element.offsetTop;
         element = element.offsetParent;
       }
-      controls.style.top = `${Math.round(imageTop + image.offsetHeight + 12)}px`;
+      controls.style.top = `${Math.round(imageTop + image.offsetHeight + 8)}px`;
     };
     const sync = () => {
       frame = 0;
       const maximum = Math.max(0, rail.scrollWidth - rail.clientWidth);
       const scrolling = maximum > 3 && /auto|scroll/.test(getComputedStyle(rail).overflowX);
-      controls.hidden = !scrolling;
-      if (!scrolling) { requested = null; placeControls(false); return; }
+      if (controls.hidden === scrolling) controls.hidden = !scrolling;
+      if (scrolling !== lastScrolling) { layoutDirty = true; lastScrolling = scrolling; }
+      if (!scrolling) { requested = null; if (layoutDirty) placeControls(false); layoutDirty = false; return; }
       const padding = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
       const start = rail.getBoundingClientRect().left + padding;
       let closest = 0, distance = Infinity;
@@ -84,9 +85,10 @@
         choices.scrollTo?.({left:Math.max(0,button.offsetLeft - (choices.clientWidth-button.offsetWidth)/2),behavior:reduced.matches?'auto':'smooth'});
       }
       edges();
-      placeControls(true);
+      if (layoutDirty) { placeControls(true); layoutDirty = false; }
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(sync); };
+    const scheduleLayout = () => { layoutDirty = true; schedule(); };
     const release = () => { clearTimeout(settleTimer); requested = null; schedule(); };
     const settling = () => { clearTimeout(settleTimer); settleTimer = setTimeout(release, 180); };
     const navigate = index => {
@@ -121,22 +123,23 @@
     rail.addEventListener('scrollend', release, { passive: true });
     rail.addEventListener('pointerdown', release, { passive: true });
     rail.addEventListener('wheel', release, { passive: true });
-    addEventListener('resize', release, { passive: true });
-    window.visualViewport?.addEventListener('resize',schedule,{passive:true});
+    addEventListener('resize', () => { layoutDirty = true; release(); }, { passive: true });
+    window.visualViewport?.addEventListener('resize',scheduleLayout,{passive:true});
     document.addEventListener('sdl:content-updated',() => {
+      layoutDirty = true;
       cards = [...rail.querySelectorAll('.home-work-card')];
       if (!cards.length) { controls.hidden = true; placeControls(false); return; }
       names = cards.map((card,index) => card.querySelector('h3')?.textContent.trim() || `Serie ${index + 1}`);
       buttons = createChoices(); choices.replaceChildren(...buttons);
       selected = -1; requested = null; schedule();
     });
-    addEventListener('pageshow', schedule);
+    addEventListener('pageshow', scheduleLayout);
     if ('ResizeObserver' in window) {
-      const observer = new ResizeObserver(schedule);
+      const observer = new ResizeObserver(scheduleLayout);
       observer.observe(rail); observer.observe(controls);
       if (section) observer.observe(section);
     }
-    document.fonts?.ready.then(schedule);
+    document.fonts?.ready.then(scheduleLayout);
     controls.dataset.collectionReady = 'true';
     sync();
   };

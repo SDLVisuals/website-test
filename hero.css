@@ -66,7 +66,7 @@ html[data-theme="light"] .showcase-next{color:#242424}
 html[data-theme="light"] .showcase-footer{background:linear-gradient(120deg,#ffffffb0,#ffffff55);color:#242424;border-color:#ffffffaa;box-shadow:inset 0 1px 0 #ffffffb0}
 .showcase-footer-caption{flex:1;font-size:10px;line-height:1.6;opacity:.8}
 .showcase-footer-caption strong{font-weight:500}
-.showcase-tabs{flex:0 1 auto;gap:6px;align-items:center;overflow:auto;padding:0;scroll-snap-type:x proximity;scrollbar-width:none;touch-action:pan-x}
+.showcase-tabs{flex:0 1 auto;gap:6px;align-items:center;overflow:auto;padding:0;scroll-snap-type:x proximity;scrollbar-width:none;touch-action:pan-x pan-y}
 .showcase-tabs button{position:relative;display:flex;gap:13px;align-items:center;min-width:88px;min-height:46px;padding:12px 18px;border:1px solid transparent;border-radius:14px;background:transparent;color:inherit;font-size:12px;white-space:nowrap;overflow:hidden;transition:background .3s,border-color .3s,box-shadow .3s}
 .showcase-tabs button:hover{background:#ffffff15}
 .showcase-tabs button[aria-pressed="true"]{background:#ffffff19;border-color:#ffffff45;box-shadow:inset 0 1px 0 #ffffff25}

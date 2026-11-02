@@ -11,10 +11,9 @@
   document.addEventListener('gesturestart', preventPageGesture, { capture: true, passive: false });
   document.addEventListener('gesturechange', preventPageGesture, { capture: true, passive: false });
 
-  /* A normal one-finger scroll, photo swipe or tap is never cancelled here. */
-  document.addEventListener('touchmove', event => {
-    if (event.touches.length > 1) preventPageGesture(event);
-  }, { capture: true, passive: false });
+  /* CSS touch-action on html permits native panning without page pinch zoom.
+     Do not add a non-passive document touchmove listener: even when it only
+     cancels multi-touch, every one-finger scroll must first wait for that JS. */
 
   /* Double-tap zoom is handled by CSS touch-action, not by cancelling touchend:
      cancelling touchend would also lose legitimate repeated button presses.
