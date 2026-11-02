@@ -15,6 +15,7 @@
   const GALLERIES = Object.values(ROUTES).map(path => path.slice(0, -5));
   const COMING_SOON_GRADIENTS = ['ruby', 'violet', 'midnight', 'silver'];
   const COMING_SOON_DEFAULT = [{ id: 'communiefotografie', title: 'Communiefotografie', description: 'Communiefotografie komt binnenkort bij SDL Visuals. Meer informatie volgt.', visible: true, gradient: 'ruby', destination: { type: 'contact' } }];
+  const GALLERY_KINDS = { photo: 'Fotografie', video: 'Videografie', drone: 'Drone' };
   const MAX_BYTES = 2 * 1024 * 1024;
   const fail = () => { throw new Error('Ongeldige gepubliceerde fotocollectie.'); };
   const plain = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -160,9 +161,16 @@
     write(article.querySelector('p'), item.description);
     return article;
   }
-  function applyVideos(videos, doc, filename) {
+  function applyVideos(videos, doc, filename, requestedFilm, content) {
     if (!videos) return;
-    const featured = videos.find(item => item.featured) || videos[0];
+    const unified = content?.galleryModel === 2;
+    const albumVideos = kind => {
+      const ids = [...new Set(content.galleries.filter(gallery => gallery.kind === kind && gallery.stage === 'published').flatMap(gallery => gallery.videoIds))];
+      return ids.map(id => videos.find(video => video.id === id)).filter(Boolean);
+    };
+    const filmVideos = unified ? albumVideos('video') : videos;
+    const droneVideos = unified ? albumVideos('drone') : videos.filter(item => item.category === 'drone');
+    const featured = (requestedFilm && videos.find(item => item.id === requestedFilm)) || filmVideos.find(item => item.featured) || filmVideos[0];
     if (filename === 'Video.html') {
       const feature = doc.querySelector('.film-featured');
       const projects = doc.querySelector('.film-projects');
@@ -190,18 +198,20 @@
       const layout = doc.querySelector('.home-film-layout');
       const mainTemplate = layout?.querySelector('.home-film-main');
       const sideTemplate = layout?.querySelector('.home-film-small');
-      const main = videos.find(item => item.featured && item.showOnHome) || videos.find(item => item.showOnHome && item.category !== 'drone');
+      const main = unified
+        ? filmVideos.find(item => item.featured && item.showOnHome) || filmVideos.find(item => item.showOnHome)
+        : videos.find(item => item.featured && item.showOnHome) || videos.find(item => item.showOnHome && item.category !== 'drone');
       if (layout && mainTemplate && sideTemplate) {
         const rows = [];
         if (main) {
           rows.push(makeHomeMain(mainTemplate, main));
           const side = doc.createElement('div'); side.className = 'home-film-side';
-          side.append(...videos.filter(item => item.showOnHome && item.category !== 'drone' && item !== main).slice(0, 3).map(item => makeHomeSmall(sideTemplate, item)));
+          side.append(...filmVideos.filter(item => item.showOnHome && (unified || item.category !== 'drone') && item !== main).slice(0, 3).map(item => makeHomeSmall(sideTemplate, item)));
           rows.push(side);
         } else { const empty = doc.createElement('p'); empty.textContent = 'Ontdek mijn videowerk of bespreek jouw filmidee.'; rows.push(empty); }
         layout.replaceChildren(...rows);
       }
-      const drone = videos.find(item => item.category === 'drone' && item.showOnHome);
+      const drone = (unified && droneVideos.find(item => item.featured && item.showOnHome)) || droneVideos.find(item => item.showOnHome);
       const figure = doc.querySelector('.home-drone-media');
       if (figure) {
         videoVisibility(figure, !!drone);
@@ -210,7 +220,7 @@
     }
     if (filename === 'drone.html') {
       const figure = doc.querySelector('.drone-film-card');
-      const drone = videos.find(item => item.category === 'drone');
+      const drone = (unified && droneVideos.find(item => item.featured)) || droneVideos[0];
       if (figure) {
         videoVisibility(figure, !!drone);
         if (drone) {
@@ -241,19 +251,29 @@
   function normalizePayload(payload) {
     if (!plain(payload) || payload.version !== 1 || !Number.isInteger(payload.revision) || payload.revision < 0) return fail();
     const content = payload.content;
-    if (!plain(content) || content.version !== 1 || !Array.isArray(content.galleries) || content.galleries.length < 6 || content.galleries.length > 30
+    const unified = content?.galleryModel === 2;
+    if (!plain(content) || content.version !== 1 || !Array.isArray(content.galleries) || (!unified && content.galleries.length < 6) || content.galleries.length > 60
       || !Array.isArray(content.hero) || content.hero.length < 1 || content.hero.length > 24) return fail();
-    const galleries = content.galleries.map(value => {
+    const galleries = content.galleries.filter(value => !unified || value?.stage !== 'draft').map(value => {
       if (!plain(value) || typeof value.key !== 'string' || !/^[a-z][a-z0-9-]{1,47}$/.test(value.key)
         || value.path !== (GALLERIES.includes(value.key) ? `${value.key}.html` : `galerij.html?serie=${value.key}`)
         || !Array.isArray(value.photos) || value.photos.length > 500) return fail();
-      const photos = value.photos.map(photo);
+      const kind = value.kind || 'photo';
+      const stage = value.stage || 'published';
+      if (!Object.hasOwn(GALLERY_KINDS, kind) || !['upcoming', 'published'].includes(stage)
+        || (GALLERIES.includes(value.key) && kind !== 'photo') || !COMING_SOON_GRADIENTS.includes(value.gradient || 'ruby')) return fail();
+      // Upcoming media is deliberately never read, rendered or turned into image requests.
+      const photos = stage === 'published' && kind !== 'video' ? value.photos.map(photo) : [];
       if (new Set(photos.map(item => item.id)).size !== photos.length) return fail();
-      const title = text(value.title, 80);
+      const title = text(value.title, 100);
       if (!title.trim()) return fail();
-      return { key: value.key, title, path: value.path, description: value.description === undefined ? undefined : text(value.description, 600), cover: photo(value.cover), photos };
+      let videoIds = stage === 'published' && kind !== 'photo' ? value.videoIds || [] : [];
+      if (!Array.isArray(videoIds) || videoIds.length > 100 || videoIds.some(value => typeof value !== 'string' || !/^[A-Za-z0-9_-]{1,120}$/.test(value)) || new Set(videoIds).size !== videoIds.length) return fail();
+      return { key: value.key, title, path: value.path, description: value.description === undefined ? undefined : text(value.description, 600),
+        cover: stage === 'published' && value.cover ? photo(value.cover) : null, photos, kind, stage, videoIds,
+        gradient: value.gradient || 'ruby', planning: text(value.planning, 80) };
     });
-    if (new Set(galleries.map(item => item.key)).size !== galleries.length || !GALLERIES.every(key => galleries.some(item => item.key === key))
+    if (new Set(galleries.map(item => item.key)).size !== galleries.length || (!unified && !GALLERIES.every(key => galleries.some(item => item.key === key)))
       || galleries.reduce((total, item) => total + item.photos.length, 0) > 2500) return fail();
     const hero = content.hero.map(value => {
       if (!plain(value) || !Object.hasOwn(ROUTES, value.category) || value.route !== ROUTES[value.category]) return fail();
@@ -264,7 +284,7 @@
       };
     });
     if (new Set(hero.map(item => item.id)).size !== hero.length || hero.some(item => !item.id || item.motion !== undefined && (!Number.isFinite(item.motion) || item.motion < 0 || item.motion > .08))) return fail();
-    const announcements = content.comingSoon === undefined ? COMING_SOON_DEFAULT : content.comingSoon;
+    const announcements = unified ? [] : content.comingSoon === undefined ? COMING_SOON_DEFAULT : content.comingSoon;
     if (!Array.isArray(announcements) || announcements.length > 20) return fail();
     const comingSoon = announcements.map(value => {
       if (!plain(value) || typeof value.visible !== 'boolean' || !COMING_SOON_GRADIENTS.includes(value.gradient || 'ruby')) return fail();
@@ -283,7 +303,11 @@
       return item;
     });
     if (new Set(comingSoon.map(item => item.id)).size !== comingSoon.length) return fail();
-    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleries, hero, videos: normalizeVideos(content.videos), comingSoon } };
+    const videos = normalizeVideos(content.videos);
+    // A v2 publication exposes films only when an actual published album references them.
+    const publicVideoIds = new Set(galleries.filter(item => item.stage === 'published').flatMap(item => item.videoIds));
+    const publicVideos = unified && videos ? videos.filter(item => publicVideoIds.has(item.id)) : videos;
+    return { version: 1, revision: payload.revision, publishedAt: text(payload.publishedAt, 80), content: { version: 1, galleryModel: unified ? 2 : undefined, galleries, hero, videos: publicVideos, comingSoon } };
   }
   const viewerSource = photo => photo.srcset?.length ? photo.srcset[photo.srcset.length - 1].src : photo.src;
   function setImage(image, item, sizes) {
@@ -380,13 +404,19 @@
     });
     return fragment;
   }
-  function applyGalleryNavigation(galleries, doc, currentPath) {
-    const visible = galleries.filter(item => item.photos.length || item.path === currentPath);
+  const galleryVideos = (gallery, content = {}) => (gallery.videoIds || []).map(id => content.videos?.find(video => video.id === id)).filter(Boolean);
+  const galleryHasMedia = (gallery, content) => gallery.stage === 'published' && (gallery.photos.length > 0 || galleryVideos(gallery, content).length > 0);
+  const galleryCover = (gallery, content) => gallery.cover || gallery.photos[0] || galleryVideos(gallery, content)[0]?.poster;
+  function galleryCount(gallery, content) {
+    const photos = gallery.photos.length, videos = galleryVideos(gallery, content).length;
+    return [photos && `${photos} ${photos === 1 ? 'foto' : 'foto’s'}`, videos && `${videos} ${videos === 1 ? 'film' : 'films'}`].filter(Boolean).join(' · ');
+  }
+  function applyGalleryNavigation(galleries, doc, currentPath, content, kind = 'photo') {
+    const visible = galleries.filter(item => item.kind === kind && galleryHasMedia(item, content));
     const categories = doc.querySelector('.portfolio-categories');
     const sheet = doc.querySelector('.gallery-collection-grid');
     [categories, sheet].filter(Boolean).forEach(nav => {
       const detailed = nav === sheet;
-      const retained = [...nav.children].filter(link => ['Video.html', 'drone.html'].includes(link.getAttribute('href')));
       const links = visible.map(item => {
         const link = doc.createElement('a');
         link.className = detailed ? 'gallery-collection-option' : 'portfolio-category';
@@ -394,21 +424,26 @@
         if (item.path === currentPath) link.setAttribute('aria-current', 'page');
         if (detailed) {
           const image = doc.createElement('img'); image.loading = 'lazy';
-          setImage(image, item.cover, '64px'); image.alt = '';
+          setImage(image, galleryCover(item, content), '64px'); image.alt = '';
           const label = doc.createElement('span'); label.textContent = item.title;
           if (item.path === currentPath) { const current = doc.createElement('small'); current.textContent = 'Nu bekeken'; label.append(current); }
           link.append(image, label);
         } else link.textContent = item.title;
         return link;
       });
-      nav.replaceChildren(...links, ...retained);
+      const rubrics = [{kind:'photo',label:'Fotografie',path:'index.html#fotografie'}, {kind:'video',label:'Videografie',path:'Video.html'}, {kind:'drone',label:'Drone',path:'drone.html'}];
+      const crossLinks = rubrics.filter(item => item.kind !== kind).map(item => {
+        const link = doc.createElement('a'); link.className = detailed ? 'gallery-collection-option gallery-rubric-link' : 'portfolio-category';
+        link.href = item.path; const label = doc.createElement('span'); label.textContent = item.label; link.append(label); return link;
+      });
+      nav.replaceChildren(...links, ...crossLinks);
     });
   }
   function applyHomeGalleries(galleries, doc) {
     const rail = doc.querySelector('.home-work-ordered');
     if (!rail) return;
     const originals = new Map([...rail.querySelectorAll('.home-work-card')].map(card => [card.getAttribute('href'), card]));
-    const visible = galleries.filter(item => item.photos.length);
+    const visible = galleries.filter(item => item.kind === 'photo' && item.stage === 'published' && item.photos.length);
     const cards = visible.map(item => {
       const original = originals.get(item.path);
       const card = original ? original.cloneNode(true) : doc.createElement('a');
@@ -424,7 +459,7 @@
       write(card.querySelector('h3'), item.title);
       if (item.description !== undefined || !original) write(card.querySelector('p'), item.description || 'Een selectie uit mijn werk.');
       const image = card.querySelector('.home-work-image img');
-      if (image) setImage(image, item.cover, '(max-width:760px) 86vw, 40vw');
+      if (image) setImage(image, item.cover || item.photos[0], '(max-width:760px) 86vw, 40vw');
       return card;
     });
     rail.replaceChildren(...cards);
@@ -433,6 +468,75 @@
       empty.textContent = 'Nieuwe fotoseries verschijnen binnenkort. Vertel me gerust wat je in gedachten hebt.'; rail.append(empty);
     }
     write(doc.querySelector('#fotografie .service-meta'), `${visible.length} ${visible.length === 1 ? 'serie' : 'series'} om te ontdekken`);
+  }
+  function makeAlbumCard(gallery, doc, content) {
+    const card = doc.createElement('a'); card.className = 'album-card'; card.href = gallery.path;
+    card.dataset.albumKey = gallery.key; card.dataset.albumKind = gallery.kind;
+    const frame = doc.createElement('span'); frame.className = 'album-card-image';
+    const image = doc.createElement('img'); image.loading = 'lazy';
+    setImage(image, galleryCover(gallery, content), '(max-width:600px) 90vw, (max-width:1000px) 45vw, 30vw');
+    const type = doc.createElement('span'); type.className = 'album-card-type'; type.textContent = GALLERY_KINDS[gallery.kind];
+    frame.append(image, type);
+    const copy = doc.createElement('span'); copy.className = 'album-card-copy';
+    const title = doc.createElement('h3'); title.textContent = gallery.title;
+    const count = doc.createElement('span'); count.className = 'album-card-count'; count.textContent = galleryCount(gallery, content);
+    const description = doc.createElement('p'); description.textContent = gallery.description || (gallery.kind === 'video' ? 'Een verhaal in beeld en geluid.' : 'Een ander perspectief op mijn werk.');
+    const action = doc.createElement('span'); action.className = 'album-card-action'; action.textContent = gallery.kind === 'video' ? 'Bekijk de videogalerij' : gallery.kind === 'drone' ? 'Bekijk de dronegalerij' : 'Bekijk de fotogalerij';
+    copy.append(title, count, description, action); card.append(frame, copy); return card;
+  }
+  function applyAlbumLists(content, doc) {
+    if (content.galleryModel !== 2) return;
+    doc.querySelectorAll('[data-album-list]').forEach(grid => {
+      const kind = grid.dataset.albumList;
+      const galleries = content.galleries.filter(item => item.kind === kind && galleryHasMedia(item, content));
+      grid.classList.add('album-grid');
+      grid.replaceChildren(...galleries.map(item => makeAlbumCard(item, doc, content)));
+      const section = grid.closest('[data-album-section]');
+      if (section) section.hidden = section.hasAttribute('data-album-hide-empty') && !galleries.length;
+      if (grid.classList.contains('film-projects')) {
+        write(doc.querySelector('#film-selection-title'), 'Videogalerijen.');
+        write(section?.querySelector('.film-section-heading>p'), 'Kies een galerij en ontdek de films die bij het verhaal horen.');
+      }
+      if (!galleries.length && !section?.hasAttribute('data-album-hide-empty')) {
+        const empty = doc.createElement('p'); empty.className = 'album-empty'; empty.textContent = 'Nieuwe galerijen verschijnen binnenkort. Bespreek intussen gerust jouw idee.';
+        const contact = doc.createElement('a'); contact.href = 'contact.html'; contact.textContent = 'Neem contact op'; empty.append(doc.createElement('br'), contact); grid.append(empty);
+      }
+    });
+  }
+  function makeAlbumVideo(item, doc) {
+    const article = doc.createElement('article'); article.className = `album-video-card album-video-${item.format}`;
+    const button = doc.createElement('button'); button.type = 'button'; button.className = 'album-video-play';
+    const image = doc.createElement('img'); image.loading = 'lazy'; button.append(image);
+    patchVideo(button, item);
+    const watch = doc.createElement('span'); watch.className = 'album-video-watch';
+    const play = doc.createElement('span'); play.className = 'album-video-play-icon'; play.setAttribute('aria-hidden', 'true');
+    const label = doc.createElement('span'); label.textContent = 'Bekijk de film'; watch.append(play, label); button.append(watch);
+    const caption = doc.createElement('div'); caption.className = 'album-video-caption';
+    const title = doc.createElement('h3'); title.textContent = item.title;
+    const duration = doc.createElement('span'); duration.textContent = item.duration || VIDEO_CATEGORIES[item.category];
+    const description = doc.createElement('p'); description.textContent = item.description;
+    caption.append(title, duration, description); article.append(button, caption); return article;
+  }
+  function makeUpcomingCard(item, doc, heading = 'h3') {
+    const card = doc.createElement('article'); card.className = `coming-soon-card coming-soon-${item.gradient || 'ruby'}`;
+    card.dataset.comingSoonId = item.key; card.dataset.albumKind = item.kind;
+    const top = doc.createElement('div'); top.className = 'coming-soon-card-top';
+    const label = doc.createElement('p'); label.className = 'coming-soon-label'; label.textContent = 'Binnenkort bij SDL Visuals';
+    const badge = doc.createElement('span'); badge.className = 'coming-soon-badge'; badge.textContent = GALLERY_KINDS[item.kind]; top.append(label, badge);
+    const copy = doc.createElement('div'); copy.className = 'coming-soon-copy';
+    const title = doc.createElement(heading); title.textContent = item.title;
+    const description = doc.createElement('p'); description.textContent = item.description || 'Een nieuw verhaal is in aantocht. Meer informatie volgt.'; copy.append(title, description);
+    const foot = doc.createElement('div'); foot.className = 'coming-soon-foot';
+    const planning = doc.createElement('span'); planning.textContent = item.planning || 'Meer informatie volgt';
+    const contact = doc.createElement('a'); contact.className = 'coming-soon-action'; contact.href = 'contact.html'; contact.textContent = 'Ik heb interesse'; contact.setAttribute('aria-label', `Meer informatie over ${item.title.toLowerCase()}`);
+    foot.append(planning, contact); card.append(top, copy, foot); return card;
+  }
+  function applyUpcomingGalleries(content, doc) {
+    const section = doc.querySelector('[data-coming-soon]'), grid = section?.querySelector('[data-coming-soon-grid]');
+    if (!section || !grid) return;
+    const upcoming = content.galleries.filter(item => item.stage === 'upcoming');
+    section.hidden = !upcoming.length;
+    grid.replaceChildren(...upcoming.map(item => makeUpcomingCard(item, doc)));
   }
   function comingSoonDestination(item, content = {}) {
     const fallback = { href: 'contact.html', label: 'Ik heb interesse', kind: 'contact', targetTitle: item.title };
@@ -477,31 +581,65 @@
       foot.append(planning, action); card.append(top, copy, foot); return card;
     }));
   }
-  function applyCustomGallery(gallery, doc) {
+  function applyUnavailableBaseGallery(gallery, doc) {
+    const main = doc.querySelector('main');
+    if (!main) return;
+    const section = doc.createElement('section'); section.className = 'custom-gallery-empty wrap';
+    if (gallery?.stage === 'upcoming') section.append(makeUpcomingCard(gallery, doc, 'h1'));
+    else {
+      const label = doc.createElement('p'); label.className = 'eyebrow'; label.textContent = 'SDL Visuals / Galerijen';
+      const title = doc.createElement('h1'); title.textContent = 'Een verhaal om te ontdekken.';
+      const description = doc.createElement('p'); description.textContent = 'Deze galerij is nog niet beschikbaar. Ontdek mijn andere galerijen of vertel me wat je in gedachten hebt.';
+      const action = doc.createElement('a'); action.className = 'clarity-action clarity-primary'; action.href = 'index.html#fotografie'; action.textContent = 'Ontdek mijn werk';
+      section.append(label, title, description, action);
+    }
+    const contact = main.querySelector('.contact-section');
+    main.replaceChildren(section, ...(contact ? [contact] : []));
+    doc.querySelector('meta[name="robots"]')?.setAttribute('content', 'noindex, follow');
+  }
+  function applyCustomGallery(gallery, doc, content) {
     if (!doc.body.hasAttribute('data-custom-gallery')) return;
     const empty = doc.querySelector('[data-custom-gallery-empty]');
     const contents = doc.querySelector('[data-custom-gallery-content]');
-    if (empty) empty.hidden = !!gallery;
-    if (contents) contents.hidden = !gallery;
-    if (!gallery) return;
-    const description = gallery.description || `Ontdek ${gallery.title.toLowerCase()} in een fotoreportage van SDL Visuals.`;
-    const title = `${gallery.title} | Fotografie door SDL Visuals`;
-    const canonical = `https://sdlvisuals.be/${gallery.path}`;
+    const preview = doc.querySelector('[data-custom-gallery-upcoming]');
+    const upcoming = gallery?.stage === 'upcoming';
+    const published = !!gallery && galleryHasMedia(gallery, content);
+    if (empty) empty.hidden = upcoming || published;
+    if (contents) contents.hidden = !published;
+    if (preview) { preview.hidden = !upcoming; preview.replaceChildren(...(upcoming ? [makeUpcomingCard(gallery, doc, 'h1')] : [])); }
+    if (!upcoming && !published) return;
+    const description = gallery.description || (upcoming ? 'Een nieuw verhaal is in aantocht. Meer informatie volgt.' : 'Ontdek deze galerij van SDL Visuals.');
+    const title = gallery.title + ' | ' + (upcoming ? 'Binnenkort bij SDL Visuals' : GALLERY_KINDS[gallery.kind] + ' door SDL Visuals');
+    const canonical = 'https://sdlvisuals.be/' + gallery.path;
     doc.title = title;
     const meta = (selector, value) => doc.querySelector(selector)?.setAttribute('content', value);
     meta('meta[name="description"]', description);
-    meta('meta[name="robots"]', 'index, follow, max-image-preview:large');
+    meta('meta[name="robots"]', upcoming ? 'noindex, follow' : 'index, follow, max-image-preview:large');
     meta('meta[property="og:title"]', title); meta('meta[property="og:description"]', description);
-    meta('meta[property="og:url"]', canonical); meta('meta[property="og:image"]', gallery.cover.src);
-    meta('meta[property="og:image:alt"]', gallery.cover.alt);
+    meta('meta[property="og:url"]', canonical);
     meta('meta[name="twitter:title"]', title); meta('meta[name="twitter:description"]', description);
-    meta('meta[name="twitter:image"]', gallery.cover.src);
     doc.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical);
+    if (upcoming) {
+      meta('meta[property="og:image"]', ''); meta('meta[property="og:image:alt"]', ''); meta('meta[name="twitter:image"]', '');
+      return;
+    }
+    const cover = galleryCover(gallery, content);
+    meta('meta[property="og:image"]', cover.src); meta('meta[property="og:image:alt"]', cover.alt); meta('meta[name="twitter:image"]', cover.src);
     write(doc.querySelector('#collection-title'), gallery.title);
     write(doc.querySelector('.collection-hero-lead'), description);
+    write(doc.querySelector('.collection-hero-copy>.eyebrow'), GALLERY_KINDS[gallery.kind] + ' / Galerij');
     write(doc.querySelector('.collection-breadcrumb [aria-current="page"]'), gallery.title);
+    write(doc.querySelector('#gallery-title'), gallery.kind === 'video' ? 'Videogalerij' : gallery.kind === 'drone' ? 'Dronegalerij' : 'Fotogalerij');
     const schema = doc.querySelector('[data-custom-gallery-schema]');
-    if (schema) schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description, url: canonical, inLanguage: 'nl-BE', isPartOf: { '@id': 'https://sdlvisuals.be/#website' }, primaryImageOfPage: { '@type': 'ImageObject', contentUrl: gallery.cover.src, caption: gallery.cover.alt } });
+    if (schema) schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description, url: canonical, inLanguage: 'nl-BE', isPartOf: { '@id': 'https://sdlvisuals.be/#website' }, primaryImageOfPage: { '@type': 'ImageObject', contentUrl: cover.src, caption: cover.alt } });
+    const films = galleryVideos(gallery, content);
+    const filmSection = doc.querySelector('[data-gallery-films]');
+    const filmGrid = filmSection?.querySelector('[data-gallery-film-grid]');
+    if (filmSection && filmGrid) { filmSection.hidden = !films.length; filmGrid.replaceChildren(...films.map(item => makeAlbumVideo(item, doc))); }
+    const photoGrid = doc.querySelector('[data-gallery]');
+    if (photoGrid) photoGrid.hidden = !gallery.photos.length;
+    const view = doc.querySelector('.gallery-view-switch');
+    if (view) view.hidden = !gallery.photos.length;
   }
   function applyContent(payload, doc, location) {
     const { content } = payload;
@@ -510,23 +648,25 @@
     const requested = filename === 'galerij.html' ? new URLSearchParams(location.search || '').get('serie') : null;
     const currentPath = requested ? `galerij.html?serie=${requested}` : filename;
     const gallery = content.galleries.find(item => item.path === currentPath);
-    const galleryElement = gallery && doc.querySelector('[data-gallery]');
+    if (content.galleryModel === 2 && GALLERIES.some(key => `${key}.html` === filename) && (!gallery || !galleryHasMedia(gallery, content))) applyUnavailableBaseGallery(gallery, doc);
+    const galleryElement = gallery?.stage === 'published' && doc.querySelector('[data-gallery]');
     const track = isHome && doc.querySelector('.home-slide-track');
     // Build replacements while detached: malformed data cannot leave half of a gallery on screen.
     const galleryFragment = galleryElement ? makeGallery(doc, gallery) : null;
     const heroFragment = track ? makeHero(doc, content.hero, track) : null;
     if (galleryElement) {
       galleryElement.replaceChildren(galleryFragment);
-      const count = `${gallery.photos.length} ${gallery.photos.length === 1 ? 'foto' : 'foto’s'}`;
+      const count = galleryCount(gallery, content) || 'Nog geen beelden';
       doc.querySelectorAll('.gallery-collection-title>p,.gallery-category-current>small').forEach(node => { node.textContent = count; });
       const explore = doc.querySelector('.collection-explore');
       if (explore) explore.textContent = `Bekijk de ${count}`;
       const cover = doc.querySelector('.collection-hero-media img');
-      if (cover) setImage(cover, gallery.cover, '(max-width:760px) 100vw, 75vw');
+      const galleryPhoto = galleryCover(gallery, content);
+      if (cover && galleryPhoto) setImage(cover, galleryPhoto, '(max-width:760px) 100vw, 75vw');
       write(doc.querySelector('.gallery-category-current>strong'), gallery.title);
     }
-    applyCustomGallery(gallery?.photos.length ? gallery : null, doc);
-    applyGalleryNavigation(content.galleries, doc, currentPath);
+    applyCustomGallery(gallery, doc, content);
+    applyGalleryNavigation(content.galleries, doc, currentPath, content, gallery?.kind || 'photo');
     if (track) {
       track.replaceChildren(heroFragment);
       const first = content.hero[0];
@@ -565,8 +705,14 @@
       const nextButton = doc.querySelector('[data-showcase-next]');
       if (nextButton) nextButton.setAttribute('aria-label', `Bekijk de volgende foto: ${next.label.toLowerCase()}`);
     }
-    if (isHome) { applyHomeGalleries(content.galleries, doc); applyComingSoon(content.comingSoon || COMING_SOON_DEFAULT, doc, content); }
-    applyVideos(content.videos, doc, filename);
+    if (isHome) {
+      applyHomeGalleries(content.galleries, doc);
+      if (content.galleryModel === 2) applyUpcomingGalleries(content, doc);
+      else applyComingSoon(content.comingSoon || COMING_SOON_DEFAULT, doc, content);
+    }
+    const requestedFilm = filename === 'Video.html' ? new URLSearchParams(location.search || '').get('film') : null;
+    applyVideos(content.videos, doc, filename, requestedFilm, content);
+    applyAlbumLists(content, doc);
     doc.documentElement.dataset.cmsRevision = String(payload.revision);
   }
   async function readJSON(response) {

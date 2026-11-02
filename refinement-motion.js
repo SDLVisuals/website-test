@@ -6,8 +6,8 @@
     if (root.classList.contains('refinement-ready')) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-    const cards = '.home-work-card,.home-film-main,.home-film-small,.home-drone-media,.home-about-photo,.coming-soon-card,.portfolio-gallery>figure,.portfolio-video,.film-featured,.film-project,.film-service,.gear-opening-photo,.gear-detail-photo,.gear-camera,.gear-tool,.gear-drone,.drone-film-card,.drone-equipment,.ig-card,.service-directory nav>a';
-    const blocks = '.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.coming-soon-heading,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading,.home-film-foot,.collection-browser';
+    const cards = '.home-work-card,.home-film-main,.home-film-small,.home-drone-media,.home-about-photo,.coming-soon-card,.album-card,.album-video-card,.portfolio-gallery>figure,.portfolio-video,.film-featured,.film-project,.film-service,.gear-opening-photo,.gear-detail-photo,.gear-camera,.gear-tool,.gear-drone,.drone-film-card,.drone-equipment,.ig-card,.service-directory nav>a';
+    const blocks = '.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.coming-soon-heading,.album-section-heading,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading,.home-film-foot,.collection-browser';
     const liftTargets = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media,.clarity-action,.home-work-open';
     // Home photo movement and full-photo viewers already have dedicated controllers.
     const mediaTargets = '.collection-hero-media,.film-project--portrait .film-project-play,.portfolio-feature:not([data-photo])';
