@@ -7,6 +7,8 @@
     if (!body.classList.contains('home-page')) return;
     const hero = document.querySelector('.showcase-hero,.home-hero');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const nativeMedia = matchMedia('(max-width:760px), (pointer:coarse)');
+    const mediaEnabled = () => !reduced.matches && !nativeMedia.matches;
     const photoSelector = '.home-work-image,.home-film-button,.home-about-photo';
     const frames = [...document.querySelectorAll(photoSelector)];
     const photoStates = new Map();
@@ -106,14 +108,10 @@
           state.ready = true;
         }
       });
-      if (hero) {
-        const bounds = hero.getBoundingClientRect();
-        hero.style.setProperty('--showcase-scroll',clamp(-bounds.top/Math.max(bounds.height,1),0,1).toFixed(4));
-      }
     };
     const paint = now => {
       tick = 0;
-      if (reduced.matches || document.hidden) { lastPaint = 0; return; }
+      if (!mediaEnabled() || document.hidden) { lastPaint = 0; return; }
       if (targetsDirty) measure();
       const time = Number.isFinite(now) ? now : performance.now();
       const delta = lastPaint ? Math.min(64,time-lastPaint) : 16;
@@ -137,7 +135,7 @@
     };
     const schedule = () => {
       targetsDirty = true;
-      if (!tick && !document.hidden && !reduced.matches) tick = requestAnimationFrame(paint);
+      if (!tick && !document.hidden && mediaEnabled()) tick = requestAnimationFrame(paint);
     };
     const show = element => {
       element.classList.add('is-scene-visible');
@@ -145,11 +143,11 @@
     };
     const applyPreference = () => {
       observer?.disconnect();
-      root.classList.toggle('home-motion-enhanced',!reduced.matches);
+      root.classList.toggle('home-motion-enhanced',mediaEnabled());
       root.classList.toggle('home-scenes-enabled',!reduced.matches);
       frames.forEach(frame => {
-        frame.toggleAttribute('data-home-media',!reduced.matches);
-        if (reduced.matches) {
+        frame.toggleAttribute('data-home-media',mediaEnabled());
+        if (!mediaEnabled()) {
           frame.style.removeProperty('--home-media-scale');
           frame.style.removeProperty('--home-media-inset');
           frame.style.removeProperty('--home-media-shift');
@@ -166,13 +164,11 @@
           if (!scene.classList.contains('is-scene-visible')) observer.observe(scene);
         });
       }
-      if (reduced.matches) {
+      if (!mediaEnabled()) {
         if (tick) cancelAnimationFrame(tick);
         tick = 0; lastPaint = 0; photoStates.clear();
-        hero?.style.removeProperty('--showcase-scroll');
-        clearTimeout(introTimer);
-        completeIntro();
       } else { targetsDirty = true; paint(); }
+      if (reduced.matches) { clearTimeout(introTimer); completeIntro(); }
     };
 
     applyPreference();
@@ -191,7 +187,7 @@
       }
       document.querySelectorAll(photoSelector).forEach(frame => {
         if (!frames.includes(frame)) {
-          frames.push(frame); frame.toggleAttribute('data-home-media',!reduced.matches);
+          frames.push(frame); frame.toggleAttribute('data-home-media',mediaEnabled());
           frame.querySelector('img')?.addEventListener('load',schedule,{once:true});
         }
       });
@@ -203,6 +199,8 @@
       if (scene) show(scene);
     });
     frames.forEach(frame => frame.querySelector('img')?.addEventListener('load',schedule,{once:true}));
+    if (nativeMedia.addEventListener) nativeMedia.addEventListener('change',applyPreference);
+    else nativeMedia.addListener(applyPreference);
     if (reduced.addEventListener) reduced.addEventListener('change',applyPreference);
     else reduced.addListener(applyPreference);
   };

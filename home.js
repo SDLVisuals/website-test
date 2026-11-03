@@ -292,9 +292,27 @@
       if (moving) fallback = setTimeout(finish,1200);
       else { moving = true; finish(); }
     };
+    const interruptTransition = () => {
+      // Fresh input owns the carousel. Settle the incoming photo and its caption
+      // before allowing a tap/swipe, and discard any stale decode continuation.
+      pending = null;
+      preparing = null;
+      if (moving || fadeLayer) {
+        clearTimeout(fallback);
+        clearFade();
+        moving = false;
+        physical = active+1;
+        track.classList.remove('is-moving');
+        position(true);
+        present(true);
+      }
+      introPending = false;
+      stopAuto(false); remaining = interval;
+      sync();
+    };
     const go = (index,manual = false,direction = 0) => {
       if (index === null || index < 0 || index >= count || unavailable.has(index)) { sync(); return; }
-      if (manual) { introPending = false; }
+      if (manual) { introPending = false; if (moving || fadeLayer || preparing) interruptTransition(); }
       if (moving) { pending = {index,manual,direction}; sync(); return; }
       if (index === active) { preparing = null; stopAuto(false); remaining = interval; position(); sync(); return; }
       if (!slideReady(index)) {
@@ -376,7 +394,10 @@
     /* A tap opens the photograph; a horizontal gesture slides the track. */
     viewport.addEventListener('pointerdown',event => {
       if (event.isPrimary === false && drag) { drag = null; track.classList.remove('is-dragging'); hero.classList.remove('is-hero-dragging'); position(); sync(); return; }
-      if (moving || event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      if (moving || fadeLayer || preparing) interruptTransition();
+      // A new contact is a real new gesture, not the synthetic click from the last swipe.
+      suppressUntil = 0;
       drag = {id:event.pointerId,x:event.clientX,y:event.clientY,dx:0,started:performance.now(),locked:false};
       sync();
     });
@@ -418,7 +439,10 @@
     window.addEventListener('pointerup',event => endDrag(event));
     window.addEventListener('pointercancel',event => endDrag(event,true));
     hero.addEventListener('click',event => {
-      if (viewport.contains(event.target) && (fadeLayer || performance.now()<suppressUntil)) { event.preventDefault(); event.stopImmediatePropagation(); }
+      if (!viewport.contains(event.target)) return;
+      if (performance.now()<suppressUntil) { event.preventDefault(); event.stopImmediatePropagation(); return; }
+      // Keyboard and assistive activation may arrive without a pointerdown.
+      if (moving || fadeLayer || preparing) interruptTransition();
     },true);
     const recover = () => {
       drag = null; pending = null; preparing = null; moving = false;

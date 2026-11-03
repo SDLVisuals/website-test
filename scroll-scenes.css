@@ -60,3 +60,11 @@
   }
   .home-page [data-home-media] img{transform:none!important;clip-path:none!important;will-change:auto}
 }
+
+/* Native phone swipes keep image geometry stable. Entrances and hero fades
+   still animate, without recropping every photograph on each scroll frame. */
+@media(max-width:760px),(pointer:coarse){
+ html body.home-page .home-work-image img,
+ html body.home-page .home-film-button img,
+ html body.home-page .home-about-photo img{transform:none!important;scale:none!important;clip-path:none!important;will-change:auto!important}
+}

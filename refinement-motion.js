@@ -9,6 +9,8 @@
     const cards = '.home-work-card,.home-film-main,.home-film-small,.home-drone-media,.home-about-photo,.coming-soon-card,.album-card,.album-video-card,.portfolio-gallery>figure,.portfolio-video,.film-featured,.film-project,.film-service,.gear-opening-photo,.gear-detail-photo,.gear-camera,.gear-tool,.gear-drone,.drone-film-card,.drone-equipment,.ig-card,.service-directory nav>a';
     const blocks = '.home-video-featured-heading,.home-heading,.home-drone-copy,.home-about-copy,.home-contact-inner,.coming-soon-heading,.album-section-heading,.portfolio-gallery-heading,.portfolio-step,.portfolio-process>h2,.contact-panel,.film-section-heading,.film-approach>div,.film-approach li,.gear-section-heading,.gear-next,.drone-film-copy,.instagram-heading,.home-film-foot,.collection-browser';
     const liftTargets = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media,.album-card-image,.album-video-play,.clarity-action,.button,.home-btn,.coming-soon-action,.service-directory nav>a';
+    const galleryRails = '.home-work-ordered,[data-album-list]';
+    const mediaSurfaces = '.home-work-image,.home-film-button,.portfolio-image,.film-featured-play,.film-project-play,.gear-photo,.drone-film-button,.ig-card-media,.album-card-image,.album-video-play,.home-about-photo,.about-story-photo';
     // Home photo movement and full-photo viewers already have dedicated controllers.
     const mediaTargets = '.collection-hero-media,.film-project--portrait .film-project-play,.portfolio-feature:not([data-photo])';
     const registered = new Set();
@@ -39,17 +41,22 @@
       if (!element.isConnected || !element.parentElement) return;
       if (reduced.matches || document.hidden || typeof element.animate !== 'function' || element.contains(document.activeElement)) return;
       const card = element.dataset.refineReveal === 'card';
+      const rail = card && element.closest(galleryRails);
+      const mobileSwipeCard = innerWidth <= 760 && rail && /auto|scroll/.test(getComputedStyle(rail).overflowX);
       const siblings = [...element.parentElement.children].filter(sibling => sibling.hasAttribute('data-refine-reveal'));
       const columns = innerWidth <= 760 ? 1 : innerWidth <= 1050 ? 2 : 3;
       const delay = card ? Math.max(0, siblings.indexOf(element)) % columns * 70 : 0;
       const offset = innerWidth <= 760 ? 18 : 28;
       // Text fades as one intact block. Only complete cards settle into position.
-      const keyframes = card
+      // A native scroll-snap target stays at its final geometry while swiping.
+      const keyframes = mobileSwipeCard
+        ? [{ opacity: .5 }, { opacity: 1 }]
+        : card
         ? [{ opacity: .18, translate: `0 ${offset}px`, scale: '.985' }, { opacity: 1, translate: '0 0', scale: '1' }]
         : [{ opacity: .35, translate: '0 6px' }, { opacity: 1, translate: '0 0' }];
       element.classList.add('is-refine-entering');
       const animation = element.animate(keyframes, {
-        duration: card ? 860 : 620, delay, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards'
+        duration: mobileSwipeCard ? 380 : card ? 860 : 620, delay, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards'
       });
       animations.set(element, animation);
       const finish = () => {
@@ -157,6 +164,11 @@
       if (event.pointerType === 'touch') clearHover();
       if (reduced.matches || event.isPrimary === false) return;
       const target = event.target.closest?.('.refine-lift');
+      // Touching a photograph usually starts a pan. Keep that surface steady;
+      // actual action buttons retain their press feedback.
+      const directPointer = event.pointerType === 'touch' || event.pointerType === 'pen';
+      if (directPointer && target && (target.matches(mediaSurfaces) ||
+          (target.closest(galleryRails) && !target.matches('.clarity-action,.button,.home-btn,button')))) return;
       if (target) { pressed = target; target.classList.add('is-refine-pressed'); }
     }, { passive: true });
     addEventListener('pointerup', clearPress, { passive: true });
