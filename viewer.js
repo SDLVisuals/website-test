@@ -441,7 +441,7 @@
       const bounds = dialog.getBoundingClientRect();
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
     });
-    dialog.addEventListener('close', () => {
+    const releaseViewer = (restoreFocus = true) => {
       cleanup();
       clearWarmPhotos();
       thumbnailObserver?.disconnect(); thumbnailObserver = null;
@@ -450,8 +450,19 @@
       if (resizeFrame) cancelAnimationFrame(resizeFrame);
       resizeFrame = 0;
       if (document.fullscreenElement === dialog) document.exitFullscreen().catch(() => {});
-      if (opener?.isConnected) opener.focus({ preventScroll: true });
+      if (restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true });
       opener = null;
+    };
+    dialog.addEventListener('close', () => {
+      // Native close events are queued. A new tap may already have reopened it.
+      if (!dialog.open) releaseViewer();
+    });
+    window.addEventListener('pagehide', () => {
+      // History navigation can freeze this document before its queued close event.
+      // Stop media immediately so returning to the page starts with a closed viewer.
+      opener = null;
+      if (dialog.open) dialog.close();
+      releaseViewer(false);
     });
     const scheduleFit = () => {
       if (!dialog.open || resizeFrame) return;

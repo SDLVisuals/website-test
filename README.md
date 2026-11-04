@@ -1,31 +1,56 @@
 # SDL Visuals
 
-Photography, film and drone portfolio at https://sdlvisuals.be.
+Fotografie, videografie en drone: https://sdlvisuals.be.
 
-## Local preview
+## Project
 
-This is a static HTML, CSS and JavaScript website. No build step is required.
+Dit is de publieke websitecode. HTML, CSS en JavaScript worden rechtstreeks
+door GitHub Pages geserveerd; een bouwstap is niet nodig.
+
+De centrale lokale projectmap is `Documenten/SDL Visuals Website`:
+
+- `Website/`: deze Git-checkout.
+- `Beheer/`: de aparte beheerapp met haar eigen publicatie en opslag.
+- `Onderhoud/`: tests, lokale preview, assetversies en livecontrole.
+- `Documentatie/`: uitleg over bestanden, beheer en publiceren.
+
+Foto's, video's, galerijen en teksten kunnen via de bestaande beheerapp worden
+gepubliceerd. De website leest die inhoud via `cms-content.js`. De broncode
+bevat daarnaast de ingebouwde foto's, films en inhoud voor de eerste weergave.
+
+## Lokale preview
+
+Gebruik `Start website.command` vanuit de centrale projectmap, of:
 
 ```sh
-python3 -m http.server 8766
+python3 ../Onderhoud/preview.py
 ```
 
-Open http://127.0.0.1:8766/index.html.
+Open http://127.0.0.1:8766/index.html. De preview serveert alleen deze map.
 
-## Editing
+## Wegwijzer
 
-- `index.html`: homepage; `glass.html` is the matching local concept alias. Keep their contents aligned.
-- `hero.css`, `home.js`: immersive photo opening and swipe slideshow.
-- `home-motion.js`, `scroll-scenes.css`: scroll-driven image and text reveals.
-- `trouw.html`, `evenementen.html`, `auto.html`, `portret.html`, `koppelshoot.html`, `product.html`: photo galleries.
-- `Video.html`, `drone.html`, `gear.html`: film, drone and equipment pages.
-- `viewer.js`, `viewer.css`, `gallery.css`, `ui.js`, `ui.css`: shared viewers and gallery controls.
-- `assets/`: finished photographs, optimized web videos, logos and equipment imagery.
+- `index.html` en `glass.html`: homepage en identieke bestaande alias.
+- `home.js`, `hero.css`: startscherm en automatische fotoslider.
+- `collection-controls.js`, `collection-controls.css`: compacte seriebediening.
+- `trouw.html`, `evenementen.html`, `portret.html`, `koppelshoot.html`,
+  `auto.html`, `product.html`: fotogalerijen.
+- `Video.html`, `drone.html`, `galerij.html`: film, drone en dynamische galerijen.
+- `gear.html`, `contact.html`: materiaal en contact.
+- `viewer.js`, `viewer.css`: gedeelde foto- en videoviewer.
+- `portfolio-nav.js`, `portfolio-nav.css`: navigatie met categorieën.
+- `cms-content.js`, `cms-config.js`, `cms-prefetch.js`: beheerintegratie.
+- `theme-init.js`: systeem-, lichte en donkere modus.
+- `assets/`: afgewerkte foto's, webvideo's en logo's.
 
-The galleries contain 204 selected photographs. Four film players use Gumlet; two optimized MP4s are served from this repository. External fonts use Google Fonts. Photos in the galleries are photographs, not stills extracted from films.
+## Publicatie
 
-## Hosting
+Behoud `CNAME` en de zelfstandige `nest-homekit`-pagina's. De checkout kan
+sparse zijn; bestanden buiten de lokale werkboom zijn niet automatisch weg
+uit Git of van de live website.
 
-The existing `CNAME` retains the custom domain. Existing files for the separate `nest-homekit` pages are retained.
-
-Before publishing a change, check desktop and mobile framing, both color themes, swipe and keyboard navigation, gallery zoom, video playback and local links. Reduced-motion preferences are respected.
+Controleer relevante tests, telefoon- en desktopbediening, beide thema's en
+lokale koppelingen. Vernieuw CSS/JS-versienummers met
+`python3 ../Onderhoud/version_assets.py`. Publiceer via de bestaande GitHub
+Pages-workflow en controleer dezelfde commit en live bestanden voordat een
+wijziging als gepubliceerd wordt gemeld.
